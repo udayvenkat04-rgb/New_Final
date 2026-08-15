@@ -1,0 +1,47 @@
+[
+  {
+    "id": 1,
+    "sighting_id": 1,
+    "case_id": 2,
+    "confidence_score": 0.914,
+    "matched_at": "2026-08-12T11:15:00",
+    "status": "Verified Match",
+    "match_method": "Auto Face Match"
+  },
+  {
+    "id": 2,
+    "sighting_id": 3,
+    "case_id": 1,
+    "confidence_score": 0.885,
+    "matched_at": "2026-08-10T17:45:00",
+    "status": "Verified Match",
+    "match_method": "Auto Face Match"
+  },
+  {
+    "id": 3,
+    "sighting_id": 4,
+    "case_id": 5,
+    "confidence_score": 0.723,
+    "matched_at": "2026-08-13T08:45:00",
+    "status": "Pending Review",
+    "match_method": "Auto Face Match"
+  },
+  {
+    "id": 4,
+    "sighting_id": 5,
+    "case_id": 6,
+    "confidence_score": 0.942,
+    "matched_at": "2026-08-07T10:30:00",
+    "status": "Verified Match",
+    "match_method": "Auto Face Match"
+  },
+  {
+    "id": 5,
+    "sighting_id": 2,
+    "case_id": 2,
+    "confidence_score": 0.58,
+    "matched_at": "2026-08-13T04:00:00",
+    "status": "False Positive",
+    "match_method": "Auto Face Match"
+  }
+]

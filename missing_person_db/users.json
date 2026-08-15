@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "username": "admin",
+    "password_hash": "$2b$12$TNWgV.Ja5Dc7gMW/gYDz8.82MQiWTubo8LH6HBa3LgrY.6vOGco9C",
+    "role": "admin",
+    "email": "admin@missingtracker.com",
+    "created_at": "2026-08-10T10:00:00"
+  },
+  {
+    "id": 2,
+    "username": "officer",
+    "password_hash": "$2b$12$CSqjEmVpZh9AXoi8Z.5dLenE/5AOOTY4t2E99Ydh5KC8wI7Owa5uW",
+    "role": "officer",
+    "email": "officer@missingtracker.com",
+    "created_at": "2026-08-11T12:00:00"
+  },
+  {
+    "id": 3,
+    "username": "public_user",
+    "password_hash": "$2b$12$x6krgqeYLSpXS94an7jpu.I2gPISgb0vX513iH4kzEeIh6.9VAlHi",
+    "role": "public",
+    "email": "public@missingtracker.com",
+    "created_at": "2026-08-12T09:30:00"
+  }
+]
