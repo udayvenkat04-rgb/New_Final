@@ -281,7 +281,7 @@ with col_form:
             <strong style="font-size: 16px; color: #0f172a; font-weight: 800; letter-spacing: -0.3px;">Finnger / MPIS Portal</strong>
         </div>
         <h1 style="font-size: 42px; font-weight: 800; color: #0f172a; margin-top: 0; margin-bottom: 8px; line-height: 1.15;">
-            Holla,<br/><span style="color: #4f46e5;">Welcome Back</span>
+            Hello,<br/><span style="color: #4f46e5;">Welcome Back</span>
         </h1>
         <p style="color: #94a3b8; font-size: 15px; margin-bottom: 25px;">
             Hey, welcome back to your special place
@@ -291,7 +291,7 @@ with col_form:
 
     # Render Standard Login Form matching input structure in user PNG
     with st.form("login_form", clear_on_submit=False):
-        email = st.text_input("Username / Email", placeholder="stanley@gmail.com or admin")
+        email = st.text_input("Username", placeholder="Enter your username")
         password = st.text_input("Password", type="password", placeholder="••••••••••••")
 
         c1, c2 = st.columns([1, 1], vertical_alignment="center")
@@ -344,11 +344,7 @@ with col_form:
     if st.button("🚨 Visit Public Missing Person Portal (No Login Required)", key="public_portal_btn", use_container_width=True):
         st.switch_page("pages/public_portal.py")
 
-    st.markdown("""
-    <div style="text-align: center; margin-top: 10px;">
-        <span style="font-size: 12px; color: #94a3b8;">ℹ️ Demo Credentials: Admin (<strong>admin</strong> / <strong>admin123</strong>) | Officer (<strong>officer</strong> / <strong>officer123</strong>)</span>
-    </div>
-    """, unsafe_allow_html=True)
+
 
 
 def _get_image_as_base64(file_path):

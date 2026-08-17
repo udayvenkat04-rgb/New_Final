@@ -21,12 +21,21 @@ inject_custom_css()
 # "officer or admin" bug where admins were accidentally treated as officers).
 require_role([ROLE_OFFICER])
 
-st.markdown("<h2 style='color: #10b981;'>👮 Officer Dashboard</h2>", unsafe_allow_html=True)
-st.markdown(
-    "<p style='color: #94a3b8;'>Track your assigned cases, register new bulletins, and verify public sighting reports.</p>",
-    unsafe_allow_html=True,
-)
-st.markdown("---", unsafe_allow_html=True)
+_officer_user = st.session_state.get("user", {})
+st.markdown(f"""
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-bottom: 18px; border-bottom: 1px solid #e2e8f0;">
+    <div>
+        <h1 style="color: #0f172a; margin: 0; font-size: 32px; font-weight: 800; letter-spacing: -0.5px;">Officer Dashboard</h1>
+        <p style="color: #64748b; margin: 4px 0 0 0; font-size: 14px;">Track your assigned cases, register new bulletins, and verify public sighting reports with ease.</p>
+    </div>
+    <div style="text-align: right;">
+        <div style="background: #eef2ff; color: #4f46e5; font-weight: 700; padding: 6px 16px; border-radius: 9999px; font-size: 13px; display: inline-block; margin-bottom: 4px; border: 1px solid #c7d2fe;">
+            👮 {_officer_user.get('username', 'Officer').upper()} (OFFICER)
+        </div>
+        <div style="color: #94a3b8; font-size: 12px;">Last refreshed: {datetime.now().strftime('%H:%M:%S')}</div>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
 # ── Database connection check ─────────────────────────────────────────
 connected, db_msg = check_connection()
@@ -95,15 +104,31 @@ if _data is None:
 # 1. Stat Cards Section — all stats are filtered to the officer
 # ─────────────────────────────────────────────────────────────────────
 
-def _stat_card(label: str, value, color: str, icon: str) -> str:
+def _stat_card(label: str, value, color: str, icon: str, is_hero: bool = False, sub_text: str = "") -> str:
+    """Returns HTML for a single Donezo-style statistic card."""
+    if is_hero:
+        return f"""
+        <div class="donezo-hero-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <span style="font-size: 13.5px; font-weight: 600; opacity: 0.9; text-transform: capitalize;">{label}</span>
+                <span style="background: rgba(255,255,255,0.2); width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px;">↗</span>
+            </div>
+            <h1 style="font-size: 38px; font-weight: 800; margin: 0 0 10px 0; color: #ffffff; line-height: 1;">{value}</h1>
+            <div style="font-size: 11.5px; opacity: 0.85; font-weight: 500;">
+                <span style="background: rgba(255,255,255,0.25); padding: 2px 8px; border-radius: 6px; margin-right: 4px;">↗</span> {sub_text or 'Assigned Bulletins'}
+            </div>
+        </div>
+        """
     return f"""
-    <div class="metric-card" style="border-left-color: {color};">
-        <span style="font-size: 12px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;">
-            {icon} {label}
-        </span>
-        <h2 style="margin: 4px 0 0 0; color: {color}; font-size: 32px; font-weight: 700;">
-            {value}
-        </h2>
+    <div class="donezo-metric-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <span style="font-size: 13.5px; font-weight: 600; color: #64748b; text-transform: capitalize;">{label}</span>
+            <span style="border: 1px solid #e2e8f0; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #64748b;">↗</span>
+        </div>
+        <h1 style="font-size: 36px; font-weight: 800; margin: 0 0 10px 0; color: #0f172a; line-height: 1;">{value}</h1>
+        <div style="font-size: 11.5px; color: #94a3b8; font-weight: 500;">
+            <span style="color: {color}; font-weight: 700; margin-right: 4px;">●</span> {sub_text or 'Live Status'}
+        </div>
     </div>
     """
 
@@ -117,24 +142,25 @@ def render_statistics_cards(d: dict):
     cols = st.columns(4)
     with cols[0]:
         st.markdown(
-            _stat_card("My Total Cases", d["my_total_cases"], "#3b82f6", "📁"),
+            _stat_card("My Total Cases", d["my_total_cases"], "#4f46e5", "📁", is_hero=True, sub_text="Total Bulletins"),
             unsafe_allow_html=True,
         )
     with cols[1]:
         st.markdown(
-            _stat_card("My Active Cases", d["my_active_cases"], "#ef4444", "🔴"),
+            _stat_card("My Active Cases", d["my_active_cases"], "#ef4444", "🔴", sub_text="In Progress"),
             unsafe_allow_html=True,
         )
     with cols[2]:
         st.markdown(
-            _stat_card("My Pending Cases", d["my_pending_cases"], "#f59e0b", "⏳"),
+            _stat_card("My Pending Cases", d["my_pending_cases"], "#f59e0b", "⏳", sub_text="Review Pending"),
             unsafe_allow_html=True,
         )
     with cols[3]:
         st.markdown(
-            _stat_card("My Resolved Cases", d["my_resolved_cases"], "#06b6d4", "🏠"),
+            _stat_card("My Resolved Cases", d["my_resolved_cases"], "#06b6d4", "🏠", sub_text="Successfully Reunited"),
             unsafe_allow_html=True,
         )
+
 
 
 # ─────────────────────────────────────────────────────────────────────

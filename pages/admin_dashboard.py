@@ -74,56 +74,78 @@ if data is None:
 def render_header():
     """Renders the dashboard title, welcome message, and refresh timestamp."""
     user = st.session_state.get("user", {})
-    st.markdown(
-        "<h2 style='color: #10b981; margin-bottom: 0;'>📊 Admin Dashboard</h2>",
-        unsafe_allow_html=True,
-    )
-    st.markdown(
-        f"<p style='color: #94a3b8;'>Welcome, <strong>{user.get('username', 'Admin')}</strong> · "
-        f"Last refreshed: {datetime.now().strftime('%H:%M:%S')}</p>",
-        unsafe_allow_html=True,
-    )
-    st.markdown("---")
+    st.markdown(f"""
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-bottom: 18px; border-bottom: 1px solid #e2e8f0;">
+        <div>
+            <h1 style="color: #0f172a; margin: 0; font-size: 32px; font-weight: 800; letter-spacing: -0.5px;">Dashboard</h1>
+            <p style="color: #64748b; margin: 4px 0 0 0; font-size: 14px;">Plan, prioritize, and accomplish case investigations with ease.</p>
+        </div>
+        <div style="text-align: right;">
+            <div style="background: #eef2ff; color: #4f46e5; font-weight: 700; padding: 6px 16px; border-radius: 9999px; font-size: 13px; display: inline-block; margin-bottom: 4px; border: 1px solid #c7d2fe;">
+                👑 {user.get('username', 'Admin').upper()} (ADMIN)
+            </div>
+            <div style="color: #94a3b8; font-size: 12px;">Last refreshed: {datetime.now().strftime('%H:%M:%S')}</div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
 
 # ──────────────────────────────────────────────────────────────────────
 # 2. Statistic Cards Section
 # ──────────────────────────────────────────────────────────────────────
 
-def _stat_card(label: str, value, color: str, icon: str) -> str:
-    """Returns HTML for a single statistic card."""
+def _stat_card(label: str, value, color: str, icon: str, is_hero: bool = False, sub_text: str = "") -> str:
+    """Returns HTML for a single Donezo-style statistic card."""
+    if is_hero:
+        return f"""
+        <div class="donezo-hero-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <span style="font-size: 13.5px; font-weight: 600; opacity: 0.9; text-transform: capitalize;">{label}</span>
+                <span style="background: rgba(255,255,255,0.2); width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px;">↗</span>
+            </div>
+            <h1 style="font-size: 38px; font-weight: 800; margin: 0 0 10px 0; color: #ffffff; line-height: 1;">{value}</h1>
+            <div style="font-size: 11.5px; opacity: 0.85; font-weight: 500;">
+                <span style="background: rgba(255,255,255,0.25); padding: 2px 8px; border-radius: 6px; margin-right: 4px;">↗</span> {sub_text or 'System Active'}
+            </div>
+        </div>
+        """
     return f"""
-    <div class="metric-card" style="border-left-color: {color};">
-        <span style="font-size: 12px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;">
-            {icon} {label}
-        </span>
-        <h2 style="margin: 4px 0 0 0; color: {color}; font-size: 32px; font-weight: 700;">
-            {value}
-        </h2>
+    <div class="donezo-metric-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <span style="font-size: 13.5px; font-weight: 600; color: #64748b; text-transform: capitalize;">{label}</span>
+            <span style="border: 1px solid #e2e8f0; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #64748b;">↗</span>
+        </div>
+        <h1 style="font-size: 36px; font-weight: 800; margin: 0 0 10px 0; color: #0f172a; line-height: 1;">{value}</h1>
+        <div style="font-size: 11.5px; color: #94a3b8; font-weight: 500;">
+            <span style="color: {color}; font-weight: 700; margin-right: 4px;">●</span> {sub_text or 'Updated live'}
+        </div>
     </div>
     """
 
 
 def render_statistics_cards(d: dict):
-    """Renders the 7+1 required dashboard statistics as cards."""
+    """Renders the 8 dashboard statistics as a perfectly aligned 4x2 grid."""
     row1 = st.columns(4)
-    row2 = st.columns(3)
+    row2 = st.columns(4)
 
     with row1[0]:
-        st.markdown(_stat_card("Total Cases", d["total_cases"], "#3b82f6", "📁"), unsafe_allow_html=True)
+        st.markdown(_stat_card("Total Cases", d["total_cases"], "#4f46e5", "📁", is_hero=True, sub_text="Total Registered"), unsafe_allow_html=True)
     with row1[1]:
-        st.markdown(_stat_card("Active Cases", d["active_cases"], "#ef4444", "🔴"), unsafe_allow_html=True)
+        st.markdown(_stat_card("Active Cases", d["active_cases"], "#ef4444", "🔴", sub_text="Investigation Active"), unsafe_allow_html=True)
     with row1[2]:
-        st.markdown(_stat_card("Pending Review", d["pending_review"], "#f59e0b", "⏳"), unsafe_allow_html=True)
+        st.markdown(_stat_card("Pending Review", d["pending_review"], "#f59e0b", "⏳", sub_text="Requires Attention"), unsafe_allow_html=True)
     with row1[3]:
-        st.markdown(_stat_card("Potential Matches", d["potential_matches"], "#8b5cf6", "🔗"), unsafe_allow_html=True)
+        st.markdown(_stat_card("Potential Matches", d["potential_matches"], "#8b5cf6", "🔗", sub_text="AI Engine Hits"), unsafe_allow_html=True)
 
     with row2[0]:
-        st.markdown(_stat_card("Confirmed Matches", d["confirmed_matches"], "#10b981", "✅"), unsafe_allow_html=True)
+        st.markdown(_stat_card("Confirmed Matches", d["confirmed_matches"], "#10b981", "✅", sub_text="Verified Match"), unsafe_allow_html=True)
     with row2[1]:
-        st.markdown(_stat_card("Resolved Cases", d["resolved_cases"], "#06b6d4", "🏠"), unsafe_allow_html=True)
+        st.markdown(_stat_card("Resolved Cases", d["resolved_cases"], "#06b6d4", "🏠", sub_text="Reunited / Closed"), unsafe_allow_html=True)
     with row2[2]:
-        st.markdown(_stat_card("Video Sightings", d["video_sightings"], "#ec4899", "🎥"), unsafe_allow_html=True)
+        st.markdown(_stat_card("Video Sightings", d["video_sightings"], "#ec4899", "🎥", sub_text="CCTV Feeds"), unsafe_allow_html=True)
+    with row2[3]:
+        st.markdown(_stat_card("Public Reports", d.get("public_submissions", 0), "#6366f1", "🌐", sub_text="Citizen Submissions"), unsafe_allow_html=True)
+
 
 
 # ──────────────────────────────────────────────────────────────────────
