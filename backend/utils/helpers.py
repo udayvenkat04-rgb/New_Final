@@ -41,7 +41,7 @@ def inject_custom_css():
             margin-bottom: 24px !important;
         }
 
-        /* Donezo-style Metric Cards */
+        /* Donezo-style Metric Cards with Interactive Blue Theme Hover */
         .donezo-hero-card {
             background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%) !important;
             border-radius: 20px !important;
@@ -50,73 +50,88 @@ def inject_custom_css():
             box-shadow: 0 10px 28px rgba(79, 70, 229, 0.35) !important;
             border: none !important;
             position: relative;
-            transition: all 0.25s ease !important;
+            margin-bottom: 20px !important;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            cursor: pointer !important;
         }
         .donezo-hero-card:hover {
-            transform: translateY(-3px) !important;
-            box-shadow: 0 14px 34px rgba(79, 70, 229, 0.45) !important;
+            transform: translateY(-5px) scale(1.02) !important;
+            box-shadow: 0 16px 40px rgba(79, 70, 229, 0.5) !important;
         }
 
         .donezo-metric-card {
             background: #ffffff !important;
             border-radius: 20px !important;
             padding: 22px !important;
-            border: 1.5px solid #e2e8f0 !important;
+            border: 1.5px solid #cbd5e1 !important;
             box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04) !important;
-            transition: all 0.25s ease !important;
+            margin-bottom: 20px !important;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
             position: relative;
+            cursor: pointer !important;
         }
         .donezo-metric-card:hover {
-            transform: translateY(-3px) !important;
-            box-shadow: 0 10px 28px rgba(79, 70, 229, 0.12) !important;
-            border-color: #c7d2fe !important;
+            transform: translateY(-5px) scale(1.02) !important;
+            background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%) !important;
+            color: #ffffff !important;
+            box-shadow: 0 14px 36px rgba(79, 70, 229, 0.45) !important;
+            border-color: transparent !important;
+        }
+        .donezo-metric-card:hover * {
+            color: #ffffff !important;
+            opacity: 1 !important;
+        }
+        .donezo-metric-card:hover .arrow-icon-circle {
+            background: rgba(255, 255, 255, 0.25) !important;
+            border-color: transparent !important;
+            color: #ffffff !important;
         }
 
         /* Light Cards */
         .glass-card {
-            background: #ffffff;
-            border-radius: 16px;
-            padding: 24px;
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
-            margin-bottom: 20px;
-            transition: all 0.3s ease;
+            background: #ffffff !important;
+            border-radius: 16px !important;
+            padding: 20px 24px !important;
+            border: 1.5px solid #cbd5e1 !important;
+            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05) !important;
+            margin-bottom: 16px !important;
+            transition: all 0.25s ease !important;
         }
         .glass-card:hover {
-            transform: translateY(-3px);
-            border-color: #6366f1;
-            box-shadow: 0 8px 24px rgba(79, 70, 229, 0.12);
+            transform: translateY(-2px) !important;
+            border-color: #4f46e5 !important;
+            box-shadow: 0 8px 24px rgba(79, 70, 229, 0.12) !important;
         }
 
         /* Styled Badges */
         .badge {
-            padding: 4px 10px;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            display: inline-block;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
+            padding: 5px 12px !important;
+            border-radius: 9999px !important;
+            font-size: 0.75rem !important;
+            font-weight: 700 !important;
+            display: inline-block !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.05em !important;
         }
         .badge-missing {
-            background-color: #fee2e2;
-            color: #dc2626;
-            border: 1px solid #fca5a5;
+            background-color: #ffe4e6 !important;
+            color: #e11d48 !important;
+            border: 1.5px solid #fda4af !important;
         }
         .badge-found {
-            background-color: #eef2ff;
-            color: #4f46e5;
-            border: 1px solid #c7d2fe;
+            background-color: #dcfce7 !important;
+            color: #15803d !important;
+            border: 1.5px solid #86efac !important;
         }
         .badge-pending {
-            background-color: #fef3c7;
-            color: #d97706;
-            border: 1px solid #fcd34d;
+            background-color: #fef3c7 !important;
+            color: #b45309 !important;
+            border: 1.5px solid #fcd34d !important;
         }
         .badge-verified {
-            background-color: #dbeafe;
-            color: #2563eb;
-            border: 1px solid #93c5fd;
+            background-color: #dbeafe !important;
+            color: #1d4ed8 !important;
+            border: 1.5px solid #93c5fd !important;
         }
 
         /* Card Image container styling */
@@ -191,11 +206,11 @@ def inject_custom_css():
         div[data-testid="stBlockContainer"] {
             max-width: 100% !important;
             width: 100% !important;
-            padding-top: 0rem !important;
-            padding-bottom: 2rem !important;
+            padding-top: 1rem !important;
+            padding-bottom: 2.5rem !important;
             padding-left: 2rem !important;
             padding-right: 2rem !important;
-            margin-top: -5rem !important;
+            margin-top: 0px !important;
             margin-left: 0px !important;
             margin-right: 0px !important;
         }
@@ -277,17 +292,27 @@ def inject_custom_css():
             box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.18) !important;
         }
 
-        /* Tabs styling */
+        /* Tabs styling - High Contrast Active and Inactive Tabs */
         button[data-baseweb="tab"] {
-            border-radius: 8px !important;
+            border-radius: 10px !important;
             font-weight: 600 !important;
-            color: #64748b !important;
-            font-size: 14px !important;
-            padding: 8px 16px !important;
+            color: #334155 !important;
+            font-size: 14.5px !important;
+            padding: 10px 20px !important;
+            margin-right: 6px !important;
+        }
+        button[data-baseweb="tab"] * {
+            color: #334155 !important;
+            font-weight: 600 !important;
         }
         button[data-baseweb="tab"][aria-selected="true"] {
             color: #4f46e5 !important;
-            border-bottom-color: #4f46e5 !important;
+            border-bottom: 3px solid #4f46e5 !important;
+            font-weight: 700 !important;
+            background-color: #eef2ff !important;
+        }
+        button[data-baseweb="tab"][aria-selected="true"] * {
+            color: #4f46e5 !important;
             font-weight: 700 !important;
         }
 
@@ -323,16 +348,33 @@ def inject_custom_css():
 
 def render_role_sidebar():
     """Dynamically renders role-scoped sidebar navigation links based on user authentication role (PYDAH Design)."""
+    import os, base64
+    from backend.utils.icons import get_svg_icon
     authenticated = st.session_state.get("authenticated", False)
     user = st.session_state.get("user", {})
     role = user.get("role") if authenticated else "public"
 
+    # Load 3D Brand Logo image as base64
+    logo_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "assets", "mpis_brand_logo.png")
+    logo_b64 = ""
+    if os.path.exists(logo_path):
+        try:
+            with open(logo_path, "rb") as f:
+                logo_b64 = base64.b64encode(f.read()).decode()
+        except Exception:
+            pass
+
+    logo_html = f'<img src="data:image/png;base64,{logo_b64}" style="width: 44px; height: 44px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); border: 1.5px solid rgba(255,255,255,0.3);" />' if logo_b64 else get_svg_icon('brand_logo', size=32)
+
     with st.sidebar:
-        # Top Blue Brand Header Container (PYDAH Reference)
-        st.markdown("""
-        <div class="sidebar-brand-header" style="background: linear-gradient(135deg, #3730a3 0%, #4f46e5 100%); padding: 24px 16px 32px 16px; margin-top: -60px; text-align: center; color: white;">
-            <div style="font-size: 22px; font-weight: 800; letter-spacing: 0.5px; color: #ffffff !important;">MPIS PORTAL</div>
-            <div style="font-size: 11px; opacity: 0.9; margin-top: 2px; color: #e0e7ff !important; font-style: italic;">Missing Persons Platform</div>
+        # Top Blue Brand Header Container with 3D Brand Logo
+        st.markdown(f"""
+        <div class="sidebar-brand-header" style="background: linear-gradient(135deg, #1e1b4b 0%, #3730a3 50%, #4f46e5 100%); padding: 24px 16px 32px 16px; margin-top: -60px; text-align: center; color: white;">
+            <div style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 6px;">
+                {logo_html}
+                <span style="font-size: 22px; font-weight: 800; letter-spacing: 0.5px; color: #ffffff !important;">MPIS PORTAL</span>
+            </div>
+            <div style="font-size: 11px; opacity: 0.9; margin-top: 2px; color: #e0e7ff !important; font-style: italic;">Missing Persons Identification System</div>
         </div>
         <div style="background: #ffffff; border-top-left-radius: 24px; border-top-right-radius: 24px; margin-top: -18px; padding: 14px 12px 12px 12px; box-shadow: 0 -4px 20px rgba(0,0,0,0.06);">
         """, unsafe_allow_html=True)

@@ -112,24 +112,24 @@ def _stat_card(label: str, value, color: str, icon: str, is_hero: bool = False, 
     return f"""
     <div class="donezo-metric-card">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-            <span style="font-size: 13.5px; font-weight: 600; color: #64748b; text-transform: capitalize;">{label}</span>
-            <span style="border: 1px solid #e2e8f0; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #64748b;">↗</span>
+            <span style="font-size: 13.5px; font-weight: 700; color: #334155; text-transform: capitalize;">{label}</span>
+            <span class="arrow-icon-circle" style="border: 1px solid #cbd5e1; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #475569; transition: all 0.3s ease;">↗</span>
         </div>
         <h1 style="font-size: 36px; font-weight: 800; margin: 0 0 10px 0; color: #0f172a; line-height: 1;">{value}</h1>
-        <div style="font-size: 11.5px; color: #94a3b8; font-weight: 500;">
-            <span style="color: {color}; font-weight: 700; margin-right: 4px;">●</span> {sub_text or 'Updated live'}
+        <div style="font-size: 12px; color: #64748b; font-weight: 600;">
+            <span style="color: {color}; font-weight: 800; margin-right: 4px;">●</span> {sub_text or 'Updated live'}
         </div>
     </div>
     """
 
 
 def render_statistics_cards(d: dict):
-    """Renders the 8 dashboard statistics as a perfectly aligned 4x2 grid."""
-    row1 = st.columns(4)
-    row2 = st.columns(4)
+    """Renders the 8 dashboard statistics as a perfectly aligned 4x2 grid with ample gap spacing."""
+    row1 = st.columns(4, gap="medium")
+    row2 = st.columns(4, gap="medium")
 
     with row1[0]:
-        st.markdown(_stat_card("Total Cases", d["total_cases"], "#4f46e5", "📁", is_hero=True, sub_text="Total Registered"), unsafe_allow_html=True)
+        st.markdown(_stat_card("Total Cases", d["total_cases"], "#4f46e5", "📁", sub_text="Total Registered"), unsafe_allow_html=True)
     with row1[1]:
         st.markdown(_stat_card("Active Cases", d["active_cases"], "#ef4444", "🔴", sub_text="Investigation Active"), unsafe_allow_html=True)
     with row1[2]:
@@ -180,21 +180,21 @@ def render_recent_cases(cases: list):
         created_str = _format_timestamp(getattr(case, "created_at", None))
 
         st.markdown(f"""
-<div class="glass-card" style="padding: 14px 20px; margin-bottom: 12px;">
+<div class="glass-card" style="padding: 16px 22px; margin-bottom: 14px;">
     <div style="display: flex; justify-content: space-between; align-items: center;">
         <div>
-            <span style="font-size: 16px; font-weight: 600; color: #0f172a;">
+            <span style="font-size: 17px; font-weight: 700; color: #0f172a;">
                 {case.name}
             </span>
-            <span style="margin-left: 8px; color: #475569; font-size: 13px;">
+            <span style="margin-left: 10px; color: #334155; font-size: 13.5px; font-weight: 600;">
                 ID #{case.id} · {case.gender}, Age {case.age}
             </span>
         </div>
         <span class="badge {badge_class}">{case.status}</span>
     </div>
-    <div style="margin-top: 6px; color: #475569; font-size: 13px;">
-        📍 {case.last_seen_location or 'Unknown'} · 🕐 {created_str}
-        {f" · 👤 By {case.created_by}" if case.created_by else ""}
+    <div style="margin-top: 8px; color: #334155; font-size: 13.5px; font-weight: 500;">
+        📍 <strong style="color: #1e293b;">{case.last_seen_location or 'Unknown'}</strong> · 🕐 {created_str}
+        {f" · 👤 By <strong style='color: #4338ca;'>{case.created_by}</strong>" if case.created_by else ""}
     </div>
 </div>
 """, unsafe_allow_html=True)
@@ -206,10 +206,10 @@ def render_recent_cases(cases: list):
 
 def _match_status_color(status: str) -> str:
     return {
-        "Pending Review": "#f59e0b",
-        "Confirmed Match": "#10b981",
-        "False Positive": "#ef4444",
-    }.get(status, "#94a3b8")
+        "Pending Review": "#d97706",
+        "Confirmed Match": "#16a34a",
+        "False Positive": "#dc2626",
+    }.get(status, "#64748b")
 
 
 def render_recent_matches(matches: list):
@@ -221,28 +221,21 @@ def render_recent_matches(matches: list):
 
     for match in matches:
         status_color = _match_status_color(match.status)
-        confidence_pct = f"{match.similarity * 100:.1f}%" if match.similarity else "N/A"
-        created_str = _format_timestamp(getattr(match, "created_at", None))
 
         st.markdown(f"""
-<div class="glass-card" style="padding: 14px 20px; margin-bottom: 12px;">
+<div class="glass-card" style="padding: 16px 22px; margin-bottom: 14px;">
     <div style="display: flex; justify-content: space-between; align-items: center;">
         <div>
-            <span style="font-size: 16px; font-weight: 600; color: #0f172a;">
+            <span style="font-size: 17px; font-weight: 700; color: #0f172a;">
                 Match #{match.id}
             </span>
-            <span style="margin-left: 8px; color: #475569; font-size: 13px;">
+            <span style="margin-left: 10px; color: #334155; font-size: 13.5px; font-weight: 600;">
                 Case #{match.case_id} ↔ Sighting #{match.sighting_id}
             </span>
         </div>
-        <span style="color: {status_color}; font-weight: 600; font-size: 13px;">
+        <span style="color: {status_color}; font-weight: 700; font-size: 13.5px; background: rgba(0,0,0,0.04); padding: 4px 10px; border-radius: 6px;">
             {match.status}
         </span>
-    </div>
-    <div style="margin-top: 6px; color: #475569; font-size: 13px;">
-        🎯 Confidence: <strong style="color: #0f172a;">{confidence_pct}</strong>
-        · 🕐 {created_str}
-        {f" · 👤 Reviewed by {match.reviewed_by}" if match.reviewed_by else ""}
     </div>
 </div>
 """, unsafe_allow_html=True)
@@ -276,15 +269,15 @@ def render_case_status_summary(status_breakdown: dict, total_sightings: int, vid
                 <div class="glass-card" style="text-align: center; padding: 24px;">
                     <div style="font-size: 36px; margin-bottom: 8px;">{cfg['icon']}</div>
                     <div style="font-size: 32px; font-weight: 700; color: {cfg['color']};">{count}</div>
-                    <div style="font-size: 14px; font-weight: 600; color: #f1f5f9; margin: 4px 0;">
+                    <div style="font-size: 14px; font-weight: 700; color: #0f172a; margin: 4px 0;">
                         {status}
                     </div>
                     <div style="font-size: 12px; color: #64748b;">{cfg['desc']}</div>
                     <div style="margin-top: 10px;">
-                        <div style="background: rgba(255,255,255,0.05); border-radius: 4px; height: 6px; overflow: hidden;">
+                        <div style="background: #e2e8f0; border-radius: 4px; height: 6px; overflow: hidden;">
                             <div style="width: {pct:.0f}%; height: 100%; background: {cfg['color']}; border-radius: 4px;"></div>
                         </div>
-                        <span style="font-size: 11px; color: #64748b;">{pct:.1f}% of total</span>
+                        <span style="font-size: 11px; color: #64748b; font-weight: 600;">{pct:.1f}% of total</span>
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
@@ -309,44 +302,46 @@ def render_case_status_summary(status_breakdown: dict, total_sightings: int, vid
 # 6. Quick Actions Section
 # ──────────────────────────────────────────────────────────────────────
 
+from backend.utils.icons import get_svg_icon
+
 QUICK_ACTIONS = [
     {
-        "icon": "📝",
+        "icon": get_svg_icon("folder", size=32, color="#10b981"),
         "label": "Register Missing Person",
         "desc": "File a new missing person bulletin",
         "page": "pages/cases.py",
         "color": "#10b981",
     },
     {
-        "icon": "🔬",
+        "icon": get_svg_icon("face_scan", size=32, color="#8b5cf6"),
         "label": "Face Matching",
         "desc": "Run biometric face comparison engine",
         "page": "pages/admin_face_matching.py",
         "color": "#8b5cf6",
     },
     {
-        "icon": "🎥",
+        "icon": get_svg_icon("video", size=32, color="#ec4899"),
         "label": "Video Sightings",
         "desc": "Process surveillance video feeds",
         "page": "pages/video_sightings.py",
         "color": "#ec4899",
     },
     {
-        "icon": "✅",
+        "icon": get_svg_icon("check", size=32, color="#f59e0b"),
         "label": "Match Review",
         "desc": "Review and confirm/reject potential matches",
         "page": "pages/match_review.py",
         "color": "#f59e0b",
     },
     {
-        "icon": "🗺️",
+        "icon": get_svg_icon("map_pin", size=32, color="#06b6d4"),
         "label": "India Map",
         "desc": "View sighting locations on the map",
         "page": "pages/map.py",
         "color": "#06b6d4",
     },
     {
-        "icon": "📥",
+        "icon": get_svg_icon("inbox", size=32, color="#10b981"),
         "label": "Public Submissions",
         "desc": "Review and verify public reports",
         "page": "pages/admin_public_submissions.py",
@@ -367,17 +362,17 @@ def render_quick_actions():
     """Renders the 'Quick Actions' tab content with navigation cards."""
     st.markdown("#### ⚡ Quick Actions")
     st.markdown(
-        "<p style='color: #94a3b8; font-size: 14px;'>Jump to frequently used modules.</p>",
+        "<p style='color: #64748b; font-size: 14px; margin-bottom: 20px;'>Jump to frequently used modules.</p>",
         unsafe_allow_html=True,
     )
 
-    cols = st.columns(3)
+    cols = st.columns(3, gap="medium")
     for idx, action in enumerate(QUICK_ACTIONS):
         with cols[idx % 3]:
             st.markdown(f"""
-            <div class="glass-card" style="text-align: center; padding: 20px; min-height: 140px;">
+            <div class="glass-card" style="text-align: center; padding: 22px; min-height: 140px; margin-bottom: 12px;">
                 <div style="font-size: 32px; margin-bottom: 8px;">{action['icon']}</div>
-                <div style="font-size: 15px; font-weight: 600; color: {action['color']};">
+                <div style="font-size: 15px; font-weight: 700; color: {action['color']};">
                     {action['label']}
                 </div>
                 <div style="font-size: 12px; color: #64748b; margin-top: 4px;">
@@ -401,7 +396,7 @@ def render_footer():
     """Renders the dashboard footer."""
     st.markdown("---")
     st.markdown(
-        "<p style='text-align: center; color: #475569; font-size: 12px;'>"
+        "<p style='text-align: center; color: #475569; font-size: 12px; margin-top: 24px;'>"
         "Missing Person Identification System · Admin Dashboard · "
         "Data sourced from MongoDB"
         "</p>",
@@ -410,11 +405,13 @@ def render_footer():
 
 
 # ══════════════════════════════════════════════════════════════════════
-# Main Render — assemble sections in order
+# Main Render — assemble sections in order with generous spacing
 # ══════════════════════════════════════════════════════════════════════
 
 render_header()
 render_statistics_cards(data)
+
+st.markdown("<div style='margin-bottom: 28px;'></div>", unsafe_allow_html=True)
 
 tab_cases, tab_matches, tab_status, tab_actions = st.tabs([
     "📂 Recent Cases",

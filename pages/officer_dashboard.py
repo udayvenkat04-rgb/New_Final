@@ -122,12 +122,12 @@ def _stat_card(label: str, value, color: str, icon: str, is_hero: bool = False, 
     return f"""
     <div class="donezo-metric-card">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-            <span style="font-size: 13.5px; font-weight: 600; color: #64748b; text-transform: capitalize;">{label}</span>
-            <span style="border: 1px solid #e2e8f0; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #64748b;">↗</span>
+            <span style="font-size: 13.5px; font-weight: 700; color: #334155; text-transform: capitalize;">{label}</span>
+            <span class="arrow-icon-circle" style="border: 1px solid #cbd5e1; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #475569; transition: all 0.3s ease;">↗</span>
         </div>
         <h1 style="font-size: 36px; font-weight: 800; margin: 0 0 10px 0; color: #0f172a; line-height: 1;">{value}</h1>
-        <div style="font-size: 11.5px; color: #94a3b8; font-weight: 500;">
-            <span style="color: {color}; font-weight: 700; margin-right: 4px;">●</span> {sub_text or 'Live Status'}
+        <div style="font-size: 12px; color: #64748b; font-weight: 600;">
+            <span style="color: {color}; font-weight: 800; margin-right: 4px;">●</span> {sub_text or 'Live Status'}
         </div>
     </div>
     """
@@ -139,10 +139,10 @@ def render_statistics_cards(d: dict):
     IMPORTANT: these values come from DashboardService.get_officer_dashboard_data
     which already filtered every query by `created_by = <officer.username>`.
     """
-    cols = st.columns(4)
+    cols = st.columns(4, gap="medium")
     with cols[0]:
         st.markdown(
-            _stat_card("My Total Cases", d["my_total_cases"], "#4f46e5", "📁", is_hero=True, sub_text="Total Bulletins"),
+            _stat_card("My Total Cases", d["my_total_cases"], "#4f46e5", "📁", sub_text="Total Bulletins"),
             unsafe_allow_html=True,
         )
     with cols[1]:

@@ -52,9 +52,30 @@ else:
     elif user_role == "officer":
         st.switch_page("pages/officer_dashboard.py")
 
+import base64
+from backend.utils.icons import get_svg_icon
+
+logo_path = os.path.join(ROOT_DIR, "assets", "mpis_brand_logo.png")
+logo_b64 = ""
+if os.path.exists(logo_path):
+    try:
+        with open(logo_path, "rb") as f:
+            logo_b64 = base64.b64encode(f.read()).decode()
+    except Exception:
+        pass
+
+header_logo_html = f'<img src="data:image/png;base64,{logo_b64}" style="width: 56px; height: 56px; border-radius: 12px; box-shadow: 0 6px 20px rgba(79,70,229,0.3); border: 2px solid #818cf8;" />' if logo_b64 else get_svg_icon('brand_logo', size=42)
+
 # Main Page Layout
-st.markdown("<h1 style='text-align: center; color: #10b981; margin-bottom: 0px;'>🔍 Missing Person Identification System</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; color: #94a3b8; font-size: 18px;'>Secure Centralized Portal for Law Enforcement & Public Search</p>", unsafe_allow_html=True)
+st.markdown(f"""
+<div style="text-align: center; margin-bottom: 8px;">
+    <div style="display: inline-flex; align-items: center; justify-content: center; gap: 14px;">
+        {header_logo_html}
+        <h1 style="color: #3730a3; margin: 0; font-size: 34px; font-weight: 800; letter-spacing: -0.5px;">Missing Person Identification System</h1>
+    </div>
+</div>
+""", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #64748b; font-size: 16px; margin-top: 4px;'>Secure Centralized Portal for Law Enforcement & Public Search</p>", unsafe_allow_html=True)
 st.markdown("---", unsafe_allow_html=True)
 
 # Fetch current dashboard metrics via repositories

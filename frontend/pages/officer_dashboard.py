@@ -139,10 +139,10 @@ def render_statistics_cards(d: dict):
     IMPORTANT: these values come from DashboardService.get_officer_dashboard_data
     which already filtered every query by `created_by = <officer.username>`.
     """
-    cols = st.columns(4)
+    cols = st.columns(4, gap="medium")
     with cols[0]:
         st.markdown(
-            _stat_card("My Total Cases", d["my_total_cases"], "#4f46e5", "📁", is_hero=True, sub_text="Total Bulletins"),
+            _stat_card("My Total Cases", d["my_total_cases"], "#4f46e5", "📁", sub_text="Total Bulletins"),
             unsafe_allow_html=True,
         )
     with cols[1]:
