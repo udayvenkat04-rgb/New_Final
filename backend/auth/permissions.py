@@ -56,19 +56,24 @@ def _current_username() -> str:
 def require_auth():
     """
     Reusable authentication guard.
-    Halts page rendering if the user is not logged in.
+    Halts page rendering and redirects to login if the user is not logged in.
     Returns True if authenticated.
     """
     if not st.session_state.get("authenticated", False):
         st.error("🔒 Authentication Required. Please log in to proceed.")
+        try:
+            st.switch_page("pages/login.py")
+        except Exception:
+            pass
         st.stop()
     return True
+
 
 
 def require_role(allowed_roles=None):
     """
     Asserts that a user is logged in and has one of the allowed roles.
-    If unauthorized, displays warning/error banner and halts further rendering.
+    If unauthorized, displays warning/error banner and provides button to return to dashboard.
     """
     if allowed_roles is None:
         allowed_roles = [ROLE_ADMIN, ROLE_OFFICER]
@@ -80,9 +85,16 @@ def require_role(allowed_roles=None):
         st.error(
             f"⚠️ Access Denied. Role '{user_role.upper()}' is not authorized to access this page."
         )
+        if user_role == ROLE_OFFICER:
+            if st.button("⬅️ Return to Officer Dashboard", key="btn_denied_return_officer"):
+                st.switch_page("pages/officer_dashboard.py")
+        elif user_role == ROLE_ADMIN:
+            if st.button("⬅️ Return to Admin Dashboard", key="btn_denied_return_admin"):
+                st.switch_page("pages/admin_dashboard.py")
         st.stop()
 
     return True
+
 
 
 # ──────────────────────────────────────────────────────────────────────

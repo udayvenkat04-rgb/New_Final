@@ -46,16 +46,20 @@ def login_user(user: dict):
 def logout_user():
     """
     Completely clears all authentication-related session state
-    and triggers a Streamlit rerun.
+    and immediately redirects the user to the login page.
     """
     for key in AUTH_SESSION_KEYS:
         if key in st.session_state:
             del st.session_state[key]
 
-    if hasattr(st, "rerun"):
-        st.rerun()
-    elif hasattr(st, "experimental_rerun"):
-        st.experimental_rerun()
+    try:
+        st.switch_page("pages/login.py")
+    except Exception:
+        if hasattr(st, "rerun"):
+            st.rerun()
+        elif hasattr(st, "experimental_rerun"):
+            st.experimental_rerun()
+
 
 
 def get_current_user() -> dict | None:

@@ -118,27 +118,9 @@ def inject_custom_css():
         section[data-testid="stSidebar"] a {
             color: #0f172a !important;
         }
-        /* Sidebar Navigation Links */
-        div[data-testid="stSidebarNav"] ul li a {
-            color: #0f172a !important;
-            font-size: 15px !important;
-            font-weight: 600 !important;
-            padding: 8px 12px !important;
-            border-radius: 6px !important;
-            transition: all 0.2s ease !important;
-        }
-        div[data-testid="stSidebarNav"] ul li a span {
-            color: #0f172a !important;
-            font-weight: 600 !important;
-        }
-        div[data-testid="stSidebarNav"] ul li a:hover {
-            background-color: #e2e8f0 !important;
-            color: #10b981 !important;
-        }
-        div[data-testid="stSidebarNav"] ul li a[aria-current="page"] {
-            background-color: #cbd5e1 !important;
-            color: #059669 !important;
-            font-weight: 700 !important;
+        /* Completely hide default auto-generated Streamlit multi-page sidebar navigation */
+        div[data-testid="stSidebarNav"] {
+            display: none !important;
         }
 
         /* Buttons styling */
@@ -177,13 +159,13 @@ def inject_custom_css():
 
 
 def render_role_sidebar():
-    """Dynamically filters sidebar navigation links based on user authentication role."""
+    """Dynamically renders role-scoped sidebar navigation links based on user authentication role."""
     authenticated = st.session_state.get("authenticated", False)
     user = st.session_state.get("user", {})
     role = user.get("role") if authenticated else "public"
 
-    # Render user profile info in sidebar top
     with st.sidebar:
+        # Render user profile info box at top of sidebar
         if authenticated:
             st.markdown(f"""
             <div style="background-color: #ffffff; padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; border-left: 4px solid #10b981; margin-bottom: 15px;">
@@ -192,9 +174,6 @@ def render_role_sidebar():
                 <span class="badge badge-found" style="margin-top: 6px;">{role.upper()} ROLE</span>
             </div>
             """, unsafe_allow_html=True)
-            if st.button("🚪 Log Out", key="sidebar_logout_btn", use_container_width=True):
-                from backend.auth.authentication import logout_user
-                logout_user()
         else:
             st.markdown("""
             <div style="background-color: #fffbeb; padding: 12px; border-radius: 8px; border: 1px solid #fde68a; border-left: 4px solid #f59e0b; margin-bottom: 15px;">
@@ -203,48 +182,44 @@ def render_role_sidebar():
             </div>
             """, unsafe_allow_html=True)
 
-    # Dynamic CSS sidebar filter by role
-    if not authenticated:
-        # Hide all secure management pages for unauthenticated visitors
-        css = """
-        <style>
-        div[data-testid="stSidebarNav"] a[href*="admin"],
-        div[data-testid="stSidebarNav"] a[href*="officer"],
-        div[data-testid="stSidebarNav"] a[href*="match"],
-        div[data-testid="stSidebarNav"] a[href*="case"],
-        div[data-testid="stSidebarNav"] a[href*="video"],
-        div[data-testid="stSidebarNav"] a[href*="dev"],
-        div[data-testid="stSidebarNav"] a[href*="sightings"],
-        div[data-testid="stSidebarNav"] a[href*="map"] {
-            display: none !important;
-        }
-        </style>
-        """
-        st.markdown(css, unsafe_allow_html=True)
+        st.markdown("<p style='font-size: 13px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px;'>📌 Navigation</p>", unsafe_allow_html=True)
 
-    elif role == "officer":
-        # Hide Admin-only pages for Officer role
-        css = """
-        <style>
-        div[data-testid="stSidebarNav"] a[href*="admin"],
-        div[data-testid="stSidebarNav"] a[href*="match_review"],
-        div[data-testid="stSidebarNav"] a[href*="case_management"],
-        div[data-testid="stSidebarNav"] a[href*="dev"] {
-            display: none !important;
-        }
-        </style>
-        """
-        st.markdown(css, unsafe_allow_html=True)
+        if not authenticated:
+            st.page_link("app.py", label="Home Portal", icon="🏠")
+            st.page_link("pages/public_portal.py", label="Public Portal", icon="🌐")
+            st.page_link("pages/cases.py", label="Case Directory", icon="📁")
+            st.page_link("pages/map.py", label="Sightings Map", icon="📍")
+            st.page_link("pages/login.py", label="Officer / Admin Login", icon="🔐")
 
-    elif role == "admin":
-        # Hide Officer-dashboard link for Admin (Admin uses Admin Dashboard)
-        css = """
-        <style>
-        div[data-testid="stSidebarNav"] a[href*="officer_dashboard"],
-        div[data-testid="stSidebarNav"] a[href*="dev"] {
-            display: none !important;
-        }
-        </style>
-        """
-        st.markdown(css, unsafe_allow_html=True)
+        elif role == "officer":
+            st.page_link("pages/officer_dashboard.py", label="Officer Dashboard", icon="👮")
+            st.page_link("pages/cases.py", label="Case Directory", icon="📁")
+            st.page_link("pages/map.py", label="Sightings Map", icon="📍")
+            st.page_link("pages/sightings.py", label="Sighting Reports", icon="👁️")
+            st.page_link("pages/public_portal.py", label="Public Portal", icon="🌐")
+
+
+        elif role == "admin":
+            st.page_link("pages/admin_dashboard.py", label="Admin Dashboard", icon="👑")
+            st.page_link("pages/case_management.py", label="Case Management", icon="📋")
+            st.page_link("pages/admin_face_matching.py", label="Face Match Engine", icon="🔬")
+            st.page_link("pages/video_sightings.py", label="Video Sightings", icon="📹")
+            st.page_link("pages/admin_map.py", label="Admin Map", icon="🗺️")
+            st.page_link("pages/admin_public_submissions.py", label="Public Submissions", icon="📥")
+            st.page_link("pages/match_review.py", label="Match Review", icon="⚖️")
+            st.page_link("pages/cases.py", label="Case Directory", icon="📁")
+            st.page_link("pages/map.py", label="Sightings Map", icon="📍")
+            st.page_link("pages/sightings.py", label="Sighting Reports", icon="👁️")
+            st.page_link("pages/public_portal.py", label="Public Portal", icon="🌐")
+
+            with st.expander("🛠️ Developer Tools"):
+                st.page_link("pages/dev_face_detection.py", label="Dev Face Detection", icon="🧪")
+                st.page_link("pages/dev_face_embedding.py", label="Dev Face Embedding", icon="🧬")
+
+        if authenticated:
+            st.markdown("---")
+            if st.button("🚪 Log Out", key="sidebar_logout_btn", use_container_width=True):
+                from backend.auth.authentication import logout_user
+                logout_user()
+
 
