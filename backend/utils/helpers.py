@@ -24,13 +24,6 @@ def inject_custom_css():
             background-color: transparent !important;
         }
 
-        /* Constrain block container width & center alignment */
-        .main .block-container {
-            max-width: 1240px !important;
-            padding-top: 25px !important;
-            padding-bottom: 40px !important;
-        }
-
         /* Donezo-style Outer Dashboard White Card Container */
         .dashboard-outer-card {
             background: #ffffff !important;
@@ -200,23 +193,74 @@ def inject_custom_css():
         div[data-testid="stAppViewContainer"],
         section.main {
             padding-top: 0px !important;
+            margin-top: 0px !important;
         }
 
+        /* 100% Full-Screen Edge-to-Edge Span across all screen resolutions */
         .main .block-container,
-        div[data-testid="stBlockContainer"] {
+        div[data-testid="stBlockContainer"],
+        [data-testid="stBlockContainer"] {
             max-width: 100% !important;
             width: 100% !important;
-            padding-top: 1rem !important;
-            padding-bottom: 2.5rem !important;
-            padding-left: 2rem !important;
-            padding-right: 2rem !important;
+            min-width: 100% !important;
+            padding-top: 0px !important;
+            padding-bottom: 2rem !important;
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
             margin-top: 0px !important;
             margin-left: 0px !important;
             margin-right: 0px !important;
         }
 
+        @media screen and (min-width: 768px) {
+            .main .block-container,
+            div[data-testid="stBlockContainer"],
+            [data-testid="stBlockContainer"] {
+                max-width: 100% !important;
+                width: 100% !important;
+                min-width: 100% !important;
+                padding-left: 0.5rem !important;
+                padding-right: 0.5rem !important;
+            }
+        }
+
+        /* Statistics Metric Cards Row - Position Cards Close Together with Uniform 16px Gap */
+        div[data-testid="stHorizontalBlock"] {
+            gap: 16px !important;
+        }
+
+        .metric-card {
+            width: 100% !important;
+            box-sizing: border-box !important;
+            margin: 0 !important;
+        }
+
+        /* Top Header Navbar Row - Strictly Single Horizontal Line (No Line Wrapping) */
+        div[data-testid="stHorizontalBlock"]:first-child {
+            display: flex !important;
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            gap: 12px !important;
+        }
+        div[data-testid="stHorizontalBlock"]:first-child > div {
+            width: auto !important;
+            min-width: auto !important;
+            flex: 0 1 auto !important;
+        }
+
+        /* Pull top header navbar flush against top edge of browser window on 100% maximized viewports */
+        .main .block-container > div:first-child,
+        div[data-testid="stBlockContainer"] > div:first-child {
+            margin-top: -55px !important;
+            padding-top: 0px !important;
+        }
+
         .main .element-container:first-child,
-        .main [data-testid="stVerticalBlock"] > div:first-child {
+        .main [data-testid="stVerticalBlock"] > div:first-child,
+        div[data-testid="stVerticalBlock"] > div:first-child,
+        div[data-testid="stVerticalBlock"] {
             margin-top: 0px !important;
             padding-top: 0px !important;
         }
@@ -264,7 +308,7 @@ def inject_custom_css():
             color: #ffffff !important;
         }
 
-        /* Buttons styling - Indigo Theme Gradient */
+        /* Buttons styling - Default Form Buttons */
         div.stButton > button:first-child {
             background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
             color: white !important;
@@ -280,7 +324,32 @@ def inject_custom_css():
             box-shadow: 0 8px 20px rgba(79, 70, 229, 0.45);
             background: linear-gradient(135deg, #4338ca 0%, #3730a3 100%);
         }
-        
+
+        /* National Power Portal Top Navbar Styling (Flat Text Links + Yellow Accent Active Box) */
+        div[data-testid="stHorizontalBlock"]:first-child div.stButton > button {
+            background: transparent !important;
+            color: #0f172a !important;
+            border: 2px solid transparent !important;
+            border-radius: 4px !important;
+            box-shadow: none !important;
+            font-weight: 700 !important;
+            font-size: 13.5px !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.5px !important;
+            padding: 6px 14px !important;
+            transition: all 0.15s ease !important;
+            margin: 0 !important;
+            white-space: nowrap !important;
+            word-break: keep-all !important;
+            overflow: visible !important;
+        }
+        div[data-testid="stHorizontalBlock"]:first-child div.stButton > button:hover {
+            background: #f8fafc !important;
+            color: #2563eb !important;
+            border-color: #cbd5e1 !important;
+            transform: none !important;
+            box-shadow: none !important;
+        }
         /* Inputs & Selectboxes */
         div[data-baseweb="input"], div[data-baseweb="select"] {
             border-radius: 12px !important;
@@ -340,21 +409,86 @@ def inject_custom_css():
             overflow: hidden;
             border: 1px solid #e2e8f0;
         }
+
+        /* Multi-Device Responsive Support (Mobile, Tablet, Laptop, Laptop L, 4K Display) */
+        @media screen and (max-width: 1200px) {
+            div[data-testid="stHorizontalBlock"]:first-child div.stButton > button {
+                font-size: 12px !important;
+                padding: 5px 8px !important;
+            }
+        }
+
+        @media screen and (max-width: 768px) {
+            /* Mobile Devices */
+            .main .block-container,
+            div[data-testid="stBlockContainer"] {
+                padding-left: 0.5rem !important;
+                padding-right: 0.5rem !important;
+            }
+            div[data-testid="stHorizontalBlock"] div.stButton > button {
+                font-size: 11px !important;
+                padding: 4px 6px !important;
+            }
+        }
+
+        /* Ensure all Streamlit columns stay in a horizontal row */
+        div[data-testid="stHorizontalBlock"] {
+            flex-direction: row !important;
+            align-items: center !important;
+        }
+
+        /* Seamless Light & Dark Theme Adaptability */
+        @media (prefers-color-scheme: dark) {
+            .stApp {
+                background-color: #0b1329 !important;
+                color: #f8fafc !important;
+            }
+            .metric-card, .dashboard-outer-card, .glass-card, div[data-testid="stForm"], div[data-testid="stExpander"] {
+                background-color: #1e293b !important;
+                border-color: #334155 !important;
+                color: #f8fafc !important;
+            }
+            .metric-card span, .glass-card span {
+                color: #cbd5e1 !important;
+            }
+            div[data-baseweb="input"], div[data-baseweb="select"] {
+                background-color: #1e293b !important;
+                color: #f8fafc !important;
+                border-color: #475569 !important;
+            }
+            div[data-testid="stHorizontalBlock"]:first-child div.stButton > button {
+                color: #f8fafc !important;
+            }
+            div[data-testid="stHorizontalBlock"]:first-child div.stButton > button[kind="primary"] {
+                background: #1e293b !important;
+                color: #f8fafc !important;
+                border-color: #eab308 !important;
+            }
+        }
+
+        /* Hide left sidebar completely so top header acts as main navbar */
+        section[data-testid="stSidebar"] {
+            display: none !important;
+            width: 0px !important;
+        }
+        div[data-testid="stSidebarNav"] {
+            display: none !important;
+        }
     </style>
     """, unsafe_allow_html=True)
     
-    render_role_sidebar()
+    render_top_header()
 
 
-def render_role_sidebar():
-    """Dynamically renders role-scoped sidebar navigation links based on user authentication role (PYDAH Design)."""
-    import os, base64
-    from backend.utils.icons import get_svg_icon
+def render_top_header():
+    """Renders a modern National Portal style top header navigation bar across all pages."""
     authenticated = st.session_state.get("authenticated", False)
-    user = st.session_state.get("user", {})
+    user = st.session_state.get("user", {}) or {}
     role = user.get("role") if authenticated else "public"
 
-    # Load 3D Brand Logo image as base64
+    import os, base64
+    from backend.utils.icons import get_svg_icon
+
     logo_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "assets", "mpis_brand_logo.png")
     logo_b64 = ""
     if os.path.exists(logo_path):
@@ -364,90 +498,124 @@ def render_role_sidebar():
         except Exception:
             pass
 
-    logo_html = f'<img src="data:image/png;base64,{logo_b64}" style="width: 44px; height: 44px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); border: 1.5px solid rgba(255,255,255,0.3);" />' if logo_b64 else get_svg_icon('brand_logo', size=32)
+    logo_html = f'<img src="data:image/png;base64,{logo_b64}" style="width: 42px; height: 42px; border-radius: 6px;" />' if logo_b64 else get_svg_icon('brand_logo', size=36)
 
-    with st.sidebar:
-        # Top Blue Brand Header Container with 3D Brand Logo
-        st.markdown(f"""
-        <div class="sidebar-brand-header" style="background: linear-gradient(135deg, #1e1b4b 0%, #3730a3 50%, #4f46e5 100%); padding: 24px 16px 32px 16px; margin-top: -60px; text-align: center; color: white;">
-            <div style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 6px;">
-                {logo_html}
-                <span style="font-size: 22px; font-weight: 800; letter-spacing: 0.5px; color: #ffffff !important;">MPIS PORTAL</span>
-            </div>
-            <div style="font-size: 11px; opacity: 0.9; margin-top: 2px; color: #e0e7ff !important; font-style: italic;">Missing Persons Identification System</div>
-        </div>
-        <div style="background: #ffffff; border-top-left-radius: 24px; border-top-right-radius: 24px; margin-top: -18px; padding: 14px 12px 12px 12px; box-shadow: 0 -4px 20px rgba(0,0,0,0.06);">
-        """, unsafe_allow_html=True)
-
-        if not authenticated:
-            st.page_link("app.py", label="Dashboard", icon="🏠")
-            st.page_link("pages/public_portal.py", label="Public Portal", icon="🌐")
-            st.page_link("pages/cases.py", label="Case Directory", icon="📁")
-            st.page_link("pages/map.py", label="Sightings Map", icon="📍")
-            st.page_link("pages/login.py", label="Officer / Admin Login", icon="🔐")
-
-        elif role == "officer":
-            st.page_link("pages/officer_dashboard.py", label="Dashboard", icon="👮")
-            st.page_link("pages/cases.py", label="Case Directory", icon="📁")
-            
-            # PYDAH Section Divider Line
-            st.markdown("""
-            <div style="text-align: center; margin: 12px 0 6px 0; border-bottom: 1px solid #f1f5f9; line-height: 0.1em;">
-                <span style="background:#fff; padding:0 8px; font-size: 10px; font-weight: 800; color: #94a3b8; letter-spacing: 0.08em;">CASE OPERATIONS</span>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            st.page_link("pages/map.py", label="Sightings Map", icon="📍")
-            st.page_link("pages/sightings.py", label="Sighting Reports", icon="👁️")
-            st.page_link("pages/public_portal.py", label="Public Portal", icon="🌐")
-
-        elif role == "admin":
-            st.page_link("pages/admin_dashboard.py", label="Dashboard", icon="👑")
-            st.page_link("pages/case_management.py", label="Case Management", icon="📋")
-
-            # PYDAH Section Divider Line 1
-            st.markdown("""
-            <div style="text-align: center; margin: 12px 0 6px 0; border-bottom: 1px solid #f1f5f9; line-height: 0.1em;">
-                <span style="background:#fff; padding:0 8px; font-size: 10px; font-weight: 800; color: #94a3b8; letter-spacing: 0.08em;">INTELLIGENCE & AI</span>
-            </div>
-            """, unsafe_allow_html=True)
-
-            st.page_link("pages/admin_face_matching.py", label="Face Match Engine", icon="🔬")
-            st.page_link("pages/video_sightings.py", label="Video Sightings", icon="📹")
-            st.page_link("pages/admin_map.py", label="Admin Map", icon="🗺️")
-            st.page_link("pages/admin_public_submissions.py", label="Public Submissions", icon="📥")
-            st.page_link("pages/match_review.py", label="Match Review", icon="⚖️")
-
-            # PYDAH Section Divider Line 2
-            st.markdown("""
-            <div style="text-align: center; margin: 12px 0 6px 0; border-bottom: 1px solid #f1f5f9; line-height: 0.1em;">
-                <span style="background:#fff; padding:0 8px; font-size: 10px; font-weight: 800; color: #94a3b8; letter-spacing: 0.08em;">DIRECTORIES & REPORTS</span>
-            </div>
-            """, unsafe_allow_html=True)
-
-            st.page_link("pages/cases.py", label="Case Directory", icon="📁")
-            st.page_link("pages/map.py", label="Sightings Map", icon="📍")
-            st.page_link("pages/sightings.py", label="Sighting Reports", icon="👁️")
-            st.page_link("pages/public_portal.py", label="Public Portal", icon="🌐")
-
-        st.markdown("</div>", unsafe_allow_html=True)
-
-        # Bottom Profile Row (PYDAH Reference Design)
-        if authenticated:
+    if not authenticated:
+        hcol1, hcol2 = st.columns([2.8, 5.2])
+        with hcol1:
             st.markdown(f"""
-            <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; background: #ffffff; border-radius: 14px; border: 1px solid #e2e8f0; margin-top: 14px; margin-bottom: 6px; box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);">
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; box-shadow: 0 2px 6px rgba(79, 70, 229, 0.3);">
-                        {user.get('username', 'U')[:2].upper()}
+            <div style="display: flex; align-items: center; gap: 12px; padding: 2px 0;">
+                {logo_html}
+                <div>
+                    <div style="font-size: 20px; font-weight: 900; letter-spacing: -0.3px; font-family: 'Outfit', sans-serif; white-space: nowrap;">
+                        <span style="color: #2563eb;">NATIONAL</span> <span style="color: #d97706;">MISSING PORTAL</span>
                     </div>
-                    <div>
-                        <strong style="font-size: 13px; color: #0f172a; display: block; line-height: 1.2;">{user.get('username', 'User').upper()}</strong>
-                        <span style="font-size: 10px; color: #4f46e5; font-weight: 700; text-transform: uppercase;">{role.upper()} ROLE</span>
-                    </div>
+                    <div style="font-size: 9px; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap;">Government of India • Ministry of Home Affairs</div>
                 </div>
             </div>
             """, unsafe_allow_html=True)
+        with hcol2:
+            cols = st.columns([0.9, 1.1, 1.4, 1.5, 1.5, 1])
+            with cols[0]:
+                if st.button("HOME", key="hdr_home", use_container_width=True):
+                    st.switch_page("app.py")
+            with cols[1]:
+                if st.button("ABOUT US", key="hdr_about", use_container_width=True):
+                    st.switch_page("app.py")
+            with cols[2]:
+                if st.button("PUBLIC PORTAL", key="hdr_public", type="primary", use_container_width=True):
+                    st.switch_page("pages/public_portal.py")
+            with cols[3]:
+                if st.button("CASE DIRECTORY", key="hdr_cases", use_container_width=True):
+                    st.switch_page("pages/cases.py")
+            with cols[4]:
+                if st.button("SIGHTINGS MAP", key="hdr_map", use_container_width=True):
+                    st.switch_page("pages/map.py")
+            with cols[5]:
+                if st.button("LOGIN", key="hdr_login", use_container_width=True):
+                    st.switch_page("pages/login.py")
 
-            if st.button("🚪 Log Out", key="sidebar_logout_btn", use_container_width=True):
-                from backend.auth.authentication import logout_user
-                logout_user()
+    elif role == "officer":
+        hcol1, hcol2 = st.columns([2.8, 5.2])
+        with hcol1:
+            st.markdown(f"""
+            <div style="display: flex; align-items: center; gap: 12px; padding: 2px 0;">
+                {logo_html}
+                <div>
+                    <div style="font-size: 20px; font-weight: 900; letter-spacing: -0.3px; font-family: 'Outfit', sans-serif; white-space: nowrap;">
+                        <span style="color: #2563eb;">NATIONAL</span> <span style="color: #d97706;">MISSING PORTAL</span>
+                    </div>
+                    <div style="font-size: 9.5px; color: #4f46e5; font-weight: 700; text-transform: uppercase;">Officer: {user.get('username', 'User').upper()}</div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+        with hcol2:
+            cols = st.columns([1, 1.1, 1.1, 1.1, 1.1, 1])
+            with cols[0]:
+                if st.button("DASHBOARD", key="hdr_off_dash", type="primary", use_container_width=True):
+                    st.switch_page("pages/officer_dashboard.py")
+            with cols[1]:
+                if st.button("CASES", key="hdr_off_cases", use_container_width=True):
+                    st.switch_page("pages/cases.py")
+            with cols[2]:
+                if st.button("MAP", key="hdr_off_map", use_container_width=True):
+                    st.switch_page("pages/map.py")
+            with cols[3]:
+                if st.button("SIGHTINGS", key="hdr_off_sightings", use_container_width=True):
+                    st.switch_page("pages/sightings.py")
+            with cols[4]:
+                if st.button("PUBLIC", key="hdr_off_pub", use_container_width=True):
+                    st.switch_page("pages/public_portal.py")
+            with cols[5]:
+                if st.button("LOGOUT", key="hdr_logout", use_container_width=True):
+                    from backend.auth.authentication import logout_user
+                    logout_user()
+
+    elif role == "admin":
+        hcol1, hcol2 = st.columns([2.5, 5.5])
+        with hcol1:
+            st.markdown(f"""
+            <div style="display: flex; align-items: center; gap: 12px; padding: 2px 0;">
+                {logo_html}
+                <div>
+                    <div style="font-size: 19px; font-weight: 900; letter-spacing: -0.3px; font-family: 'Outfit', sans-serif; white-space: nowrap;">
+                        <span style="color: #2563eb;">NATIONAL</span> <span style="color: #d97706;">MISSING PORTAL</span>
+                    </div>
+                    <div style="font-size: 9.5px; color: #dc2626; font-weight: 700; text-transform: uppercase;">Admin: {user.get('username', 'Admin').upper()}</div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+        with hcol2:
+            cols = st.columns([1, 1, 1, 1, 1, 1, 1, 1])
+            with cols[0]:
+                if st.button("DASH", key="hdr_adm_dash", type="primary", use_container_width=True):
+                    st.switch_page("pages/admin_dashboard.py")
+            with cols[1]:
+                if st.button("CASES", key="hdr_adm_cases", use_container_width=True):
+                    st.switch_page("pages/case_management.py")
+            with cols[2]:
+                if st.button("MATCH", key="hdr_adm_match", use_container_width=True):
+                    st.switch_page("pages/admin_face_matching.py")
+            with cols[3]:
+                if st.button("VIDEO", key="hdr_adm_vid", use_container_width=True):
+                    st.switch_page("pages/video_sightings.py")
+            with cols[4]:
+                if st.button("MAP", key="hdr_adm_map", use_container_width=True):
+                    st.switch_page("pages/admin_map.py")
+            with cols[5]:
+                if st.button("SUBMISSIONS", key="hdr_adm_sub", use_container_width=True):
+                    st.switch_page("pages/admin_public_submissions.py")
+            with cols[6]:
+                if st.button("REVIEW", key="hdr_adm_rev", use_container_width=True):
+                    st.switch_page("pages/match_review.py")
+            with cols[7]:
+                if st.button("LOGOUT", key="hdr_adm_logout", use_container_width=True):
+                    from backend.auth.authentication import logout_user
+                    logout_user()
+
+    st.markdown("<div style='height: 2px; background: linear-gradient(90deg, #2563eb 0%, #3b82f6 50%, #eab308 100%); margin: 6px 0 18px 0;'></div>", unsafe_allow_html=True)
+
+
+def render_role_sidebar():
+    """Backwards compatible alias that delegates to render_top_header()."""
+    render_top_header()

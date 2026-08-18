@@ -32,13 +32,7 @@ st.markdown("""
     width: 100% !important;
 }
 
-/* Constrain container width & center alignment on screen */
-.main .block-container {
-    max-width: 1120px !important;
-    padding-top: 25px !important;
-    padding-bottom: 25px !important;
-    margin: auto !important;
-}
+/* Unboxed layout - Remove outer card background box and form border */
 
 
 /* Unboxed layout - Remove outer card background box and form border */
