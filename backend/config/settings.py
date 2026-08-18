@@ -5,9 +5,15 @@ from dotenv import load_dotenv
 # Base Directory of the Project
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Load environment variables from .env file safely
-env_path = BASE_DIR / ".env"
-load_dotenv(dotenv_path=env_path)
+# Load environment variables from .env file safely (checking backend/.env and root .env)
+env_path_backend = BASE_DIR / ".env"
+env_path_root = BASE_DIR.parent / ".env"
+
+if env_path_backend.exists():
+    load_dotenv(dotenv_path=env_path_backend)
+if env_path_root.exists():
+    load_dotenv(dotenv_path=env_path_root, override=False)
+
 
 class Settings:
     def __init__(self):
