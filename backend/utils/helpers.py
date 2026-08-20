@@ -4,11 +4,110 @@ from backend.utils.file_utils import save_uploaded_file, load_image_safely, get_
 
 def inject_custom_css():
     """Injects a modern, premium 100% Light Theme styling in Streamlit."""
+    authenticated = st.session_state.get("authenticated", False)
     st.markdown("""
     <style>
         /* Import Outfit Google Font */
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
         
+        /* Custom Custom Sidebar Transition & Width overrides (TEMPORARILY DISABLED FOR DIAGNOSTICS)
+        section[data-testid="stSidebar"] {
+            background-color: #f8fafc !important;
+            border-right: 1px solid #e2e8f0 !important;
+            transition: width 0.3s ease, min-width 0.3s ease, transform 0.3s ease !important;
+        }
+        
+        section[data-testid="stSidebar"]:not([data-collapsed="true"]) {
+            width: 310px !important;
+            min-width: 310px !important;
+        }
+        
+        section[data-testid="stSidebar"][data-collapsed="true"],
+        div[data-testid="stAppViewContainer"][data-sidebar-state="collapsed"] section[data-testid="stSidebar"] {
+            transform: none !important;
+            width: 80px !important;
+            min-width: 80px !important;
+            display: block !important;
+            visibility: visible !important;
+        }
+        
+        section[data-testid="stSidebar"][data-collapsed="true"] [data-testid="stSidebarUserContent"],
+        section[data-testid="stSidebar"][data-collapsed="true"] > div,
+        div[data-testid="stAppViewContainer"][data-sidebar-state="collapsed"] section[data-testid="stSidebar"] [data-testid="stSidebarUserContent"],
+        div[data-testid="stAppViewContainer"][data-sidebar-state="collapsed"] section[data-testid="stSidebar"] > div,
+        section[data-testid="stSidebar"][data-collapsed="true"] *,
+        div[data-testid="stAppViewContainer"][data-sidebar-state="collapsed"] section[data-testid="stSidebar"] * {
+            visibility: visible !important;
+            display: block !important;
+            opacity: 1 !important;
+        }
+        
+        section[data-testid="stSidebar"][data-collapsed="true"] .sidebar-brand-text,
+        div[data-testid="stAppViewContainer"][data-sidebar-state="collapsed"] section[data-testid="stSidebar"] .sidebar-brand-text {
+            display: none !important;
+        }
+        section[data-testid="stSidebar"][data-collapsed="true"] .sidebar-brand-container,
+        div[data-testid="stAppViewContainer"][data-sidebar-state="collapsed"] section[data-testid="stSidebar"] .sidebar-brand-container {
+            justify-content: center !important;
+            padding-left: 0 !important;
+        }
+        section[data-testid="stSidebar"][data-collapsed="true"] div[data-testid="stPageLink"] a span:last-child,
+        div[data-testid="stAppViewContainer"][data-sidebar-state="collapsed"] section[data-testid="stSidebar"] div[data-testid="stPageLink"] a span:last-child {
+            display: none !important;
+        }
+        section[data-testid="stSidebar"][data-collapsed="true"] div[data-testid="stPageLink"] a,
+        div[data-testid="stAppViewContainer"][data-sidebar-state="collapsed"] section[data-testid="stSidebar"] div[data-testid="stPageLink"] a {
+            justify-content: center !important;
+            padding: 12px 0 !important;
+        }
+        section[data-testid="stSidebar"][data-collapsed="true"] .st-key-sidebar_logout_btn button,
+        div[data-testid="stAppViewContainer"][data-sidebar-state="collapsed"] section[data-testid="stSidebar"] .st-key-sidebar_logout_btn button {
+            font-size: 0 !important;
+            padding: 8px 0 !important;
+            width: 100% !important;
+        }
+        section[data-testid="stSidebar"][data-collapsed="true"] .st-key-sidebar_logout_btn button::before,
+        div[data-testid="stAppViewContainer"][data-sidebar-state="collapsed"] section[data-testid="stSidebar"] .st-key-sidebar_logout_btn button::before {
+            content: "🚪" !important;
+            font-size: 18px !important;
+        }
+        
+        button[data-testid="stSidebarCollapseButton"],
+        button[data-testid="stHeaderSidebarCollapseButton"],
+        div[data-testid="collapsedControl"] button,
+        header[data-testid="stHeader"] button {
+            background-color: #ffffff !important;
+            border: 1.5px solid #cbd5e1 !important;
+            border-radius: 8px !important;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08) !important;
+            transition: all 0.2s ease !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            z-index: 999999 !important;
+            width: 40px !important;
+            height: 40px !important;
+            color: #0f172a !important;
+        }
+        
+        button[data-testid="stSidebarCollapseButton"] svg,
+        button[data-testid="stHeaderSidebarCollapseButton"] svg,
+        div[data-testid="collapsedControl"] button svg,
+        header[data-testid="stHeader"] button svg {
+            fill: #0f172a !important;
+            color: #0f172a !important;
+        }
+
+        button[data-testid="stSidebarCollapseButton"]:hover,
+        button[data-testid="stHeaderSidebarCollapseButton"]:hover,
+        div[data-testid="collapsedControl"] button:hover,
+        header[data-testid="stHeader"] button:hover {
+            background-color: #f1f5f9 !important;
+            border-color: #94a3b8 !important;
+            transform: scale(1.05) !important;
+        }
+        */
+
         /* Global font & light theme background */
         html, body, [class*="css"], .stMarkdown {
             font-family: 'Outfit', sans-serif;
@@ -20,186 +119,152 @@ def inject_custom_css():
             color: #0f172a !important;
         }
 
-        header[data-testid="stHeader"] {
+        /* Remove default Streamlit paddings that were left unchecked by the user and apply compact margins */
+        .block-container,
+        div[data-testid="stAppViewBlockContainer"],
+        .st-emotion-cache-zy6yx3 {
+            padding-left: 2rem !important;
+            padding-right: 2rem !important;
+            padding-top: 1.5rem !important;
+            padding-bottom: 2rem !important;
+        }
+
+        /* Override generated column block wrapper display property to block as requested */
+        .st-emotion-cache-tn0cau {
+            display: block !important;
+        }
+
+        header[data-testid="stHeader"],
+        .stAppHeader {
             background-color: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            height: 0px !important;
+            min-height: 0px !important;
+            overflow: visible !important;
+        }
+
+        /* Hide the raw sidebar navigation page links list under all circumstances */
+        [data-testid="stSidebarNav"] {
+            display: none !important;
         }
 
         /* Donezo-style Outer Dashboard White Card Container */
         .dashboard-outer-card {
             background: #ffffff !important;
             border-radius: 28px !important;
-            padding: 32px 32px 36px 32px !important;
-            box-shadow: 0 20px 60px rgba(15, 23, 42, 0.07), 0 4px 16px rgba(15, 23, 42, 0.03) !important;
+            padding: 32px !important;
             border: 1px solid #e2e8f0 !important;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04) !important;
             margin-bottom: 24px !important;
         }
 
-        /* Donezo-style Metric Cards with Interactive Blue Theme Hover */
-        .donezo-hero-card {
-            background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%) !important;
-            border-radius: 20px !important;
-            padding: 22px !important;
-            color: #ffffff !important;
-            box-shadow: 0 10px 28px rgba(79, 70, 229, 0.35) !important;
-            border: none !important;
-            position: relative;
-            margin-bottom: 20px !important;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-            cursor: pointer !important;
-        }
-        .donezo-hero-card:hover {
-            transform: translateY(-5px) scale(1.02) !important;
-            box-shadow: 0 16px 40px rgba(79, 70, 229, 0.5) !important;
-        }
-
-        .donezo-metric-card {
+        /* Metric Dashboard Cards Styling - Scaled Down / Reduced Size with increased vertical spacing */
+        .metric-card, .donezo-metric-card {
             background: #ffffff !important;
-            border-radius: 20px !important;
-            padding: 22px !important;
-            border: 1.5px solid #cbd5e1 !important;
-            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04) !important;
-            margin-bottom: 20px !important;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-            position: relative;
-            cursor: pointer !important;
-        }
-        .donezo-metric-card:hover {
-            transform: translateY(-5px) scale(1.02) !important;
-            background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%) !important;
-            color: #ffffff !important;
-            box-shadow: 0 14px 36px rgba(79, 70, 229, 0.45) !important;
-            border-color: transparent !important;
-        }
-        .donezo-metric-card:hover * {
-            color: #ffffff !important;
-            opacity: 1 !important;
-        }
-        .donezo-metric-card:hover .arrow-icon-circle {
-            background: rgba(255, 255, 255, 0.25) !important;
-            border-color: transparent !important;
-            color: #ffffff !important;
-        }
-
-        /* Light Cards */
-        .glass-card {
-            background: #ffffff !important;
-            border-radius: 16px !important;
-            padding: 20px 24px !important;
-            border: 1.5px solid #cbd5e1 !important;
-            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05) !important;
-            margin-bottom: 16px !important;
+            border: 1px solid #cbd5e1 !important;
+            border-radius: 12px !important;
+            padding: 12px 16px !important;
+            margin-bottom: 24px !important; /* Increased distance between cards vertically */
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03) !important;
             transition: all 0.25s ease !important;
         }
-        .glass-card:hover {
-            transform: translateY(-2px) !important;
-            border-color: #4f46e5 !important;
-            box-shadow: 0 8px 24px rgba(79, 70, 229, 0.12) !important;
-        }
-
-        /* Styled Badges */
-        .badge {
-            padding: 5px 12px !important;
-            border-radius: 9999px !important;
-            font-size: 0.75rem !important;
-            font-weight: 700 !important;
-            display: inline-block !important;
-            text-transform: uppercase !important;
-            letter-spacing: 0.05em !important;
-        }
-        .badge-missing {
-            background-color: #ffe4e6 !important;
-            color: #e11d48 !important;
-            border: 1.5px solid #fda4af !important;
-        }
-        .badge-found {
-            background-color: #dcfce7 !important;
-            color: #15803d !important;
-            border: 1.5px solid #86efac !important;
-        }
-        .badge-pending {
-            background-color: #fef3c7 !important;
-            color: #b45309 !important;
-            border: 1.5px solid #fcd34d !important;
-        }
-        .badge-verified {
-            background-color: #dbeafe !important;
-            color: #1d4ed8 !important;
-            border: 1.5px solid #93c5fd !important;
-        }
-
-        /* Card Image container styling */
-        .card-img-container {
-            width: 100%;
-            height: 200px;
-            border-radius: 8px;
-            overflow: hidden;
-            background-color: #f1f5f9;
-            border: 1px solid #e2e8f0;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        
+        /* Scaled down internal typography and controls inside metric cards */
+        .metric-card div:first-child > span:first-child,
+        .donezo-metric-card div:first-child > span:first-child {
+            font-size: 10.5px !important; /* Sized down label text */
         }
         
-        .card-img-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        /* Metric Dashboard Cards */
-        .metric-card {
-            background: #ffffff;
-            border-left: 4px solid #4f46e5;
-            border-radius: 14px;
-            padding: 18px;
-            margin-bottom: 15px;
-            border-top: 1px solid #e2e8f0;
-            border-right: 1px solid #e2e8f0;
-            border-bottom: 1px solid #e2e8f0;
-            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
-            transition: all 0.25s ease;
-        }
-        .metric-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(79, 70, 229, 0.12);
-            border-color: #c7d2fe;
+        .metric-card h1, .donezo-metric-card h1 {
+            font-size: 22px !important; /* Sized down value number */
+            margin-bottom: 6px !important;
         }
         
-        /* Light Sidebar styling - PYDAH Reference Design */
-        section[data-testid="stSidebar"] {
-            background-color: #f8fafc !important;
-            border-right: 1px solid #e2e8f0 !important;
-            width: 310px !important;
-            min-width: 310px !important;
+        .metric-card div:last-child, .donezo-metric-card div:last-child {
+            font-size: 9.5px !important; /* Sized down bottom subtext */
         }
-        section[data-testid="stSidebar"] [data-testid="stSidebarUserContent"] {
-            padding: 0 !important;
+        
+        .metric-card .arrow-icon-circle, .donezo-metric-card .arrow-icon-circle {
+            width: 18px !important; /* Sized down arrow circle control */
+            height: 18px !important;
+            font-size: 9px !important;
         }
-        /* Forcefully collapse top Streamlit header, toolbar, and decoration bar */
-        header[data-testid="stHeader"],
-        div[data-testid="stHeader"],
-        div[data-testid="stDecoration"],
+        
+        /* Premium Interactive Hover - Transforms card background to solid blue/indigo */
+        .metric-card:hover, .donezo-metric-card:hover {
+            transform: translateY(-4px) !important;
+            background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%) !important;
+            border-color: transparent !important;
+            box-shadow: 0 12px 30px rgba(79, 70, 229, 0.3) !important;
+        }
+        
+        /* Label text turns white on hover */
+        .metric-card:hover div:first-child > span:first-child,
+        .donezo-metric-card:hover div:first-child > span:first-child {
+            color: #ffffff !important;
+        }
+        
+        /* Large value number turns white on hover */
+        .metric-card:hover h1, .donezo-metric-card:hover h1 {
+            color: #ffffff !important;
+        }
+        
+        /* Bottom subtext wrapper turns light white on hover (preserves bullet point color via inheritance) */
+        .metric-card:hover div:last-child, .donezo-metric-card:hover div:last-child {
+            color: rgba(255, 255, 255, 0.9) !important;
+        }
+        
+        /* Arrow icon circle turns white outline and translucent white background on hover */
+        .metric-card:hover .arrow-icon-circle, .donezo-metric-card:hover .arrow-icon-circle {
+            border-color: rgba(255, 255, 255, 0.4) !important;
+            color: #ffffff !important;
+            background-color: rgba(255, 255, 255, 0.15) !important;
+        }
+
+        /* Donezo Hero Cards Styling - Scaled Down / Reduced Size */
+        .donezo-hero-card {
+            background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%) !important;
+            color: #ffffff !important;
+            border-radius: 12px !important;
+            padding: 12px 16px !important;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.15) !important;
+            transition: all 0.25s ease !important;
+            margin-bottom: 12px !important;
+            border: none !important;
+        }
+        .donezo-hero-card:hover {
+            transform: translateY(-4px) !important;
+            box-shadow: 0 10px 25px rgba(79, 70, 229, 0.35) !important;
+        }
+
+        /* Hide Streamlit Deploy button, Main Menu (three dots), and Decoration Line */
+        .stDeployButton, .stAppDeployButton, div[data-testid="stConnectionStatus"] {
+            display: none !important;
+        }
+        #MainMenu, [data-testid="stMainMenu"] {
+            visibility: hidden !important;
+            display: none !important;
+        }
+        div[data-testid="stDecoration"] {
+            display: none !important;
+        }
         div[data-testid="stToolbar"] {
             display: none !important;
-            height: 0px !important;
-            min-height: 0px !important;
-            padding: 0px !important;
-            margin: 0px !important;
-            visibility: hidden !important;
         }
 
-        /* Main Page Viewport - 100% Full Width Span (Left to Right Edge) & Top Edge Placement */
+        /* Main Page Viewport - 100% Full Width Span (Left to Right Edge) */
         div[data-testid="stAppViewContainer"],
         section.main {
-            padding-top: 0px !important;
             margin-top: 0px !important;
         }
 
         /* 100% Full-Screen Edge-to-Edge Span across all screen resolutions */
         .main .block-container,
         div[data-testid="stBlockContainer"],
-        [data-testid="stBlockContainer"] {
+        [data-testid="stBlockContainer"],
+        div[data-testid="stAppViewBlockContainer"],
+        .stAppViewBlockContainer {
             max-width: 100% !important;
             width: 100% !important;
             min-width: 100% !important;
@@ -235,28 +300,6 @@ def inject_custom_css():
             margin: 0 !important;
         }
 
-        /* Top Header Navbar Row - Strictly Single Horizontal Line (No Line Wrapping) */
-        div[data-testid="stHorizontalBlock"]:first-child {
-            display: flex !important;
-            flex-direction: row !important;
-            flex-wrap: nowrap !important;
-            align-items: center !important;
-            justify-content: space-between !important;
-            gap: 12px !important;
-        }
-        div[data-testid="stHorizontalBlock"]:first-child > div {
-            width: auto !important;
-            min-width: auto !important;
-            flex: 0 1 auto !important;
-        }
-
-        /* Pull top header navbar flush against top edge of browser window on 100% maximized viewports */
-        .main .block-container > div:first-child,
-        div[data-testid="stBlockContainer"] > div:first-child {
-            margin-top: -55px !important;
-            padding-top: 0px !important;
-        }
-
         .main .element-container:first-child,
         .main [data-testid="stVerticalBlock"] > div:first-child,
         div[data-testid="stVerticalBlock"] > div:first-child,
@@ -269,12 +312,8 @@ def inject_custom_css():
         .sidebar-brand-header * {
             color: #ffffff !important;
         }
-        /* Completely hide default auto-generated Streamlit multi-page sidebar navigation */
-        div[data-testid="stSidebarNav"] {
-            display: none !important;
-        }
 
-        /* 100% Full-Width Span Page Link Cards in Sidebar (PYDAH Pill Cards) */
+        /* 100% Full-Width Page Link Cards in Sidebar (PYDAH Pill Cards) */
         div[data-testid="stPageLink"] {
             width: 100% !important;
         }
@@ -325,31 +364,6 @@ def inject_custom_css():
             background: linear-gradient(135deg, #4338ca 0%, #3730a3 100%);
         }
 
-        /* National Power Portal Top Navbar Styling (Flat Text Links + Yellow Accent Active Box) */
-        div[data-testid="stHorizontalBlock"]:first-child div.stButton > button {
-            background: transparent !important;
-            color: #0f172a !important;
-            border: 2px solid transparent !important;
-            border-radius: 4px !important;
-            box-shadow: none !important;
-            font-weight: 700 !important;
-            font-size: 13.5px !important;
-            text-transform: uppercase !important;
-            letter-spacing: 0.5px !important;
-            padding: 6px 14px !important;
-            transition: all 0.15s ease !important;
-            margin: 0 !important;
-            white-space: nowrap !important;
-            word-break: keep-all !important;
-            overflow: visible !important;
-        }
-        div[data-testid="stHorizontalBlock"]:first-child div.stButton > button:hover {
-            background: #f8fafc !important;
-            color: #2563eb !important;
-            border-color: #cbd5e1 !important;
-            transform: none !important;
-            box-shadow: none !important;
-        }
         /* Inputs & Selectboxes */
         div[data-baseweb="input"], div[data-baseweb="select"] {
             border-radius: 12px !important;
@@ -410,27 +424,6 @@ def inject_custom_css():
             border: 1px solid #e2e8f0;
         }
 
-        /* Multi-Device Responsive Support (Mobile, Tablet, Laptop, Laptop L, 4K Display) */
-        @media screen and (max-width: 1200px) {
-            div[data-testid="stHorizontalBlock"]:first-child div.stButton > button {
-                font-size: 12px !important;
-                padding: 5px 8px !important;
-            }
-        }
-
-        @media screen and (max-width: 768px) {
-            /* Mobile Devices */
-            .main .block-container,
-            div[data-testid="stBlockContainer"] {
-                padding-left: 0.5rem !important;
-                padding-right: 0.5rem !important;
-            }
-            div[data-testid="stHorizontalBlock"] div.stButton > button {
-                font-size: 11px !important;
-                padding: 4px 6px !important;
-            }
-        }
-
         /* Ensure all Streamlit columns stay in a horizontal row */
         div[data-testid="stHorizontalBlock"] {
             flex-direction: row !important;
@@ -465,23 +458,107 @@ def inject_custom_css():
                 border-color: #eab308 !important;
             }
         }
-
-        /* Hide left sidebar completely so top header acts as main navbar */
-        section[data-testid="stSidebar"] {
-            display: none !important;
-            width: 0px !important;
+        
+        /* Styled st.container(border=True) */
+        div[data-testid="stVerticalBlockBorderWrapper"] {
+            background: #ffffff !important;
+            border-radius: 16px !important;
+            border: 1.5px solid #cbd5e1 !important;
+            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05) !important;
+            padding: 16px 20px !important;
+            transition: all 0.25s ease !important;
         }
-        div[data-testid="stSidebarNav"] {
-            display: none !important;
+        div[data-testid="stVerticalBlockBorderWrapper"]:hover {
+            transform: translateY(-2px) !important;
+            border-color: #4f46e5 !important;
+            box-shadow: 0 8px 24px rgba(79, 70, 229, 0.12) !important;
         }
     </style>
     """, unsafe_allow_html=True)
+    
+    if not authenticated:
+        st.markdown("""
+        <style>
+            /* Hide the sidebar completely across all screens and pages for unauthenticated users */
+            section[data-testid="stSidebar"],
+            [data-testid="stSidebar"],
+            div[data-testid="collapsedControl"],
+            [data-testid="collapsedControl"],
+            button[data-testid="stSidebarCollapseButton"],
+            .stSidebarCollapseButton {
+                display: none !important;
+                width: 0px !important;
+                visibility: hidden !important;
+            }
+
+            /* Force main container to use 100% width and remove any sidebar spacer */
+            div[data-testid="stAppViewContainer"] {
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            div[data-testid="stAppViewContainer"] > section {
+                width: 100% !important;
+                max-width: 100% !important;
+                margin-left: 0px !important;
+            }
+        </style>
+        """, unsafe_allow_html=True)
+    else:
+        st.markdown("""
+        <style>
+            /* Force the sidebar to be permanently visible and expanded at 280px width on the left */
+            section[data-testid="stSidebar"],
+            [data-testid="stSidebar"] {
+                display: block !important;
+                visibility: visible !important;
+                width: 280px !important;
+                min-width: 280px !important;
+                margin-left: 0px !important;
+                transform: none !important; /* Force it to stay on screen */
+            }
+
+            /* Hide all collapse/expand trigger buttons and arrows completely */
+            button[data-testid="stSidebarCollapseButton"],
+            button[data-testid="stHeaderSidebarCollapseButton"],
+            div[data-testid="collapsedControl"],
+            [data-testid="collapsedControl"],
+            .stSidebarCollapseButton {
+                display: none !important;
+                visibility: hidden !important;
+                width: 0px !important;
+                height: 0px !important;
+            }
+
+            /* Hide the default empty space reserved for the sidebar header */
+            div[data-testid="stSidebarHeader"] {
+                padding: 0 !important;
+                min-height: 0px !important;
+                height: 0px !important;
+            }
+
+            /* Force the main container viewport layout (section.main) to fit exactly next to the static left sidebar */
+            div[data-testid="stAppViewContainer"] > section.main {
+                margin-left: 280px !important;
+                width: calc(100% - 280px) !important;
+                max-width: calc(100% - 280px) !important;
+            }
+
+            /* Align the top of the brand container and remove any top padding spacing */
+            div[data-testid="stSidebarUserContent"] {
+                padding-top: 20px !important;
+            }
+            .sidebar-brand-container {
+                padding-right: 0px !important;
+                margin-bottom: 24px !important;
+            }
+        </style>
+        """, unsafe_allow_html=True)
     
     render_top_header()
 
 
 def render_top_header():
-    """Renders a modern National Portal style top header navigation bar across all pages."""
+    """Renders the navigation in a modern horizontal top navbar at the top of the main page."""
     authenticated = st.session_state.get("authenticated", False)
     user = st.session_state.get("user", {}) or {}
     role = user.get("role") if authenticated else "public"
@@ -498,124 +575,163 @@ def render_top_header():
         except Exception:
             pass
 
-    logo_html = f'<img src="data:image/png;base64,{logo_b64}" style="width: 42px; height: 42px; border-radius: 6px;" />' if logo_b64 else get_svg_icon('brand_logo', size=36)
+    logo_html = f'<img src="data:image/png;base64,{logo_b64}" style="width: 32px; height: 32px; border-radius: 6px;" />' if logo_b64 else get_svg_icon('brand_logo', size=28)
 
+    # Styling for the horizontal navbar container and links
+    st.markdown("""
+    <style>
+        /* Target the top navbar container by its Streamlit key to stretch edge-to-edge */
+        div.st-key-navbar_container {
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        div.st-key-navbar_container div[data-testid="stVerticalBlockBorderWrapper"] {
+            padding: 10px 24px !important;
+            margin-top: 0px !important;
+            margin-left: -0.5rem !important;
+            margin-right: -0.5rem !important;
+            margin-bottom: 24px !important;
+            width: calc(100% + 1rem) !important;
+            max-width: calc(100% + 1rem) !important;
+            min-width: calc(100% + 1rem) !important;
+            background-color: #ffffff !important;
+            border-top: none !important;
+            border-left: none !important;
+            border-right: none !important;
+            border-bottom: 1px solid #cbd5e1 !important;
+            border-radius: 0px !important;
+            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06) !important;
+        }
+        
+        /* Seamless Dark Theme Adaptability for the top navbar */
+        @media (prefers-color-scheme: dark) {
+            div.st-key-navbar_container div[data-testid="stVerticalBlockBorderWrapper"] {
+                background-color: #1a2238 !important;
+                border-color: #2e3b5e !important;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25) !important;
+            }
+        }
+        
+        /* Ensure all Streamlit columns stay in a horizontal row and align centered */
+        div[data-testid="stHorizontalBlock"] {
+            align-items: center !important;
+        }
+    </style>
+    """, unsafe_allow_html=True)
+
+    # Determine pages based on role and authentication
+    pages = []
     if not authenticated:
-        hcol1, hcol2 = st.columns([2.8, 5.2])
-        with hcol1:
-            st.markdown(f"""
-            <div style="display: flex; align-items: center; gap: 12px; padding: 2px 0;">
-                {logo_html}
-                <div>
-                    <div style="font-size: 20px; font-weight: 900; letter-spacing: -0.3px; font-family: 'Outfit', sans-serif; white-space: nowrap;">
-                        <span style="color: #2563eb;">NATIONAL</span> <span style="color: #d97706;">MISSING PORTAL</span>
-                    </div>
-                    <div style="font-size: 9px; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap;">Government of India • Ministry of Home Affairs</div>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-        with hcol2:
-            cols = st.columns([0.9, 1.1, 1.4, 1.5, 1.5, 1])
-            with cols[0]:
-                if st.button("HOME", key="hdr_home", use_container_width=True):
-                    st.switch_page("app.py")
-            with cols[1]:
-                if st.button("ABOUT US", key="hdr_about", use_container_width=True):
-                    st.switch_page("app.py")
-            with cols[2]:
-                if st.button("PUBLIC PORTAL", key="hdr_public", type="primary", use_container_width=True):
-                    st.switch_page("pages/public_portal.py")
-            with cols[3]:
-                if st.button("CASE DIRECTORY", key="hdr_cases", use_container_width=True):
-                    st.switch_page("pages/cases.py")
-            with cols[4]:
-                if st.button("SIGHTINGS MAP", key="hdr_map", use_container_width=True):
-                    st.switch_page("pages/map.py")
-            with cols[5]:
-                if st.button("LOGIN", key="hdr_login", use_container_width=True):
-                    st.switch_page("pages/login.py")
+        pages = [
+            ("app.py", "Home", "🏠"),
+            ("pages/public_portal.py", "Public Portal", "🌐"),
+            ("pages/cases.py", "Cases", "📁"),
+            ("pages/map.py", "Map", "📍"),
+            ("pages/login.py", "Login", "🔑"),
+        ]
 
+    # Sidebar navigation items (exclusively for Admin or Officer when logged in)
+    sidebar_pages = []
+    if role == "admin":
+        sidebar_pages = [
+            ("pages/admin_dashboard.py", "Dashboard", "📊"),
+            ("pages/case_management.py", "Cases", "📁"),
+            ("pages/admin_face_matching.py", "Face Match", "🔍"),
+            ("pages/video_sightings.py", "CCTV", "📹"),
+            ("pages/admin_map.py", "Map", "📍"),
+            ("pages/admin_public_submissions.py", "Submissions", "🌐"),
+            ("pages/match_review.py", "Reviews", "⚖️"),
+        ]
     elif role == "officer":
-        hcol1, hcol2 = st.columns([2.8, 5.2])
-        with hcol1:
-            st.markdown(f"""
-            <div style="display: flex; align-items: center; gap: 12px; padding: 2px 0;">
-                {logo_html}
-                <div>
-                    <div style="font-size: 20px; font-weight: 900; letter-spacing: -0.3px; font-family: 'Outfit', sans-serif; white-space: nowrap;">
-                        <span style="color: #2563eb;">NATIONAL</span> <span style="color: #d97706;">MISSING PORTAL</span>
-                    </div>
-                    <div style="font-size: 9.5px; color: #4f46e5; font-weight: 700; text-transform: uppercase;">Officer: {user.get('username', 'User').upper()}</div>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-        with hcol2:
-            cols = st.columns([1, 1.1, 1.1, 1.1, 1.1, 1])
-            with cols[0]:
-                if st.button("DASHBOARD", key="hdr_off_dash", type="primary", use_container_width=True):
-                    st.switch_page("pages/officer_dashboard.py")
-            with cols[1]:
-                if st.button("CASES", key="hdr_off_cases", use_container_width=True):
-                    st.switch_page("pages/cases.py")
-            with cols[2]:
-                if st.button("MAP", key="hdr_off_map", use_container_width=True):
-                    st.switch_page("pages/map.py")
-            with cols[3]:
-                if st.button("SIGHTINGS", key="hdr_off_sightings", use_container_width=True):
-                    st.switch_page("pages/sightings.py")
-            with cols[4]:
-                if st.button("PUBLIC", key="hdr_off_pub", use_container_width=True):
-                    st.switch_page("pages/public_portal.py")
-            with cols[5]:
-                if st.button("LOGOUT", key="hdr_logout", use_container_width=True):
-                    from backend.auth.authentication import logout_user
-                    logout_user()
+        sidebar_pages = [
+            ("pages/officer_dashboard.py", "Dashboard", "📊"),
+            ("pages/cases.py", "Cases", "📁"),
+            ("pages/map.py", "GIS Map", "📍"),
+            ("pages/sightings.py", "Sightings", "👁️"),
+            ("pages/public_portal.py", "Public Portal", "🌐"),
+        ]
 
-    elif role == "admin":
-        hcol1, hcol2 = st.columns([2.5, 5.5])
-        with hcol1:
-            st.markdown(f"""
-            <div style="display: flex; align-items: center; gap: 12px; padding: 2px 0;">
-                {logo_html}
-                <div>
-                    <div style="font-size: 19px; font-weight: 900; letter-spacing: -0.3px; font-family: 'Outfit', sans-serif; white-space: nowrap;">
-                        <span style="color: #2563eb;">NATIONAL</span> <span style="color: #d97706;">MISSING PORTAL</span>
-                    </div>
-                    <div style="font-size: 9.5px; color: #dc2626; font-weight: 700; text-transform: uppercase;">Admin: {user.get('username', 'Admin').upper()}</div>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-        with hcol2:
-            cols = st.columns([1, 1, 1, 1, 1, 1, 1, 1])
+    # Dynamically build horizontal layout using st.container & st.columns (ONLY for public guest navigation)
+    if not authenticated:
+        with st.container(key="navbar_container", border=True):
+            # Calculate dynamic column width spec based on label text length to prevent any wrapping or cutoffs
+            col_spec = [2.2]  # Logo and Brand Branding
+            for path, label, icon in pages:
+                width = 0.7 + (len(label) * 0.065)
+                col_spec.append(width)
+                
+            cols = st.columns(col_spec)
+            
+            # 1. Branding (Col 0)
             with cols[0]:
-                if st.button("DASH", key="hdr_adm_dash", type="primary", use_container_width=True):
-                    st.switch_page("pages/admin_dashboard.py")
-            with cols[1]:
-                if st.button("CASES", key="hdr_adm_cases", use_container_width=True):
-                    st.switch_page("pages/case_management.py")
-            with cols[2]:
-                if st.button("MATCH", key="hdr_adm_match", use_container_width=True):
-                    st.switch_page("pages/admin_face_matching.py")
-            with cols[3]:
-                if st.button("VIDEO", key="hdr_adm_vid", use_container_width=True):
-                    st.switch_page("pages/video_sightings.py")
-            with cols[4]:
-                if st.button("MAP", key="hdr_adm_map", use_container_width=True):
-                    st.switch_page("pages/admin_map.py")
-            with cols[5]:
-                if st.button("SUBMISSIONS", key="hdr_adm_sub", use_container_width=True):
-                    st.switch_page("pages/admin_public_submissions.py")
-            with cols[6]:
-                if st.button("REVIEW", key="hdr_adm_rev", use_container_width=True):
-                    st.switch_page("pages/match_review.py")
-            with cols[7]:
-                if st.button("LOGOUT", key="hdr_adm_logout", use_container_width=True):
-                    from backend.auth.authentication import logout_user
-                    logout_user()
+                st.markdown(f"""
+                <div style="display: flex; align-items: center; gap: 8px; padding-top: 4px;">
+                    {logo_html}
+                    <div style="line-height: 1.1;">
+                        <div style="font-size: 13px; font-weight: 800; color: #0f172a; letter-spacing: -0.3px;">MPIS PORTAL</div>
+                        <div style="font-size: 8px; color: #4f46e5; font-weight: 700; text-transform: uppercase;">{role.upper()}</div>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+                
+            # 2. Navigation Links
+            for i, (path, label, icon) in enumerate(pages):
+                with cols[i + 1]:
+                    st.page_link(path, label=label, icon=icon)
 
-    st.markdown("<div style='height: 2px; background: linear-gradient(90deg, #2563eb 0%, #3b82f6 50%, #eab308 100%); margin: 6px 0 18px 0;'></div>", unsafe_allow_html=True)
+    # 4. Render custom sidebar navigation exclusively for authenticated users (Admin / Officer dashboards)
+    if authenticated:
+        st.sidebar.markdown(f"""
+        <div class="sidebar-brand-container" style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
+            {logo_html}
+            <div class="sidebar-brand-text">
+                <div style="font-size: 15px; font-weight: 800; color: #0f172a; line-height: 1.1;">MPIS PORTAL</div>
+                <div style="font-size: 10px; color: #4f46e5; font-weight: 700;">{role.upper()}</div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        for path, label, icon in sidebar_pages:
+            st.sidebar.page_link(path, label=label, icon=icon)
+            
+        st.sidebar.divider()
+        if st.sidebar.button("🚪 Logout", key="sidebar_logout_btn_auth", use_container_width=True):
+            from backend.auth.authentication import logout_user
+            logout_user()
+
+        # Force sidebar to expand programmatically if collapsed when page loads (using multiple selectors for robustness)
+        import streamlit.components.v1 as components
+        components.html("""
+        <script>
+            function checkAndOpenSidebar() {
+                try {
+                    const selectors = [
+                        'button[data-testid="stHeaderSidebarCollapseButton"]',
+                        'div[data-testid="collapsedControl"] button',
+                        '.stHeaderSidebarCollapseButton',
+                        'div[data-testid="collapsedControl"]'
+                    ];
+                    for (const sel of selectors) {
+                        const btn = window.parent.document.querySelector(sel);
+                        if (btn) {
+                            btn.click();
+                            console.log("Forced sidebar expansion via selector: " + sel);
+                            break;
+                        }
+                    }
+                } catch (e) {
+                    console.error("Error opening sidebar:", e);
+                }
+            }
+            setTimeout(checkAndOpenSidebar, 200);
+            setTimeout(checkAndOpenSidebar, 500);
+            setTimeout(checkAndOpenSidebar, 1000);
+        </script>
+        """, height=0, width=0)
 
 
 def render_role_sidebar():
     """Backwards compatible alias that delegates to render_top_header()."""
     render_top_header()
+

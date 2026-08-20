@@ -24,9 +24,10 @@ if not connected:
 case_repo = CaseRepository()
 sighting_repo = SightingRepository()
 
-# Sidebar Filters
-st.sidebar.subheader("Filters")
-status_filter = st.sidebar.selectbox("Verification Status", ["All", "Pending", "Verified", "Rejected"])
+# Sighting Filters (rendered horizontally)
+fcol1, _ = st.columns([2, 8])
+with fcol1:
+    status_filter = st.selectbox("Verification Status", ["All", "Pending", "Verified", "Rejected"])
 
 # Query sightings from MongoDB via SightingRepository
 query_filter = {}

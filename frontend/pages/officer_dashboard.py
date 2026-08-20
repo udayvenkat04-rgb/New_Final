@@ -14,7 +14,7 @@ from backend.repositories import CaseRepository, SightingRepository, FaceReposit
 from backend.services import CaseService, DashboardService
 
 # ── Page config & OFFICER-ONLY authorization guard ───────────────────
-st.set_page_config(page_title="Officer Dashboard", page_icon="👮", layout="wide")
+st.set_page_config(page_title="Officer Dashboard", page_icon="👮", layout="wide", initial_sidebar_state="expanded")
 inject_custom_css()
 # CRITICAL: only ROLE_OFFICER is allowed here. Admin is NOT allowed through
 # this guard (require_role with a single allowed role prevents the previous
@@ -122,12 +122,12 @@ def _stat_card(label: str, value, color: str, icon: str, is_hero: bool = False, 
     return f"""
     <div class="donezo-metric-card">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-            <span style="font-size: 13.5px; font-weight: 600; color: #64748b; text-transform: capitalize;">{label}</span>
-            <span style="border: 1px solid #e2e8f0; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #64748b;">↗</span>
+            <span style="font-size: 13.5px; font-weight: 700; color: #334155; text-transform: capitalize;">{label}</span>
+            <span class="arrow-icon-circle" style="border: 1px solid #cbd5e1; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #475569; transition: all 0.3s ease;">↗</span>
         </div>
         <h1 style="font-size: 36px; font-weight: 800; margin: 0 0 10px 0; color: #0f172a; line-height: 1;">{value}</h1>
-        <div style="font-size: 11.5px; color: #94a3b8; font-weight: 500;">
-            <span style="color: {color}; font-weight: 700; margin-right: 4px;">●</span> {sub_text or 'Live Status'}
+        <div style="font-size: 12px; color: #64748b; font-weight: 600;">
+            <span style="color: {color}; font-weight: 800; margin-right: 4px;">●</span> {sub_text or 'Live Status'}
         </div>
     </div>
     """
@@ -139,7 +139,7 @@ def render_statistics_cards(d: dict):
     IMPORTANT: these values come from DashboardService.get_officer_dashboard_data
     which already filtered every query by `created_by = <officer.username>`.
     """
-    cols = st.columns(4, gap="medium")
+    cols = st.columns(4, gap="large")
     with cols[0]:
         st.markdown(
             _stat_card("My Total Cases", d["my_total_cases"], "#4f46e5", "📁", sub_text="Total Bulletins"),
@@ -198,30 +198,31 @@ def render_quick_actions():
     """Renders the Quick Actions section — Register Missing Person + My Cases."""
     st.markdown("#### ⚡ Quick Actions")
     st.markdown(
-        "<p style='color: #94a3b8; font-size: 14px;'>Jump to frequently used features.</p>",
+        "<p style='color: #64748b; font-size: 13px; margin-bottom: 16px;'>Jump to frequently used features.</p>",
         unsafe_allow_html=True,
     )
 
     cols = st.columns(2)
     for idx, action in enumerate(OFFICER_QUICK_ACTIONS):
         with cols[idx % 2]:
-            st.markdown(f"""
-            <div class="glass-card" style="text-align: center; padding: 20px; min-height: 140px;">
-                <div style="font-size: 32px; margin-bottom: 8px;">{action['icon']}</div>
-                <div style="font-size: 15px; font-weight: 600; color: {action['color']};">
-                    {action['label']}
+            with st.container(border=True):
+                st.markdown(f"""
+                <div style="text-align: center; padding: 5px 0 0 0; min-height: 90px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                    <div style="font-size: 24px; margin-bottom: 6px;">{action['icon']}</div>
+                    <div style="font-size: 13px; font-weight: 700; color: {action['color']}; line-height: 1.1;">
+                        {action['label']}
+                    </div>
+                    <div style="font-size: 11px; color: #64748b; margin-top: 4px; margin-bottom: 8px; line-height: 1.2;">
+                        {action['desc']}
+                    </div>
                 </div>
-                <div style="font-size: 12px; color: #64748b; margin-top: 4px;">
-                    {action['desc']}
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-            if st.button(
-                f"Open {action['label']}",
-                key=f"oqa_{idx}",
-                use_container_width=True,
-            ):
-                _navigate_to(action["target"])
+                """, unsafe_allow_html=True)
+                if st.button(
+                    f"Open {action['label']}",
+                    key=f"oqa_{idx}",
+                    use_container_width=True,
+                ):
+                    _navigate_to(action["target"])
 
 
 # ─────────────────────────────────────────────────────────────────────
@@ -253,6 +254,10 @@ def render_recent_cases(cases: list):
     leaking another officer's data.
     """
     st.markdown("#### 🕒 Recent Cases")
+    st.markdown(
+        "<p style='color: #64748b; font-size: 13px; margin-bottom: 16px;'>Track and monitor your recently updated cases.</p>",
+        unsafe_allow_html=True,
+    )
 
     if not cases:
         st.info("No recent cases. Use **Register Missing Person** to file your first bulletin.")
@@ -274,19 +279,19 @@ def render_recent_cases(cases: list):
         created_str = _format_timestamp(getattr(case, "created_at", None))
 
         st.markdown(f"""
-        <div class="glass-card" style="padding: 14px 20px;">
+        <div class="glass-card" style="padding: 8px 16px; margin-bottom: 8px;">
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <div>
-                    <span style="font-size: 16px; font-weight: 600; color: #f1f5f9;">
+                    <span style="font-size: 13.5px; font-weight: 700; color: #0f172a;">
                         {case.name}
                     </span>
-                    <span style="margin-left: 8px; color: #64748b; font-size: 13px;">
+                    <span style="margin-left: 8px; color: #475569; font-size: 11.5px; font-weight: 600;">
                         ID #{case.id} · {case.gender}, Age {case.age}
                     </span>
                 </div>
                 <span class="badge {badge_class}">{case.status}</span>
             </div>
-            <div style="margin-top: 6px; color: #94a3b8; font-size: 13px;">
+            <div style="margin-top: 4px; color: #475569; font-size: 11px;">
                 📍 {case.last_seen_location or 'Unknown'} · 🕐 {created_str}
             </div>
         </div>
@@ -566,8 +571,8 @@ def render_register_case_tab():
 
 render_statistics_cards(_data)
 
-# Top-level sections: Quick Actions + Recent Cases
-col_actions, col_recent = st.columns([1, 2])
+# Top-level sections: Quick Actions + Recent Cases (aligned with large horizontal gap spacing)
+col_actions, col_recent = st.columns([1, 2], gap="large")
 with col_actions:
     render_quick_actions()
 with col_recent:

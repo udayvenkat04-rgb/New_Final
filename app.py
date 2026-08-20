@@ -90,19 +90,39 @@ carousel_slides = [
 curr_slide = carousel_slides[st.session_state.carousel_index % len(carousel_slides)]
 
 # Hero Banner Carousel Section (100% Full Width Matching All Containers)
-bhead1, bhead2 = st.columns([8.5, 1.5])
-with bhead1:
-    st.markdown("<span style='font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;'>NATIONAL PORTAL HIGHLIGHT</span>", unsafe_allow_html=True)
-with bhead2:
-    c_prev, c_next = st.columns(2)
-    with c_prev:
-        if st.button("❮", key="carousel_prev", use_container_width=True):
-            st.session_state.carousel_index = (st.session_state.carousel_index - 1) % len(carousel_slides)
-            st.rerun()
-    with c_next:
-        if st.button("❯", key="carousel_next", use_container_width=True):
-            st.session_state.carousel_index = (st.session_state.carousel_index + 1) % len(carousel_slides)
-            st.rerun()
+st.markdown("<span style='font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;'>NATIONAL PORTAL HIGHLIGHT</span>", unsafe_allow_html=True)
+
+# Hidden button to trigger auto-transition of carousel slides
+st.markdown("""
+<style>
+    .st-key-hidden_rerun {
+        display: none !important;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+if st.button("hidden_rerun", key="hidden_rerun"):
+    st.session_state.carousel_index = (st.session_state.carousel_index + 1) % len(carousel_slides)
+    st.rerun()
+
+# Auto-advance carousel timer script (5 seconds)
+import streamlit.components.v1 as components
+components.html(
+    """
+    <script>
+        setTimeout(function() {
+            const parentDoc = window.parent.document;
+            const button = parentDoc.querySelector('.st-key-hidden_rerun button');
+            if (button) {
+                button.click();
+            }
+        }, 5000);
+    </script>
+    """,
+    height=0,
+    width=0
+)
+
 
 st.markdown(f"""
 <div style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #1e1b4b 100%); border-radius: 20px; padding: 36px 40px; color: white; position: relative; overflow: hidden; box-shadow: 0 14px 40px rgba(15, 23, 42, 0.25); border: 1px solid #334155; width: 100%;">

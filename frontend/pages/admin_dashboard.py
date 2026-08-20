@@ -6,7 +6,7 @@ from backend.utils.helpers import inject_custom_css
 from backend.services.dashboard_service import DashboardService
 
 # ── Page config & auth guard ─────────────────────────────────────────
-st.set_page_config(page_title="Admin Dashboard", page_icon="📊", layout="wide")
+st.set_page_config(page_title="Admin Dashboard", page_icon="📊", layout="wide", initial_sidebar_state="expanded")
 inject_custom_css()
 require_role([ROLE_ADMIN])
 
@@ -125,8 +125,8 @@ def _stat_card(label: str, value, color: str, icon: str, is_hero: bool = False, 
 
 def render_statistics_cards(d: dict):
     """Renders the 8 dashboard statistics as a perfectly aligned 4x2 grid with ample gap spacing."""
-    row1 = st.columns(4, gap="medium")
-    row2 = st.columns(4, gap="medium")
+    row1 = st.columns(4, gap="large")
+    row2 = st.columns(4, gap="large")
 
     with row1[0]:
         st.markdown(_stat_card("Total Cases", d["total_cases"], "#4f46e5", "📁", sub_text="Total Registered"), unsafe_allow_html=True)
@@ -260,13 +260,13 @@ def render_case_status_summary(status_breakdown: dict, total_sightings: int, vid
             "Closed": {"color": "#64748b", "icon": "📁", "desc": "Investigations closed"},
         }
 
-        cols = st.columns(max(len(status_breakdown), 1))
+        cols = st.columns(max(len(status_breakdown), 1), gap="medium")
         for idx, (status, count) in enumerate(sorted(status_breakdown.items())):
             cfg = status_config.get(status, {"color": "#94a3b8", "icon": "📋", "desc": status})
             with cols[idx % len(cols)]:
                 pct = (count / total * 100) if total else 0
                 st.markdown(f"""
-                <div class="glass-card" style="text-align: center; padding: 24px;">
+                <div class="glass-card" style="text-align: center; padding: 24px; margin-bottom: 16px;">
                     <div style="font-size: 36px; margin-bottom: 8px;">{cfg['icon']}</div>
                     <div style="font-size: 32px; font-weight: 700; color: {cfg['color']};">{count}</div>
                     <div style="font-size: 14px; font-weight: 700; color: #0f172a; margin: 4px 0;">
@@ -283,9 +283,9 @@ def render_case_status_summary(status_breakdown: dict, total_sightings: int, vid
                 """, unsafe_allow_html=True)
 
     # Sightings summary row
-    st.markdown("---")
+    st.markdown("<div style='margin: 24px 0 16px 0;'><hr style='border: none; border-top: 1px solid #e2e8f0;' /></div>", unsafe_allow_html=True)
     st.markdown("#### 📍 Sightings Overview")
-    sc1, sc2 = st.columns(2)
+    sc1, sc2 = st.columns(2, gap="medium")
     with sc1:
         st.markdown(
             _stat_card("Total Sightings", total_sightings, "#3b82f6", "📍"),
@@ -368,24 +368,25 @@ def render_quick_actions():
 
     cols = st.columns(3, gap="medium")
     for idx, action in enumerate(QUICK_ACTIONS):
-        with cols[idx % 3]:
-            st.markdown(f"""
-            <div class="glass-card" style="text-align: center; padding: 22px; min-height: 140px; margin-bottom: 12px;">
-                <div style="font-size: 32px; margin-bottom: 8px;">{action['icon']}</div>
-                <div style="font-size: 15px; font-weight: 700; color: {action['color']};">
-                    {action['label']}
+         with cols[idx % 3]:
+            with st.container(border=True):
+                st.markdown(f"""
+                <div style="text-align: center; padding: 10px 0 0 0;">
+                    <div style="font-size: 32px; margin-bottom: 8px;">{action['icon']}</div>
+                    <div style="font-size: 16px; font-weight: 700; color: {action['color']};">
+                        {action['label']}
+                    </div>
+                    <div style="font-size: 12.5px; color: #64748b; margin-top: 6px; margin-bottom: 12px;">
+                        {action['desc']}
+                    </div>
                 </div>
-                <div style="font-size: 12px; color: #64748b; margin-top: 4px;">
-                    {action['desc']}
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-            if st.button(
-                f"Open {action['label']}",
-                key=f"qa_{idx}",
-                use_container_width=True,
-            ):
-                _navigate_to(action["page"])
+                """, unsafe_allow_html=True)
+                if st.button(
+                    f"Open {action['label']}",
+                    key=f"qa_{idx}",
+                    use_container_width=True,
+                ):
+                    _navigate_to(action["page"])
 
 
 # ──────────────────────────────────────────────────────────────────────

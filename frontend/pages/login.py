@@ -6,7 +6,7 @@ from backend.auth.authentication import authenticate_user, login_user, logout_us
 from backend.utils.helpers import inject_custom_css
 
 # Page setup - Wide layout for split screen matching the user PNG
-st.set_page_config(page_title="Login - MPIS Portal", page_icon="🔐", layout="wide")
+st.set_page_config(page_title="Login - MPIS Portal", page_icon="🔐", layout="wide", initial_sidebar_state="expanded")
 inject_custom_css()
 
 # Path to the user-provided PNG illustration graphics
@@ -17,20 +17,20 @@ FULL_PNG_PATH = os.path.join("data", "login_hero.png")
 st.markdown("""
 <style>
 /* Background of app on login page & viewport centering */
-.stApp {
+/* .stApp {
     background-color: #f1f5f9 !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: center !important;
     min-height: 100vh !important;
-}
+} */
 
-.main {
+/* .main {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     width: 100% !important;
-}
+} */
 
 /* Unboxed layout - Remove outer card background box and form border */
 
@@ -154,8 +154,6 @@ div[data-testid="stButton"] button:hover {
     color: #ffffff !important;
     transform: translateY(-2px) !important;
     box-shadow: 0 10px 28px rgba(79, 70, 229, 0.5) !important;
-}
-
 }
 
 /* Right column image styling - rounded corners matching card & disable click-to-zoom */

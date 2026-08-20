@@ -281,11 +281,14 @@ def render_register_tab():
 
 def render_directory_tab():
     """Existing case directory + detail + filter + status update (kept)."""
-    # 1. Sidebar Filters
-    st.sidebar.subheader("Filters")
-    status_filter = st.sidebar.selectbox("Status", ["All", "Missing", "Found", "ACTIVE"], key="dir_status")
-    gender_filter = st.sidebar.selectbox("Gender", ["All", "Male", "Female", "Other"], key="dir_gender")
-    search_name = st.sidebar.text_input("Search Name", key="dir_search")
+    # Horizontal Directory Filters
+    fcol1, fcol2, fcol3 = st.columns(3)
+    with fcol1:
+        search_name = st.text_input("🔍 Search Name", key="dir_search")
+    with fcol2:
+        status_filter = st.selectbox("Status", ["All", "Missing", "Found", "ACTIVE"], key="dir_status")
+    with fcol3:
+        gender_filter = st.selectbox("Gender", ["All", "Male", "Female", "Other"], key="dir_gender")
 
     # Build MongoDB query filter
     query_filter = {}
