@@ -175,6 +175,66 @@ button[data-testid="StyledFullScreenButton"],
     cursor: default !important;
     user-select: none !important;
 }
+
+/* Mobile optimizations for Login Page */
+@media screen and (max-width: 991px) {
+    /* Hide the giant biometric graphic on mobile to keep login screen clean and focused */
+    .login-graphic-container {
+        display: none !important;
+    }
+    
+    /* Force checkbox and forgot password columns inside the form to stay side-by-side in a row */
+    div[data-testid="stForm"] div[data-testid="stHorizontalBlock"] {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        flex-wrap: nowrap !important;
+        gap: 10px !important;
+        padding: 0 !important;
+    }
+    
+    div[data-testid="stForm"] div[data-testid="stHorizontalBlock"] > div[data-testid="column"],
+    div[data-testid="stForm"] div[data-testid="stHorizontalBlock"] > div.stColumn {
+        width: 50% !important;
+        flex: 1 1 50% !important;
+        min-width: 50% !important;
+        max-width: 50% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    /* Reset margins for elements inside the columns */
+    div[data-testid="stForm"] div[data-testid="stHorizontalBlock"] div.element-container {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    /* Scale down checkbox and forgot password link font sizes on mobile to prevent messy wrapping */
+    div[data-testid="stForm"] div[data-testid="stCheckbox"] label p {
+        font-size: 12px !important;
+    }
+
+    div[data-testid="stForm"] div[data-testid="stHorizontalBlock"] a {
+        font-size: 12px !important;
+    }
+    
+    /* Right-align the forgot password container link text */
+    div[data-testid="stForm"] div[data-testid="stHorizontalBlock"] div {
+        text-align: right !important;
+    }
+    
+    /* Scale down the greeting message on mobile screens */
+    .login-greeting-container h1 {
+        font-size: 28px !important;
+        line-height: 1.2 !important;
+        margin-bottom: 6px !important;
+    }
+    .login-greeting-container p {
+        font-size: 13.5px !important;
+        margin-bottom: 16px !important;
+    }
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -267,7 +327,7 @@ col_form, col_graphic = st.columns([1.1, 1.0], gap="large")
 
 with col_form:
     st.markdown("""
-    <div style="padding: 10px 10px 0 10px;">
+    <div class="login-greeting-container" style="padding: 10px 10px 0 10px;">
         <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 24px;">
             <span style="background: #4f46e5; color: white; width: 14px; height: 14px; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 900;">🔒</span>
             <strong style="font-size: 16px; color: #0f172a; font-weight: 800; letter-spacing: -0.3px;">Finnger / MPIS Portal</strong>
@@ -351,7 +411,7 @@ with col_graphic:
     if graphic_b64:
         st.markdown(
             f'''
-            <div style="width: 100%; text-align: center; pointer-events: none; user-select: none;">
+            <div class="login-graphic-container" style="width: 100%; text-align: center; pointer-events: none; user-select: none;">
                 <img src="data:image/png;base64,{graphic_b64}" 
                      style="width: 100%; border-radius: 20px; display: block; margin: 0 auto; pointer-events: none; user-select: none; box-shadow: 0 8px 24px rgba(124, 58, 237, 0.15);" 
                      alt="Biometric Authentication Graphic" />

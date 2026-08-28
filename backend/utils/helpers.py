@@ -487,6 +487,55 @@ def inject_custom_css():
             border-color: #4f46e5 !important;
             box-shadow: 0 8px 24px rgba(79, 70, 229, 0.12) !important;
         }
+
+        /* Mobile 2x2 Grid Layout for Statistic Cards */
+        @media screen and (max-width: 767px) {
+            /* Force horizontal columns blocks to display as flex wrap on mobile */
+            div[data-testid="stHorizontalBlock"] {
+                display: flex !important;
+                flex-flow: row wrap !important;
+                gap: 12px !important;
+            }
+            /* Force each child column to be exactly 50% width minus gap */
+            div[data-testid="stHorizontalBlock"] > div[data-testid="column"],
+            div[data-testid="stHorizontalBlock"] > div.stColumn {
+                flex: 1 1 calc(50% - 6px) !important;
+                min-width: calc(50% - 6px) !important;
+                max-width: calc(50% - 6px) !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            
+            /* Adjust metric cards styling inside the 2x2 grid */
+            .metric-card, .donezo-metric-card, .donezo-hero-card {
+                height: 105px !important;
+                padding: 10px 12px !important;
+                margin-bottom: 0px !important; /* Remove bottom margin since container gap handles spacing */
+            }
+            
+            /* Scale down values & text sizes on mobile to prevent overflow */
+            .metric-card h1, .donezo-metric-card h1 {
+                font-size: 20px !important;
+                margin-bottom: 2px !important;
+            }
+            
+            .metric-card div:first-child > span:first-child,
+            .donezo-metric-card div:first-child > span:first-child,
+            .donezo-hero-card div:first-child > span:first-child {
+                font-size: 10px !important;
+            }
+            
+            .metric-card div:last-child, .donezo-metric-card div:last-child,
+            .donezo-hero-card div:last-child {
+                font-size: 9px !important;
+            }
+            
+            .metric-card .arrow-icon-circle, .donezo-metric-card .arrow-icon-circle {
+                width: 16px !important;
+                height: 16px !important;
+                font-size: 8px !important;
+            }
+        }
     </style>
     """, unsafe_allow_html=True)
     
@@ -759,6 +808,164 @@ def render_top_header():
             setTimeout(checkAndOpenSidebar, 1000);
         </script>
         """, height=0, width=0)
+
+    # Determine bottom navigation items dynamically based on role/auth
+    nav_items = []
+    if not authenticated:
+        nav_items = [
+            ("/", "Home", "🏠"),
+            ("/public_portal", "Portal", "🌐"),
+            ("/cases", "Cases", "📁"),
+            ("/map", "Map", "📍"),
+            ("/login", "Login", "🔑"),
+        ]
+    elif role == "admin":
+        nav_items = [
+            ("/admin_dashboard", "Dashboard", "📊"),
+            ("/case_management", "Cases", "📁"),
+            ("/admin_face_matching", "Face Match", "🔍"),
+            ("/video_sightings", "CCTV", "📹"),
+            ("menu", "Menu", "☰"),
+        ]
+    elif role == "officer":
+        nav_items = [
+            ("/officer_dashboard", "Dashboard", "📊"),
+            ("/cases", "Cases", "📁"),
+            ("/map", "Map", "📍"),
+            ("/sightings", "Sightings", "👁️"),
+            ("menu", "Menu", "☰"),
+        ]
+
+    # Detect current page filename to apply 'active' class
+    current_page_file = ""
+    try:
+        import inspect
+        import os
+        frame = inspect.currentframe()
+        while frame:
+            filename = frame.f_code.co_filename
+            if "helpers.py" not in filename:
+                current_page_file = os.path.basename(filename)
+                break
+            frame = frame.f_back
+    except Exception:
+        pass
+
+    def is_active(path, current_page_file):
+        if not current_page_file:
+            return False
+        if path == "/":
+            return current_page_file == "app.py"
+        page_name = path.strip("/")
+        return page_name in current_page_file.lower()
+
+    # Generate Bottom Navbar HTML (un-indented to prevent markdown parser code-block issues)
+    nav_html = '<div class="mobile-nav-bar">'
+    for path, label, icon in nav_items:
+        if path == "menu":
+            nav_html += f"""<a href="#" onclick="try {{
+    const selectors = [
+        'button[data-testid=\\'stHeaderSidebarCollapseButton\\']',
+        'div[data-testid=\\'collapsedControl\\'] button',
+        '.stHeaderSidebarCollapseButton',
+        'div[data-testid=\\'collapsedControl\\']'
+    ];
+    for (const sel of selectors) {{
+        const btn = window.parent.document.querySelector(sel);
+        if (btn) {{
+            btn.click();
+            break;
+        }}
+    }}
+}} catch(e) {{}} return false;" class="mobile-nav-item">
+<div class="mobile-nav-icon">{icon}</div>
+<div class="mobile-nav-label">{label}</div>
+</a>"""
+        else:
+            active_class = "active" if is_active(path, current_page_file) else ""
+            nav_html += f"""<a href="{path}" class="mobile-nav-item {active_class}" target="_self">
+<div class="mobile-nav-icon">{icon}</div>
+<div class="mobile-nav-label">{label}</div>
+</a>"""
+    nav_html += '</div>'
+
+    # Inject Bottom Navbar CSS & HTML (completely un-indented for clean rendering)
+    st.markdown(f"""<style>
+/* Mobile Navigation Bar Styling */
+.mobile-nav-bar {{
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 64px;
+    background-color: #ffffff;
+    border-top: 1px solid #cbd5e1;
+    box-shadow: 0 -4px 16px rgba(15, 23, 42, 0.06);
+    z-index: 999990;
+    justify-content: space-around;
+    align-items: center;
+    padding-bottom: env(safe-area-inset-bottom);
+    box-sizing: border-box;
+}}
+
+.mobile-nav-item {{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #64748b;
+    text-decoration: none !important;
+    flex: 1;
+    height: 100%;
+    transition: all 0.2s ease;
+}}
+
+.mobile-nav-item:hover, .mobile-nav-item.active {{
+    color: #4f46e5;
+}}
+
+.mobile-nav-icon {{
+    font-size: 20px;
+    margin-bottom: 2px;
+}}
+
+.mobile-nav-label {{
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}}
+
+/* Seamless Dark Theme Adaptability for mobile bottom navbar */
+@media (prefers-color-scheme: dark) {{
+    .mobile-nav-bar {{
+        background-color: #1a2238;
+        border-color: #2e3b5e;
+        box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.25);
+    }}
+    .mobile-nav-item {{
+        color: #94a3b8;
+    }}
+    .mobile-nav-item:hover, .mobile-nav-item.active {{
+        color: #818cf8;
+    }}
+}}
+
+/* Media Query to show bottom nav bar only on mobile/tablet viewports */
+@media screen and (max-width: 991px) {{
+    .mobile-nav-bar {{
+        display: flex;
+    }}
+    /* Add bottom padding to the main content container to prevent it from being obscured by the bottom navbar */
+    .block-container,
+    div[data-testid="stAppViewBlockContainer"],
+    .stAppViewBlockContainer {{
+        padding-bottom: 80px !important;
+    }}
+}}
+</style>{nav_html}
+    """, unsafe_allow_html=True)
 
 
 def render_role_sidebar():
