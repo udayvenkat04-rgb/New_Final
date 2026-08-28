@@ -29,7 +29,7 @@ PHONE_REGEX = re.compile(r"^\+?[0-9\s\-]{7,15}$")
 UPLOAD_DIR = os.path.join(BASE_DIR, "data", "uploads", "public_submissions")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
-MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024  # 5 MB
+MAX_IMAGE_SIZE_BYTES = 100 * 1024 * 1024  # 100 MB
 ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png"}
 
 
@@ -94,7 +94,7 @@ class PublicSubmissionService:
         # 7. Image File Validation (If image bytes provided)
         if image_bytes is not None and len(image_bytes) > 0:
             if len(image_bytes) > MAX_IMAGE_SIZE_BYTES:
-                return False, "OVERSIZED_IMAGE: Image file size must not exceed 5 MB."
+                return False, "OVERSIZED_IMAGE: Image file size must not exceed 100 MB."
 
             if filename:
                 ext = os.path.splitext(filename)[1].lower()

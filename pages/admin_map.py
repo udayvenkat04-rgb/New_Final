@@ -89,6 +89,8 @@ except Exception as exc:
     st.stop()
 
 with fcol3:
+    if "map_filter_state" in st.session_state and st.session_state["map_filter_state"] not in available_states:
+        del st.session_state["map_filter_state"]
     state_choice = st.selectbox(
         "Geographic State",
         options=available_states,

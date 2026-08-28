@@ -229,9 +229,9 @@ def test_invalid_image_type(phase22_setup):
 
 
 def test_oversized_image_rejection(phase22_setup):
-    """8. Oversized image file rejection (>5MB)."""
+    """8. Oversized image file rejection (>100MB)."""
     pub_service, _, _, _, _, _ = phase22_setup
-    large_bytes = b"0" * (6 * 1024 * 1024)
+    large_bytes = b"0" * (101 * 1024 * 1024)
     valid, msg = pub_service.validate_submission_data(
         form_data={"full_name": "John Doe", "age": 30, "gender": "Male", "last_seen_city": "Pune", "last_seen_state": "Maharashtra", "complainant_name": "Jane Doe", "contact_email": "j@ex.com", "contact_phone": "+919876543210", "consent": True},
         image_bytes=large_bytes,

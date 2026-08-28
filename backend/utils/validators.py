@@ -13,8 +13,8 @@ from typing import Tuple, Optional, List, Dict, Any
 # ------------------------------------------------------------------
 ALLOWED_IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp"}
 ALLOWED_IMAGE_MIMES = {"image/png", "image/jpeg", "image/jpg", "image/webp"}
-# 5 MB default max image size
-MAX_IMAGE_BYTES = 5 * 1024 * 1024
+# 100 MB default max image size
+MAX_IMAGE_BYTES = 100 * 1024 * 1024
 MIN_AGE = 0
 MAX_AGE = 120
 

@@ -33,8 +33,8 @@ from backend.services.face_matching import (
 from backend.services.case_service import CaseService
 from backend.utils.helpers import inject_custom_css, load_image_safely
 
-# Maximum allowed file upload size (10 MB)
-MAX_UPLOAD_SIZE_BYTES = 10 * 1024 * 1024
+# Maximum allowed file upload size (100 MB)
+MAX_UPLOAD_SIZE_BYTES = 100 * 1024 * 1024
 ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png", "webp"}
 
 
@@ -86,7 +86,7 @@ def _validate_uploaded_image(file) -> tuple[bool, str, PILImage.Image | None]:
 
     if len(bytes_data) > MAX_UPLOAD_SIZE_BYTES:
         size_mb = len(bytes_data) / (1024 * 1024)
-        return False, f"File size ({size_mb:.1f} MB) exceeds maximum allowed 10 MB limit.", None
+        return False, f"File size ({size_mb:.1f} MB) exceeds maximum allowed 100 MB limit.", None
 
     try:
         pil_img = PILImage.open(io.BytesIO(bytes_data))

@@ -146,9 +146,9 @@ def test_path_traversal_filename_rejection():
 
 
 def test_oversized_image_rejection():
-    """13. Oversized image file (>5MB) rejected."""
+    """13. Oversized image file (>100MB) rejected."""
     sub_svc = PublicSubmissionService()
-    large_bytes = b"0" * (6 * 1024 * 1024)
+    large_bytes = b"0" * (101 * 1024 * 1024)
     valid, msg = sub_svc.validate_submission_data(
         form_data={"full_name": "Test Person", "age": 25, "gender": "Male", "last_seen_city": "Pune", "last_seen_state": "MH", "complainant_name": "Complainant Name", "contact_email": "c@ex.com", "contact_phone": "+919876543210", "consent": True},
         image_bytes=large_bytes,

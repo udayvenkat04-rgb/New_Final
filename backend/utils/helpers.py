@@ -164,31 +164,37 @@ def inject_custom_css():
             background: #ffffff !important;
             border: 1px solid #cbd5e1 !important;
             border-radius: 12px !important;
-            padding: 12px 16px !important;
+            padding: 16px 20px !important;
             margin-bottom: 24px !important; /* Increased distance between cards vertically */
             box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03) !important;
             transition: all 0.25s ease !important;
+            height: 140px !important;
+            width: 100% !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: space-between !important;
+            box-sizing: border-box !important;
         }
         
         /* Scaled down internal typography and controls inside metric cards */
         .metric-card div:first-child > span:first-child,
         .donezo-metric-card div:first-child > span:first-child {
-            font-size: 10.5px !important; /* Sized down label text */
+            font-size: 13.5px !important; /* Keep normal label text size */
         }
         
         .metric-card h1, .donezo-metric-card h1 {
-            font-size: 22px !important; /* Sized down value number */
-            margin-bottom: 6px !important;
+            font-size: 32px !important; /* Keep large value number size */
+            margin-bottom: 0px !important;
         }
         
         .metric-card div:last-child, .donezo-metric-card div:last-child {
-            font-size: 9.5px !important; /* Sized down bottom subtext */
+            font-size: 11.5px !important; /* Keep normal bottom subtext size */
         }
         
         .metric-card .arrow-icon-circle, .donezo-metric-card .arrow-icon-circle {
-            width: 18px !important; /* Sized down arrow circle control */
-            height: 18px !important;
-            font-size: 9px !important;
+            width: 24px !important; /* Keep normal arrow circle control */
+            height: 24px !important;
+            font-size: 11px !important;
         }
         
         /* Premium Interactive Hover - Transforms card background to solid blue/indigo */
@@ -227,11 +233,17 @@ def inject_custom_css():
             background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%) !important;
             color: #ffffff !important;
             border-radius: 12px !important;
-            padding: 12px 16px !important;
+            padding: 16px 20px !important;
             box-shadow: 0 4px 12px rgba(79, 70, 229, 0.15) !important;
             transition: all 0.25s ease !important;
-            margin-bottom: 12px !important;
+            margin-bottom: 24px !important;
             border: none !important;
+            height: 140px !important;
+            width: 100% !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: space-between !important;
+            box-sizing: border-box !important;
         }
         .donezo-hero-card:hover {
             transform: translateY(-4px) !important;
@@ -424,10 +436,12 @@ def inject_custom_css():
             border: 1px solid #e2e8f0;
         }
 
-        /* Ensure all Streamlit columns stay in a horizontal row */
-        div[data-testid="stHorizontalBlock"] {
-            flex-direction: row !important;
-            align-items: center !important;
+        /* Ensure all Streamlit columns stay in a horizontal row only on tablet/desktop */
+        @media screen and (min-width: 768px) {
+            div[data-testid="stHorizontalBlock"] {
+                flex-direction: row !important;
+                align-items: center !important;
+            }
         }
 
         /* Seamless Light & Dark Theme Adaptability */
@@ -506,41 +520,53 @@ def inject_custom_css():
     else:
         st.markdown("""
         <style>
-            /* Force the sidebar to be permanently visible and expanded at 280px width on the left */
-            section[data-testid="stSidebar"],
-            [data-testid="stSidebar"] {
-                display: block !important;
-                visibility: visible !important;
-                width: 280px !important;
-                min-width: 280px !important;
-                margin-left: 0px !important;
-                transform: none !important; /* Force it to stay on screen */
+            @media screen and (min-width: 992px) {
+                /* Force the sidebar to be permanently visible and expanded at 280px width on the left */
+                section[data-testid="stSidebar"],
+                [data-testid="stSidebar"] {
+                    display: block !important;
+                    visibility: visible !important;
+                    width: 280px !important;
+                    min-width: 280px !important;
+                    margin-left: 0px !important;
+                    transform: none !important; /* Force it to stay on screen */
+                }
+
+                /* Hide all collapse/expand trigger buttons and arrows completely */
+                button[data-testid="stSidebarCollapseButton"],
+                button[data-testid="stHeaderSidebarCollapseButton"],
+                div[data-testid="collapsedControl"],
+                [data-testid="collapsedControl"],
+                .stSidebarCollapseButton {
+                    display: none !important;
+                    visibility: hidden !important;
+                    width: 0px !important;
+                    height: 0px !important;
+                }
+
+                /* Hide the default empty space reserved for the sidebar header */
+                div[data-testid="stSidebarHeader"] {
+                    padding: 0 !important;
+                    min-height: 0px !important;
+                    height: 0px !important;
+                }
+
+                /* Force the main container viewport layout (section.main) to fit exactly next to the static left sidebar */
+                div[data-testid="stAppViewContainer"] > section.main {
+                    margin-left: 280px !important;
+                    width: calc(100% - 280px) !important;
+                    max-width: calc(100% - 280px) !important;
+                }
             }
 
-            /* Hide all collapse/expand trigger buttons and arrows completely */
-            button[data-testid="stSidebarCollapseButton"],
-            button[data-testid="stHeaderSidebarCollapseButton"],
-            div[data-testid="collapsedControl"],
-            [data-testid="collapsedControl"],
-            .stSidebarCollapseButton {
-                display: none !important;
-                visibility: hidden !important;
-                width: 0px !important;
-                height: 0px !important;
-            }
-
-            /* Hide the default empty space reserved for the sidebar header */
-            div[data-testid="stSidebarHeader"] {
-                padding: 0 !important;
-                min-height: 0px !important;
-                height: 0px !important;
-            }
-
-            /* Force the main container viewport layout (section.main) to fit exactly next to the static left sidebar */
-            div[data-testid="stAppViewContainer"] > section.main {
-                margin-left: 280px !important;
-                width: calc(100% - 280px) !important;
-                max-width: calc(100% - 280px) !important;
+            /* On mobile/tablet, let sidebar collapse and push content naturally */
+            @media screen and (max-width: 991px) {
+                /* Ensure main content takes full width when sidebar is collapsed */
+                div[data-testid="stAppViewContainer"] > section.main {
+                    margin-left: 0px !important;
+                    width: 100% !important;
+                    max-width: 100% !important;
+                }
             }
 
             /* Align the top of the brand container and remove any top padding spacing */
@@ -705,6 +731,10 @@ def render_top_header():
         components.html("""
         <script>
             function checkAndOpenSidebar() {
+                if (window.parent.innerWidth < 992) {
+                    // Do not force expand sidebar on mobile/tablet to keep it clean and responsive
+                    return;
+                }
                 try {
                     const selectors = [
                         'button[data-testid="stHeaderSidebarCollapseButton"]',

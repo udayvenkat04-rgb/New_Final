@@ -95,7 +95,7 @@ with tab_file:
         # Section 4: Photograph Upload
         st.markdown("#### 🖼️ 4. Missing Person Photograph Upload")
         uploaded_image = st.file_uploader(
-            "Upload Clear Photograph (JPG, PNG - Max 5MB) *",
+            "Upload Clear Photograph (JPG, PNG - Max 100MB) *",
             type=["jpg", "jpeg", "png"],
             help="Please provide a clear front-facing photograph if available.",
         )

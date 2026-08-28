@@ -570,3 +570,57 @@ class TestCaching:
         assert err_d is None
         assert lm_d is not lm_c
         assert len(calls) == 3, f"Expected 3 real creations (forced), got {len(calls)}"
+
+
+# ---------------------------------------------------------------------------
+# Fallback mechanism tests
+# ---------------------------------------------------------------------------
+
+
+class TestFallbackDetection:
+    def test_fallback_stages_invoked(self, monkeypatch):
+        # We want to trace all calls to initialize_face_landmarker
+        init_calls = []
+
+        def _mock_init(**kwargs):
+            init_calls.append(kwargs)
+            # Return a fake landmarker that returns 0 faces for default/stage 1 (if confidence is > 0.3)
+            # but returns 1 face for stage 2 (if confidence is 0.3)
+            conf = kwargs.get("min_face_detection_confidence")
+            if conf is not None and abs(conf - 0.3) < 0.01:
+                return _FakeLandmarker(num_faces=1), None
+            else:
+                return _FakeLandmarker(num_faces=0), None
+
+        monkeypatch.setattr(fd, "initialize_face_landmarker", _mock_init)
+
+        img = _make_synthetic_face_image(1)
+        res = fd.detect_faces(img, min_face_detection_confidence=0.5, fallback_on_unclear=True)
+
+        assert res.success is True
+        assert res.num_faces == 1
+        # It should have called initialize_face_landmarker twice:
+        # 1st call for min_face_detection_confidence=0.5
+        # 2nd call for min_face_detection_confidence=0.3
+        assert len(init_calls) == 2
+        assert init_calls[0]["min_face_detection_confidence"] == 0.5
+        assert init_calls[1]["min_face_detection_confidence"] == 0.3
+        assert init_calls[1]["num_faces"] == 10
+
+    def test_no_fallback_when_disabled(self, monkeypatch):
+        init_calls = []
+
+        def _mock_init(**kwargs):
+            init_calls.append(kwargs)
+            return _FakeLandmarker(num_faces=0), None
+
+        monkeypatch.setattr(fd, "initialize_face_landmarker", _mock_init)
+
+        img = _make_synthetic_face_image(1)
+        res = fd.detect_faces(img, min_face_detection_confidence=0.5, fallback_on_unclear=False)
+
+        assert res.success is True
+        assert res.num_faces == 0
+        # It should only call initialize_face_landmarker once:
+        assert len(init_calls) == 1
+        assert init_calls[0]["min_face_detection_confidence"] == 0.5

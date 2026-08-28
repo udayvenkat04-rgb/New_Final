@@ -202,27 +202,25 @@ def render_quick_actions():
         unsafe_allow_html=True,
     )
 
-    cols = st.columns(2)
     for idx, action in enumerate(OFFICER_QUICK_ACTIONS):
-        with cols[idx % 2]:
-            with st.container(border=True):
-                st.markdown(f"""
-                <div style="text-align: center; padding: 5px 0 0 0; min-height: 90px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
-                    <div style="font-size: 24px; margin-bottom: 6px;">{action['icon']}</div>
-                    <div style="font-size: 13px; font-weight: 700; color: {action['color']}; line-height: 1.1;">
-                        {action['label']}
-                    </div>
-                    <div style="font-size: 11px; color: #64748b; margin-top: 4px; margin-bottom: 8px; line-height: 1.2;">
-                        {action['desc']}
-                    </div>
+        with st.container(border=True):
+            st.markdown(f"""
+            <div style="text-align: center; padding: 5px 0 0 0; min-height: 90px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                <div style="font-size: 24px; margin-bottom: 6px;">{action['icon']}</div>
+                <div style="font-size: 13px; font-weight: 700; color: {action['color']}; line-height: 1.1;">
+                    {action['label']}
                 </div>
-                """, unsafe_allow_html=True)
-                if st.button(
-                    f"Open {action['label']}",
-                    key=f"oqa_{idx}",
-                    use_container_width=True,
-                ):
-                    _navigate_to(action["target"])
+                <div style="font-size: 11px; color: #64748b; margin-top: 4px; margin-bottom: 8px; line-height: 1.2;">
+                    {action['desc']}
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+            if st.button(
+                f"Open {action['label']}",
+                key=f"oqa_{idx}",
+                use_container_width=True,
+            ):
+                _navigate_to(action["target"])
 
 
 # ─────────────────────────────────────────────────────────────────────

@@ -252,7 +252,13 @@ class VideoAIService:
 
             try:
                 # MediaPipe Face Detection on RGB frame
-                detection: FaceDetectionResult = detect_faces(sampled.frame)
+                try:
+                    detection: FaceDetectionResult = detect_faces(sampled.frame, fallback_on_unclear=False)
+                except TypeError as e:
+                    if "unexpected keyword argument 'fallback_on_unclear'" in str(e):
+                        detection = detect_faces(sampled.frame)
+                    else:
+                        raise
 
                 if not detection.success or detection.num_faces == 0:
                     continue

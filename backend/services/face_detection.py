@@ -464,6 +464,7 @@ def detect_faces(
     min_face_presence_confidence: Optional[float] = None,
     min_tracking_confidence: Optional[float] = None,
     max_image_dimension: int = _MAX_IMAGE_DIMENSION,
+    fallback_on_unclear: bool = True,
 ) -> FaceDetectionResult:
     """Run MediaPipe Face Landmarker on ``image``.
 
@@ -473,6 +474,9 @@ def detect_faces(
             ``initialize_face_landmarker``; None → use Settings defaults.
         max_image_dimension: images with height/width larger than this are
             downscaled proportionally before analysis.
+        fallback_on_unclear: if True, will automatically retry detection
+            with lower confidence thresholds and higher max face counts if
+            0 faces are detected with default parameters.
 
     Returns:
         FaceDetectionResult — always a concrete instance, never None.
@@ -493,54 +497,93 @@ def detect_faces(
             error_message=f"Failed during image preprocessing: {exc}",
         )
 
-    # 3. Get or create a cached landmarker
-    landmarker, init_err = initialize_face_landmarker(
-        model_path=model_path,
-        num_faces=num_faces,
-        min_face_detection_confidence=min_face_detection_confidence,
-        min_face_presence_confidence=min_face_presence_confidence,
-        min_tracking_confidence=min_tracking_confidence,
+    # Resolve default/configured confidence thresholds
+    try:
+        from backend.config import settings as _cfg
+        default_det = float(_cfg.MEDIAPIPE_MIN_DETECTION_CONF)
+        default_pres = float(_cfg.MEDIAPIPE_MIN_PRESENCE_CONF)
+        default_num = int(_cfg.MEDIAPIPE_NUM_FACES)
+    except Exception:
+        default_det = 0.5
+        default_pres = 0.5
+        default_num = 5
+
+    req_det = min_face_detection_confidence if min_face_detection_confidence is not None else default_det
+    req_pres = min_face_presence_confidence if min_face_presence_confidence is not None else default_pres
+    req_num = num_faces if num_faces is not None else default_num
+
+    # Define stages of (det_conf, pres_conf, num_faces)
+    stages = [(req_det, req_pres, req_num)]
+
+    if fallback_on_unclear:
+        if req_det > 0.35:
+            stages.append((0.3, 0.3, max(req_num, 10)))
+        if req_det > 0.15:
+            stages.append((0.15, 0.15, max(req_num, 15)))
+        stages.append((0.08, 0.08, max(req_num, 20)))
+
+    last_result = None
+    for det_conf, pres_conf, n_faces in stages:
+        # 3. Get or create a cached landmarker
+        landmarker, init_err = initialize_face_landmarker(
+            model_path=model_path,
+            num_faces=n_faces,
+            min_face_detection_confidence=det_conf,
+            min_face_presence_confidence=pres_conf,
+            min_tracking_confidence=min_tracking_confidence,
+        )
+        if init_err is not None or landmarker is None:
+            h, w = rgb_processed.shape[:2]
+            last_result = FaceDetectionResult(
+                success=False,
+                num_faces=0,
+                image_width=w,
+                image_height=h,
+                error_message=init_err or "Face landmarker failed to initialise.",
+                processed_image_rgb=rgb_processed,
+            )
+            continue
+
+        # 4. Wrap image into MediaPipe's SRGB Image + run detect
+        try:
+            mp_image = MPImage(image_format=ImageFormat.SRGB, data=rgb_processed)
+        except Exception as exc:
+            h, w = rgb_processed.shape[:2]
+            last_result = FaceDetectionResult(
+                success=False,
+                num_faces=0,
+                image_width=w,
+                image_height=h,
+                error_message=f"Failed to build MediaPipe Image: {exc}",
+                processed_image_rgb=rgb_processed,
+            )
+            continue
+
+        try:
+            mp_result = landmarker.detect(mp_image)
+        except Exception as exc:
+            h, w = rgb_processed.shape[:2]
+            last_result = FaceDetectionResult(
+                success=False,
+                num_faces=0,
+                image_width=w,
+                image_height=h,
+                error_message=f"MediaPipe face detection error: {exc}",
+                processed_image_rgb=rgb_processed,
+            )
+            continue
+
+        # 5. Convert MP result to our pure-Python structures
+        res = _build_result_from_mp(mp_result, rgb_processed)
+        if res.success and res.num_faces > 0:
+            return res
+        last_result = res
+
+    return last_result or FaceDetectionResult(
+        success=False,
+        error_message="Unknown detection error occurred.",
+        processed_image_rgb=rgb_processed,
     )
-    if init_err is not None or landmarker is None:
-        h, w = rgb_processed.shape[:2]
-        return FaceDetectionResult(
-            success=False,
-            num_faces=0,
-            image_width=w,
-            image_height=h,
-            error_message=init_err or "Face landmarker failed to initialise.",
-            processed_image_rgb=rgb_processed,
-        )
-
-    # 4. Wrap image into MediaPipe's SRGB Image + run detect
-    try:
-        mp_image = MPImage(image_format=ImageFormat.SRGB, data=rgb_processed)
-    except Exception as exc:
-        h, w = rgb_processed.shape[:2]
-        return FaceDetectionResult(
-            success=False,
-            num_faces=0,
-            image_width=w,
-            image_height=h,
-            error_message=f"Failed to build MediaPipe Image: {exc}",
-            processed_image_rgb=rgb_processed,
-        )
-
-    try:
-        mp_result = landmarker.detect(mp_image)
-    except Exception as exc:
-        h, w = rgb_processed.shape[:2]
-        return FaceDetectionResult(
-            success=False,
-            num_faces=0,
-            image_width=w,
-            image_height=h,
-            error_message=f"MediaPipe face detection error: {exc}",
-            processed_image_rgb=rgb_processed,
-        )
-
-    # 5. Convert MP result to our pure-Python structures
-    return _build_result_from_mp(mp_result, rgb_processed)
 
 
 def extract_landmarks(

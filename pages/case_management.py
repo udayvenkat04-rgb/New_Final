@@ -775,6 +775,8 @@ def render_list_view():
             for r in records
         ]
         mapping = {label: r["id"] for label, r in zip(label_options, records)}
+        if "cm_pick_case" in st.session_state and st.session_state["cm_pick_case"] not in label_options:
+            del st.session_state["cm_pick_case"]
         pick = st.selectbox(
             "Select a case",
             options=label_options,

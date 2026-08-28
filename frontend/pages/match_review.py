@@ -137,6 +137,8 @@ else:
         badge_color = "#f59e0b" if r.review_status == "PENDING_REVIEW" else ("#10b981" if r.review_status == "CONFIRMED" else "#ef4444")
         review_labels.append(f"Review #{r.id} | Case {r.case_id} ({c_name}) | {r.source_type} | Similarity: {r.similarity_score:.1f}% | [{r.review_status}]")
 
+    if "selected_review_idx" in st.session_state and st.session_state["selected_review_idx"] not in range(len(reviews)):
+        del st.session_state["selected_review_idx"]
     selected_index = st.selectbox(
         "Select candidate record to inspect & review:",
         options=range(len(reviews)),
