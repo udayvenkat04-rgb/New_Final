@@ -139,6 +139,11 @@ def inject_custom_css():
             background-color: transparent !important;
             border: none !important;
             box-shadow: none !important;
+            pointer-events: none !important;
+        }
+        header[data-testid="stHeader"] *,
+        .stAppHeader * {
+            pointer-events: auto !important;
         }
 
         @media screen and (min-width: 992px) {
@@ -180,6 +185,11 @@ def inject_custom_css():
             flex-direction: column !important;
             justify-content: space-between !important;
             box-sizing: border-box !important;
+        }
+        .metric-card:hover, .donezo-metric-card:hover {
+            transform: translateY(-2px) !important;
+            border-color: #4f46e5 !important;
+            box-shadow: 0 8px 24px rgba(79, 70, 229, 0.1) !important;
         }
         
         /* Scaled down internal typography and controls inside metric cards */
@@ -456,13 +466,28 @@ def inject_custom_css():
                 background-color: #0b1329 !important;
                 color: #f8fafc !important;
             }
-            .metric-card, .dashboard-outer-card, .glass-card, div[data-testid="stForm"], div[data-testid="stExpander"] {
+            .metric-card, .donezo-metric-card, .dashboard-outer-card, .glass-card, div[data-testid="stForm"], div[data-testid="stExpander"] {
                 background-color: #1e293b !important;
                 border-color: #334155 !important;
                 color: #f8fafc !important;
             }
-            .metric-card span, .glass-card span {
+            .metric-card span, .donezo-metric-card span, .glass-card span {
                 color: #cbd5e1 !important;
+            }
+            .metric-card h1, .donezo-metric-card h1 {
+                color: #f8fafc !important;
+            }
+            .metric-card div, .donezo-metric-card div {
+                color: #cbd5e1 !important;
+            }
+            .donezo-metric-card .arrow-icon-circle {
+                color: #f8fafc !important;
+                border-color: #475569 !important;
+                background-color: transparent !important;
+            }
+            .metric-card:hover, .donezo-metric-card:hover {
+                border-color: #818cf8 !important;
+                box-shadow: 0 8px 24px rgba(129, 140, 248, 0.15) !important;
             }
             div[data-baseweb="input"], div[data-baseweb="select"] {
                 background-color: #1e293b !important;
@@ -490,6 +515,62 @@ def inject_custom_css():
             div[data-testid="stPageLink"] a:hover {
                 background-color: rgba(255, 255, 255, 0.08) !important;
                 color: #ffffff !important;
+            }
+            
+            /* Dark Mode Floating mobile logout button colors */
+            @media screen and (max-width: 991px) {
+                div[class*="st-key-mobile_header_logout"] button {
+                    background: #1e293b !important;
+                    color: #f87171 !important;
+                    border-color: #475569 !important;
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25) !important;
+                }
+                div[class*="st-key-mobile_header_logout"] button:hover {
+                    background-color: #334155 !important;
+                    border-color: #64748b !important;
+                }
+            }
+        }
+        
+        /* Floating mobile logout button in the top right corner */
+        @media screen and (max-width: 991px) {
+            div.element-container:has(div[class*="st-key-mobile_header_logout"]) {
+                position: fixed !important;
+                top: 10px !important;
+                right: 16px !important;
+                z-index: 999995 !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                width: 40px !important;
+                height: 40px !important;
+            }
+            div[class*="st-key-mobile_header_logout"] button {
+                background: #ffffff !important;
+                color: #ef4444 !important;
+                border: 1.5px solid #cbd5e1 !important;
+                border-radius: 50% !important;
+                width: 40px !important;
+                height: 40px !important;
+                min-width: 40px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08) !important;
+                font-size: 16px !important;
+                padding: 0 !important;
+                pointer-events: auto !important;
+            }
+            div[class*="st-key-mobile_header_logout"] button:hover {
+                background-color: #f8fafc !important;
+                border-color: #94a3b8 !important;
+            }
+        }
+        @media screen and (min-width: 992px) {
+            div.element-container:has(div[class*="st-key-mobile_header_logout"]) {
+                display: none !important;
+                height: 0px !important;
+                margin: 0 !important;
+                padding: 0 !important;
             }
         }
         
@@ -945,6 +1026,15 @@ def render_top_header():
 
     # 4. Render custom sidebar navigation exclusively for authenticated users (Admin / Officer dashboards)
     if authenticated:
+        import sys
+        main_mod = sys.modules.get("__main__")
+        page_file = getattr(main_mod, "__file__", "default_page")
+        page_name = os.path.basename(page_file).replace(".py", "")
+        mobile_logout_key = f"mobile_header_logout_{page_name}"
+        if st.button("🚪", key=mobile_logout_key):
+            from backend.auth.authentication import logout_user
+            logout_user()
+
         st.sidebar.markdown(f"""
         <div class="sidebar-brand-container" style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
             {logo_html}

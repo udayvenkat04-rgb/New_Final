@@ -21,20 +21,82 @@ inject_custom_css()
 # "officer or admin" bug where admins were accidentally treated as officers).
 require_role([ROLE_OFFICER])
 
-_officer_user = st.session_state.get("user", {})
+_officer_user = st.session_state.get("user", {}) or {}
 st.markdown(f"""
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-bottom: 18px; border-bottom: 1px solid #e2e8f0;">
-    <div>
-        <h1 style="color: #0f172a; margin: 0; font-size: 32px; font-weight: 800; letter-spacing: -0.5px;">Officer Dashboard</h1>
-        <p style="color: #64748b; margin: 4px 0 0 0; font-size: 14px;">Track your assigned cases, register new bulletins, and verify public sighting reports with ease.</p>
+<div class="dashboard-header">
+    <div class="header-left">
+        <h1 class="header-title">Officer Dashboard</h1>
+        <p class="header-subtitle">Track your assigned cases, register new bulletins, and verify public sighting reports with ease.</p>
     </div>
-    <div style="text-align: right;">
-        <div style="background: #eef2ff; color: #4f46e5; font-weight: 700; padding: 6px 16px; border-radius: 9999px; font-size: 13px; display: inline-block; margin-bottom: 4px; border: 1px solid #c7d2fe;">
+    <div class="header-right">
+        <div class="role-badge">
             👮 {_officer_user.get('username', 'Officer').upper()} (OFFICER)
         </div>
-        <div style="color: #94a3b8; font-size: 12px;">Last refreshed: {datetime.now().strftime('%H:%M:%S')}</div>
+        <div class="refresh-time">Last refreshed: {datetime.now().strftime('%H:%M:%S')}</div>
     </div>
 </div>
+
+<style>
+.dashboard-header {{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid #e2e8f0;
+    gap: 16px;
+}}
+.header-title {{
+    color: #0f172a;
+    margin: 0;
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+}}
+.header-subtitle {{
+    color: #64748b;
+    margin: 4px 0 0 0;
+    font-size: 14px;
+}}
+.header-right {{
+    text-align: right;
+    flex-shrink: 0;
+}}
+.role-badge {{
+    background: #eef2ff;
+    color: #4f46e5;
+    font-weight: 700;
+    padding: 6px 16px;
+    border-radius: 9999px;
+    font-size: 13px;
+    display: inline-block;
+    margin-bottom: 4px;
+    border: 1px solid #c7d2fe;
+    white-space: nowrap;
+}}
+.refresh-time {{
+    color: #94a3b8;
+    font-size: 12px;
+}}
+
+@media screen and (max-width: 767px) {{
+    .dashboard-header {{
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }}
+    .header-right {{
+        text-align: left;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }}
+    .role-badge {{
+        margin-bottom: 0;
+    }}
+}}
+</style>
 """, unsafe_allow_html=True)
 
 # ── Database connection check ─────────────────────────────────────────
