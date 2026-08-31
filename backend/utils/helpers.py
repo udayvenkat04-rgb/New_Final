@@ -139,9 +139,15 @@ def inject_custom_css():
             background-color: transparent !important;
             border: none !important;
             box-shadow: none !important;
-            height: 0px !important;
-            min-height: 0px !important;
-            overflow: visible !important;
+        }
+
+        @media screen and (min-width: 992px) {
+            header[data-testid="stHeader"],
+            .stAppHeader {
+                height: 0px !important;
+                min-height: 0px !important;
+                overflow: visible !important;
+            }
         }
 
         /* Hide the raw sidebar navigation page links list under all circumstances */
@@ -471,6 +477,20 @@ def inject_custom_css():
                 color: #f8fafc !important;
                 border-color: #eab308 !important;
             }
+            /* Dark Mode Sidebar text and link colors */
+            .sidebar-brand-text div {
+                color: #f8fafc !important;
+            }
+            .sidebar-brand-text div:last-child {
+                color: #818cf8 !important;
+            }
+            div[data-testid="stPageLink"] a {
+                color: #cbd5e1 !important;
+            }
+            div[data-testid="stPageLink"] a:hover {
+                background-color: rgba(255, 255, 255, 0.08) !important;
+                color: #ffffff !important;
+            }
         }
         
         /* Styled st.container(border=True) */
@@ -490,27 +510,30 @@ def inject_custom_css():
 
         /* Mobile 2x2 Grid Layout for Statistic Cards */
         @media screen and (max-width: 767px) {
-            /* Force horizontal columns blocks to display as flex wrap on mobile */
-            div[data-testid="stHorizontalBlock"] {
+            /* Force horizontal columns blocks containing statistic cards to display as flex wrap on mobile */
+            div[data-testid="stHorizontalBlock"]:has(.donezo-metric-card, .donezo-hero-card, .metric-card) {
                 display: flex !important;
                 flex-flow: row wrap !important;
                 gap: 12px !important;
             }
-            /* Force each child column to be exactly 50% width minus gap */
-            div[data-testid="stHorizontalBlock"] > div[data-testid="column"],
-            div[data-testid="stHorizontalBlock"] > div.stColumn {
+            /* Force each child column containing statistic cards to be exactly 50% width minus gap */
+            div[data-testid="stHorizontalBlock"]:has(.donezo-metric-card, .donezo-hero-card, .metric-card) > div[data-testid="column"],
+            div[data-testid="stHorizontalBlock"]:has(.donezo-metric-card, .donezo-hero-card, .metric-card) > div.stColumn {
                 flex: 1 1 calc(50% - 6px) !important;
                 min-width: calc(50% - 6px) !important;
                 max-width: calc(50% - 6px) !important;
-                margin: 0 !important;
+                margin-top: 0 !important;
+                margin-left: 0 !important;
+                margin-right: 0 !important;
+                margin-bottom: 16px !important; /* Force bottom spacing between rows */
                 padding: 0 !important;
             }
             
             /* Adjust metric cards styling inside the 2x2 grid */
             .metric-card, .donezo-metric-card, .donezo-hero-card {
-                height: 105px !important;
-                padding: 10px 12px !important;
-                margin-bottom: 0px !important; /* Remove bottom margin since container gap handles spacing */
+                height: 140px !important; /* Enforce uniform 140px height to prevent overflow and maintain same length/width */
+                padding: 12px 14px !important;
+                margin-bottom: 16px !important; /* Force bottom spacing between rows */
             }
             
             /* Scale down values & text sizes on mobile to prevent overflow */
@@ -535,6 +558,137 @@ def inject_custom_css():
                 height: 16px !important;
                 font-size: 8px !important;
             }
+
+            /* Mobile Overrides for responsive containers & grids */
+            .about-container-card {
+                padding: 20px 16px !important;
+                border-radius: 14px !important;
+                box-sizing: border-box !important;
+                width: 100% !important;
+            }
+            .mission-synergy-grid {
+                grid-template-columns: 1fr !important;
+                gap: 16px !important;
+                margin-bottom: 16px !important;
+                box-sizing: border-box !important;
+                width: 100% !important;
+            }
+            .workflow-grid {
+                grid-template-columns: 1fr !important;
+                gap: 20px !important;
+                padding: 16px !important;
+                box-sizing: border-box !important;
+                width: 100% !important;
+            }
+            .footer-container-card {
+                padding: 24px 16px !important;
+                border-radius: 14px !important;
+                box-sizing: border-box !important;
+                width: 100% !important;
+            }
+            .footer-grid {
+                grid-template-columns: 1fr !important;
+                gap: 24px !important;
+                padding-bottom: 20px !important;
+                box-sizing: border-box !important;
+                width: 100% !important;
+            }
+            .features-grid {
+                grid-template-columns: 1fr !important;
+                gap: 16px !important;
+                box-sizing: border-box !important;
+                width: 100% !important;
+            }
+            .feature-card {
+                height: auto !important;
+                min-height: 175px !important;
+                box-sizing: border-box !important;
+                width: 100% !important;
+            }
+            /* Mobile tab bar adjustments to prevent squishing and overlap */
+            button[data-baseweb="tab"] {
+                font-size: 12px !important;
+                padding: 6px 12px !important;
+                margin-right: 4px !important;
+            }
+            div[role="tablist"] {
+                overflow-x: auto !important;
+                flex-wrap: nowrap !important;
+                gap: 4px !important;
+            }
+        }
+
+        /* Desktop/Default Styles for responsive containers & grids */
+        .about-container-card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 36px 40px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 8px 30px rgba(15, 23, 42, 0.05);
+            margin-top: 10px;
+            box-sizing: border-box !important;
+            width: 100% !important;
+        }
+        .mission-synergy-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 28px;
+            margin-bottom: 28px;
+            box-sizing: border-box !important;
+            width: 100% !important;
+        }
+        .workflow-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            background: #f8fafc;
+            padding: 24px;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            box-sizing: border-box !important;
+            width: 100% !important;
+        }
+        .footer-container-card {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #ffffff;
+            border-radius: 20px;
+            padding: 40px 48px;
+            border: 1px solid #334155;
+            box-shadow: 0 12px 36px rgba(15, 23, 42, 0.3);
+            margin-top: 36px;
+            margin-bottom: 24px;
+            box-sizing: border-box !important;
+            width: 100% !important;
+        }
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1.5fr 1.5fr 1fr;
+            gap: 36px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid #334155;
+            box-sizing: border-box !important;
+            width: 100% !important;
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+            box-sizing: border-box !important;
+            width: 100% !important;
+        }
+        .feature-card {
+            padding: 20px;
+            background: #ffffff;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 14px;
+            box-shadow: 0 4px 14px rgba(15,23,42,0.03);
+            height: 175px; /* Fixed height for uniform desktop alignment */
+            box-sizing: border-box !important;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            width: 100% !important;
         }
     </style>
     """, unsafe_allow_html=True)
@@ -655,36 +809,70 @@ def render_top_header():
     # Styling for the horizontal navbar container and links
     st.markdown("""
     <style>
-        /* Target the top navbar container by its Streamlit key to stretch edge-to-edge */
-        div.st-key-navbar_container {
-            width: 100% !important;
-            margin: 0 !important;
-            padding: 0 !important;
+        /* Target the top navbar container by its Streamlit key to stretch edge-to-edge on Desktop */
+        @media screen and (min-width: 992px) {
+            div.st-key-navbar_container {
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            div.st-key-navbar_container div[data-testid="stVerticalBlockBorderWrapper"] {
+                padding: 10px 24px !important;
+                margin-top: 0px !important;
+                margin-left: -0.5rem !important;
+                margin-right: -0.5rem !important;
+                margin-bottom: 24px !important;
+                width: calc(100% + 1rem) !important;
+                max-width: calc(100% + 1rem) !important;
+                min-width: calc(100% + 1rem) !important;
+                background-color: #ffffff !important;
+                border-top: none !important;
+                border-left: none !important;
+                border-right: none !important;
+                border-bottom: 1px solid #cbd5e1 !important;
+                border-radius: 0px !important;
+                box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06) !important;
+            }
         }
-        div.st-key-navbar_container div[data-testid="stVerticalBlockBorderWrapper"] {
-            padding: 10px 24px !important;
-            margin-top: 0px !important;
-            margin-left: -0.5rem !important;
-            margin-right: -0.5rem !important;
-            margin-bottom: 24px !important;
-            width: calc(100% + 1rem) !important;
-            max-width: calc(100% + 1rem) !important;
-            min-width: calc(100% + 1rem) !important;
-            background-color: #ffffff !important;
-            border-top: none !important;
-            border-left: none !important;
-            border-right: none !important;
-            border-bottom: 1px solid #cbd5e1 !important;
-            border-radius: 0px !important;
-            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06) !important;
+
+        /* On Mobile/Tablet: style the navbar container as a neat centered card with correct margins and borders visible */
+        @media screen and (max-width: 991px) {
+            div.st-key-navbar_container {
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                box-sizing: border-box !important;
+            }
+            div.st-key-navbar_container div[data-testid="stVerticalBlockBorderWrapper"] {
+                padding: 16px 20px !important;
+                margin-top: 10px !important;
+                margin-left: 0px !important;
+                margin-right: 0px !important;
+                margin-bottom: 20px !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                min-width: 100% !important;
+                background-color: #ffffff !important;
+                border: 1.5px solid #cbd5e1 !important;
+                border-radius: 16px !important;
+                box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05) !important;
+                box-sizing: border-box !important;
+            }
         }
         
         /* Seamless Dark Theme Adaptability for the top navbar */
-        @media (prefers-color-scheme: dark) {
+        @media (prefers-color-scheme: dark) and (min-width: 992px) {
             div.st-key-navbar_container div[data-testid="stVerticalBlockBorderWrapper"] {
                 background-color: #1a2238 !important;
                 border-color: #2e3b5e !important;
                 box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25) !important;
+            }
+        }
+        @media (prefers-color-scheme: dark) and (max-width: 991px) {
+            div.st-key-navbar_container div[data-testid="stVerticalBlockBorderWrapper"] {
+                background-color: #1e293b !important;
+                border-color: #334155 !important;
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25) !important;
             }
         }
         
@@ -771,7 +959,12 @@ def render_top_header():
             st.sidebar.page_link(path, label=label, icon=icon)
             
         st.sidebar.divider()
-        if st.sidebar.button("🚪 Logout", key="sidebar_logout_btn_auth", use_container_width=True):
+        import sys
+        main_mod = sys.modules.get("__main__")
+        page_file = getattr(main_mod, "__file__", "default_page")
+        page_name = os.path.basename(page_file).replace(".py", "")
+        logout_key = f"sidebar_logout_btn_{page_name}"
+        if st.sidebar.button("🚪 Logout", key=logout_key, use_container_width=True):
             from backend.auth.authentication import logout_user
             logout_user()
 
@@ -809,163 +1002,7 @@ def render_top_header():
         </script>
         """, height=0, width=0)
 
-    # Determine bottom navigation items dynamically based on role/auth
-    nav_items = []
-    if not authenticated:
-        nav_items = [
-            ("/", "Home", "🏠"),
-            ("/public_portal", "Portal", "🌐"),
-            ("/cases", "Cases", "📁"),
-            ("/map", "Map", "📍"),
-            ("/login", "Login", "🔑"),
-        ]
-    elif role == "admin":
-        nav_items = [
-            ("/admin_dashboard", "Dashboard", "📊"),
-            ("/case_management", "Cases", "📁"),
-            ("/admin_face_matching", "Face Match", "🔍"),
-            ("/video_sightings", "CCTV", "📹"),
-            ("menu", "Menu", "☰"),
-        ]
-    elif role == "officer":
-        nav_items = [
-            ("/officer_dashboard", "Dashboard", "📊"),
-            ("/cases", "Cases", "📁"),
-            ("/map", "Map", "📍"),
-            ("/sightings", "Sightings", "👁️"),
-            ("menu", "Menu", "☰"),
-        ]
 
-    # Detect current page filename to apply 'active' class
-    current_page_file = ""
-    try:
-        import inspect
-        import os
-        frame = inspect.currentframe()
-        while frame:
-            filename = frame.f_code.co_filename
-            if "helpers.py" not in filename:
-                current_page_file = os.path.basename(filename)
-                break
-            frame = frame.f_back
-    except Exception:
-        pass
-
-    def is_active(path, current_page_file):
-        if not current_page_file:
-            return False
-        if path == "/":
-            return current_page_file == "app.py"
-        page_name = path.strip("/")
-        return page_name in current_page_file.lower()
-
-    # Generate Bottom Navbar HTML (un-indented to prevent markdown parser code-block issues)
-    nav_html = '<div class="mobile-nav-bar">'
-    for path, label, icon in nav_items:
-        if path == "menu":
-            nav_html += f"""<a href="#" onclick="try {{
-    const selectors = [
-        'button[data-testid=\\'stHeaderSidebarCollapseButton\\']',
-        'div[data-testid=\\'collapsedControl\\'] button',
-        '.stHeaderSidebarCollapseButton',
-        'div[data-testid=\\'collapsedControl\\']'
-    ];
-    for (const sel of selectors) {{
-        const btn = window.parent.document.querySelector(sel);
-        if (btn) {{
-            btn.click();
-            break;
-        }}
-    }}
-}} catch(e) {{}} return false;" class="mobile-nav-item">
-<div class="mobile-nav-icon">{icon}</div>
-<div class="mobile-nav-label">{label}</div>
-</a>"""
-        else:
-            active_class = "active" if is_active(path, current_page_file) else ""
-            nav_html += f"""<a href="{path}" class="mobile-nav-item {active_class}" target="_self">
-<div class="mobile-nav-icon">{icon}</div>
-<div class="mobile-nav-label">{label}</div>
-</a>"""
-    nav_html += '</div>'
-
-    # Inject Bottom Navbar CSS & HTML (completely un-indented for clean rendering)
-    st.markdown(f"""<style>
-/* Mobile Navigation Bar Styling */
-.mobile-nav-bar {{
-    display: none;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 64px;
-    background-color: #ffffff;
-    border-top: 1px solid #cbd5e1;
-    box-shadow: 0 -4px 16px rgba(15, 23, 42, 0.06);
-    z-index: 999990;
-    justify-content: space-around;
-    align-items: center;
-    padding-bottom: env(safe-area-inset-bottom);
-    box-sizing: border-box;
-}}
-
-.mobile-nav-item {{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    color: #64748b;
-    text-decoration: none !important;
-    flex: 1;
-    height: 100%;
-    transition: all 0.2s ease;
-}}
-
-.mobile-nav-item:hover, .mobile-nav-item.active {{
-    color: #4f46e5;
-}}
-
-.mobile-nav-icon {{
-    font-size: 20px;
-    margin-bottom: 2px;
-}}
-
-.mobile-nav-label {{
-    font-size: 9px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-}}
-
-/* Seamless Dark Theme Adaptability for mobile bottom navbar */
-@media (prefers-color-scheme: dark) {{
-    .mobile-nav-bar {{
-        background-color: #1a2238;
-        border-color: #2e3b5e;
-        box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.25);
-    }}
-    .mobile-nav-item {{
-        color: #94a3b8;
-    }}
-    .mobile-nav-item:hover, .mobile-nav-item.active {{
-        color: #818cf8;
-    }}
-}}
-
-/* Media Query to show bottom nav bar only on mobile/tablet viewports */
-@media screen and (max-width: 991px) {{
-    .mobile-nav-bar {{
-        display: flex;
-    }}
-    /* Add bottom padding to the main content container to prevent it from being obscured by the bottom navbar */
-    .block-container,
-    div[data-testid="stAppViewBlockContainer"],
-    .stAppViewBlockContainer {{
-        padding-bottom: 80px !important;
-    }}
-}}
-</style>{nav_html}
-    """, unsafe_allow_html=True)
 
 
 def render_role_sidebar():

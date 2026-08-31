@@ -193,7 +193,7 @@ st.markdown(f"""
 # Comprehensive Project Explanation Section
 st.markdown("<br>", unsafe_allow_html=True)
 st.markdown("""
-<div style="background: #ffffff; border-radius: 20px; padding: 36px 40px; border: 1px solid #e2e8f0; box-shadow: 0 8px 30px rgba(15, 23, 42, 0.05); margin-top: 10px;">
+<div class="about-container-card">
 <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 24px; border-bottom: 2px solid #f1f5f9; padding-bottom: 16px;">
 <span style="font-size: 32px;">🏛️</span>
 <div>
@@ -202,7 +202,7 @@ st.markdown("""
 </div>
 </div>
 
-<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-bottom: 28px;">
+<div class="mission-synergy-grid">
 <div style="background: #f8fafc; padding: 24px; border-radius: 16px; border-left: 5px solid #2563eb;">
 <h3 style="color: #1e3a8a; margin-top: 0; font-size: 18px; font-weight: 700;">🎯 Project Mission & Objective</h3>
 <p style="color: #334155; font-size: 14.5px; line-height: 1.65; margin-bottom: 0;">
@@ -220,26 +220,26 @@ Public users can anonymously view active missing bulletins, report spotted indiv
 
 <h3 style="color: #1e3a8a; font-size: 20px; font-weight: 800; margin-top: 32px; margin-bottom: 18px;">🛠️ Core System Architecture & Features</h3>
 
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; margin-bottom: 30px;">
-<div style="padding: 20px; background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: 14px; box-shadow: 0 4px 14px rgba(15,23,42,0.03);">
+<div class="features-grid">
+<div class="feature-card">
 <div style="font-size: 24px; margin-bottom: 8px;">🔬</div>
 <strong style="color: #0f172a; font-size: 15px; display: block; margin-bottom: 4px;">1. AI Face Matching Engine</strong>
 <span style="color: #475569; font-size: 12.5px; line-height: 1.5; display: block;">MediaPipe 468-point facial landmark mesh extraction and deep feature vector cosine similarity scoring for reliable face comparison.</span>
 </div>
 
-<div style="padding: 20px; background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: 14px; box-shadow: 0 4px 14px rgba(15,23,42,0.03);">
+<div class="feature-card">
 <div style="font-size: 24px; margin-bottom: 8px;">📍</div>
 <strong style="color: #0f172a; font-size: 15px; display: block; margin-bottom: 4px;">2. Interactive GIS Sighting Map</strong>
 <span style="color: #475569; font-size: 12.5px; line-height: 1.5; display: block;">Interactive spatial mapping with radius search, location markers, missing case pins, and real-time spatial sighting heatmaps.</span>
 </div>
 
-<div style="padding: 20px; background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: 14px; box-shadow: 0 4px 14px rgba(15,23,42,0.03);">
+<div class="feature-card">
 <div style="font-size: 24px; margin-bottom: 8px;">🌐</div>
 <strong style="color: #0f172a; font-size: 15px; display: block; margin-bottom: 4px;">3. Public Sighting Portal</strong>
 <span style="color: #475569; font-size: 12.5px; line-height: 1.5; display: block;">Public submission pipeline allowing citizens to submit sighting photos, location data, and observer notes directly for police review.</span>
 </div>
 
-<div style="padding: 20px; background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: 14px; box-shadow: 0 4px 14px rgba(15,23,42,0.03);">
+<div class="feature-card">
 <div style="font-size: 24px; margin-bottom: 8px;">📹</div>
 <strong style="color: #0f172a; font-size: 15px; display: block; margin-bottom: 4px;">4. Surveillance Video Feed Extraction</strong>
 <span style="color: #475569; font-size: 12.5px; line-height: 1.5; display: block;">CCTV video frame sampling, face detection, and batch matching against registered missing case files.</span>
@@ -248,7 +248,7 @@ Public users can anonymously view active missing bulletins, report spotted indiv
 
 <h3 style="color: #1e3a8a; font-size: 20px; font-weight: 800; margin-top: 28px; margin-bottom: 18px;">🔄 End-to-End Operational Workflow</h3>
 
-<div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; background: #f8fafc; padding: 24px; border-radius: 16px; border: 1px solid #e2e8f0;">
+<div class="workflow-grid">
 <div style="text-align: center;">
 <div style="width: 40px; height: 40px; border-radius: 50%; background: #2563eb; color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; margin: 0 auto 10px auto;">1</div>
 <strong style="color: #1e3a8a; font-size: 14px; display: block;">Case Registration</strong>
@@ -276,8 +276,8 @@ Public users can anonymously view active missing bulletins, report spotted indiv
 # Complete Project Contact Details, Helplines, and Support Emails Footer
 st.markdown("<br>", unsafe_allow_html=True)
 st.markdown("""
-<div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff; border-radius: 20px; padding: 40px 48px; border: 1px solid #334155; box-shadow: 0 12px 36px rgba(15,23,42,0.3); margin-top: 36px; margin-bottom: 24px;">
-<div style="display: grid; grid-template-columns: 2fr 1.5fr 1.5fr 1fr; gap: 36px; padding-bottom: 30px; border-bottom: 1px solid #334155;">
+<div class="footer-container-card">
+<div class="footer-grid">
 
 <div>
 <h3 style="color: #60a5fa; font-size: 20px; font-weight: 800; margin-top: 0; margin-bottom: 12px; text-transform: uppercase;">National MPIS Portal</h3>
