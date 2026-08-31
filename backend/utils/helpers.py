@@ -71,6 +71,7 @@ def inject_custom_css():
             content: "🚪" !important;
             font-size: 18px !important;
         }
+        */
         
         button[data-testid="stSidebarCollapseButton"],
         button[data-testid="stHeaderSidebarCollapseButton"],
@@ -106,7 +107,6 @@ def inject_custom_css():
             border-color: #94a3b8 !important;
             transform: scale(1.05) !important;
         }
-        */
 
         /* Global font & light theme background */
         html, body, [class*="css"], .stMarkdown {
@@ -141,19 +141,17 @@ def inject_custom_css():
             box-shadow: none !important;
             pointer-events: none !important;
         }
-        header[data-testid="stHeader"] *,
-        .stAppHeader * {
+
+        /* Re-enable pointer events for all interactive header controls (like expand/collapse buttons) */
+        button[data-testid="stSidebarCollapseButton"],
+        button[data-testid="stHeaderSidebarCollapseButton"],
+        div[data-testid="collapsedControl"],
+        div[data-testid="collapsedControl"] *,
+        .stSidebarCollapseButton {
             pointer-events: auto !important;
         }
 
-        @media screen and (min-width: 992px) {
-            header[data-testid="stHeader"],
-            .stAppHeader {
-                height: 0px !important;
-                min-height: 0px !important;
-                overflow: visible !important;
-            }
-        }
+        /* Keep header native height so expand chevron/hamburger is always visible */
 
         /* Hide the raw sidebar navigation page links list under all circumstances */
         [data-testid="stSidebarNav"] {
@@ -530,6 +528,31 @@ def inject_custom_css():
                     border-color: #64748b !important;
                 }
             }
+            
+            /* Dark Mode Sidebar Collapse / Expand button colors */
+            button[data-testid="stSidebarCollapseButton"],
+            button[data-testid="stHeaderSidebarCollapseButton"],
+            div[data-testid="collapsedControl"] button,
+            header[data-testid="stHeader"] button {
+                background-color: #1e293b !important;
+                border-color: #475569 !important;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25) !important;
+                color: #f8fafc !important;
+            }
+            button[data-testid="stSidebarCollapseButton"] svg,
+            button[data-testid="stHeaderSidebarCollapseButton"] svg,
+            div[data-testid="collapsedControl"] button svg,
+            header[data-testid="stHeader"] button svg {
+                fill: #f8fafc !important;
+                color: #f8fafc !important;
+            }
+            button[data-testid="stSidebarCollapseButton"]:hover,
+            button[data-testid="stHeaderSidebarCollapseButton"]:hover,
+            div[data-testid="collapsedControl"] button:hover,
+            header[data-testid="stHeader"] button:hover {
+                background-color: #334155 !important;
+                border-color: #64748b !important;
+            }
         }
         
         /* Floating mobile logout button in the top right corner */
@@ -566,11 +589,20 @@ def inject_custom_css():
             }
         }
         @media screen and (min-width: 992px) {
-            div.element-container:has(div[class*="st-key-mobile_header_logout"]) {
+            div.element-container:has(div[class*="st-key-mobile_header_logout"]),
+            div[class*="st-key-mobile_header_logout"] {
                 display: none !important;
+                visibility: hidden !important;
                 height: 0px !important;
+                width: 0px !important;
                 margin: 0 !important;
                 padding: 0 !important;
+            }
+            div[class*="st-key-mobile_header_logout"] button {
+                display: none !important;
+                visibility: hidden !important;
+                height: 0px !important;
+                width: 0px !important;
             }
         }
         
@@ -777,24 +809,20 @@ def inject_custom_css():
     if not authenticated:
         st.markdown("""
         <style>
-            /* Hide the sidebar completely across all screens and pages for unauthenticated users */
+            /* Hide the sidebar completely for unauthenticated users */
             section[data-testid="stSidebar"],
-            [data-testid="stSidebar"],
-            div[data-testid="collapsedControl"],
-            [data-testid="collapsedControl"],
-            button[data-testid="stSidebarCollapseButton"],
-            .stSidebarCollapseButton {
+            [data-testid="stSidebar"] {
                 display: none !important;
                 width: 0px !important;
                 visibility: hidden !important;
             }
 
-            /* Force main container to use 100% width and remove any sidebar spacer */
+            /* Force main container to use 100% width and remove any sidebar spacer for unauthenticated users */
             div[data-testid="stAppViewContainer"] {
                 margin: 0 !important;
                 padding: 0 !important;
             }
-            div[data-testid="stAppViewContainer"] > section {
+            div[data-testid="stAppViewContainer"] > section.main {
                 width: 100% !important;
                 max-width: 100% !important;
                 margin-left: 0px !important;
@@ -816,7 +844,7 @@ def inject_custom_css():
                     transform: none !important; /* Force it to stay on screen */
                 }
 
-                /* Hide all collapse/expand trigger buttons and arrows completely */
+                /* Hide all collapse/expand trigger buttons and arrows completely on desktop */
                 button[data-testid="stSidebarCollapseButton"],
                 button[data-testid="stHeaderSidebarCollapseButton"],
                 div[data-testid="collapsedControl"],
@@ -828,7 +856,7 @@ def inject_custom_css():
                     height: 0px !important;
                 }
 
-                /* Hide the default empty space reserved for the sidebar header */
+                /* Hide the default empty space reserved for the sidebar header on desktop */
                 div[data-testid="stSidebarHeader"] {
                     padding: 0 !important;
                     min-height: 0px !important;
