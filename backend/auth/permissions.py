@@ -27,6 +27,11 @@ ROLE_OFFICER = "officer"
 
 def _current_role() -> str:
     """Returns the role of the current session user, or empty string."""
+    try:
+        from backend.auth.authentication import restore_session_if_needed
+        restore_session_if_needed()
+    except Exception:
+        pass
     user = st.session_state.get("user")
     if user:
         return user.get("role", "")
@@ -35,6 +40,11 @@ def _current_role() -> str:
 
 def _current_user_id():
     """Returns the ID of the current session user, or None."""
+    try:
+        from backend.auth.authentication import restore_session_if_needed
+        restore_session_if_needed()
+    except Exception:
+        pass
     user = st.session_state.get("user")
     if user:
         return user.get("id")
@@ -43,6 +53,11 @@ def _current_user_id():
 
 def _current_username() -> str:
     """Returns the username of the current session user, or empty string."""
+    try:
+        from backend.auth.authentication import restore_session_if_needed
+        restore_session_if_needed()
+    except Exception:
+        pass
     user = st.session_state.get("user")
     if user:
         return user.get("username", "")
@@ -59,6 +74,12 @@ def require_auth():
     Halts page rendering and redirects to login if the user is not logged in.
     Returns True if authenticated.
     """
+    try:
+        from backend.auth.authentication import restore_session_if_needed
+        restore_session_if_needed()
+    except Exception:
+        pass
+
     if not st.session_state.get("authenticated", False):
         st.error("🔒 Authentication Required. Please log in to proceed.")
         try:

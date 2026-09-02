@@ -4,6 +4,11 @@ from backend.utils.file_utils import save_uploaded_file, load_image_safely, get_
 
 def inject_custom_css():
     """Injects a modern, premium 100% Light Theme styling in Streamlit."""
+    try:
+        from backend.auth.authentication import restore_session_if_needed
+        restore_session_if_needed()
+    except Exception:
+        pass
     authenticated = st.session_state.get("authenticated", False)
     st.markdown("""
     <style>
@@ -374,43 +379,140 @@ def inject_custom_css():
             padding-top: 0px !important;
         }
 
-        /* Sidebar Brand Header White Text Enforcement */
-        .sidebar-brand-header * {
+        /* Deep Navy Sidebar Styling matching Reference Design (Image 2) */
+        section[data-testid="stSidebar"] {
+            background-color: #0b192c !important;
+            border-right: 1px solid #1e293b !important;
+        }
+        section[data-testid="stSidebar"] [data-testid="stSidebarUserContent"] {
+            padding: 1.25rem 0.8rem 1.5rem 0.8rem !important;
+            background-color: #0b192c !important;
             color: #ffffff !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+        }
+        section[data-testid="stSidebar"] [data-testid="stVerticalBlockBorderWrapper"],
+        section[data-testid="stSidebar"] [data-testid="stVerticalBlock"],
+        section[data-testid="stSidebar"] div[data-testid="element-container"] {
+            width: 100% !important;
+            padding-left: 0px !important;
+            padding-right: 0px !important;
+            margin-left: 0px !important;
+            margin-right: 0px !important;
         }
 
-        /* 100% Full-Width Page Link Cards in Sidebar (PYDAH Pill Cards) */
+        /* Sidebar Section Category Headers (MAIN, MANAGEMENT, OPERATIONS, SYSTEM) */
+        .sidebar-section-header {
+            font-size: 10.5px !important;
+            font-weight: 700 !important;
+            color: #475569 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 1px !important;
+            margin-top: 14px !important;
+            margin-bottom: 6px !important;
+            padding-left: 10px !important;
+            display: block !important;
+        }
+
+        /* Full-Width Page Link Cards in Deep Navy Sidebar */
         div[data-testid="stPageLink"] {
             width: 100% !important;
+            margin-bottom: 4px !important;
+            padding: 0 !important;
         }
         div[data-testid="stPageLink"] a {
             display: flex !important;
             align-items: center !important;
+            gap: 12px !important;
             width: 100% !important;
+            height: 42px !important;
+            min-height: 42px !important;
             box-sizing: border-box !important;
-            padding: 9px 14px !important;
+            padding: 0 14px !important;
             border-radius: 12px !important;
             font-size: 14px !important;
-            font-weight: 600 !important;
-            color: #334155 !important;
+            font-weight: 500 !important;
+            color: #cbd5e1 !important;
             background-color: transparent !important;
             border: none !important;
-            margin-bottom: 2px !important;
             transition: all 0.2s ease !important;
         }
-        div[data-testid="stPageLink"] a:hover {
-            background-color: #f1f5f9 !important;
-            color: #4f46e5 !important;
+        div[data-testid="stPageLink"] a p,
+        div[data-testid="stPageLink"] a span,
+        div[data-testid="stPageLink"] a label,
+        div[data-testid="stPageLink"] a div {
+            color: #cbd5e1 !important;
+            font-weight: 500 !important;
+            font-size: 14px !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            line-height: 42px !important;
         }
-        /* Active Page Link: Solid Blue Pill Fill like PYDAH reference */
+        div[data-testid="stPageLink"] a:hover {
+            background-color: rgba(255, 255, 255, 0.08) !important;
+        }
+        div[data-testid="stPageLink"] a:hover p,
+        div[data-testid="stPageLink"] a:hover span,
+        div[data-testid="stPageLink"] a:hover label,
+        div[data-testid="stPageLink"] a:hover div {
+            color: #ffffff !important;
+            font-weight: 600 !important;
+        }
+
+        /* Active Page Link Card: Light Blue Soft Fill (matching Image 2) */
         div[data-testid="stPageLink"] a[aria-current="page"] {
-            background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%) !important;
+            background-color: #dbeafe !important;
+            border-radius: 12px !important;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25) !important;
+        }
+        div[data-testid="stPageLink"] a[aria-current="page"] p,
+        div[data-testid="stPageLink"] a[aria-current="page"] span,
+        div[data-testid="stPageLink"] a[aria-current="page"] label,
+        div[data-testid="stPageLink"] a[aria-current="page"] div,
+        div[data-testid="stPageLink"] a[aria-current="page"] * {
+            color: #1e3a8a !important;
+            font-weight: 700 !important;
+        }
+
+        /* Bottom User Profile Card */
+        .sidebar-user-card {
+            background: #112240 !important;
+            border: 1px solid #1e293b !important;
+            border-radius: 14px !important;
+            padding: 10px 14px !important;
+            margin-bottom: 12px !important;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2) !important;
+        }
+
+        /* Sidebar Dedicated Logout Button Styling - Full Width (44px) */
+        section[data-testid="stSidebar"] div.stButton > button {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+            color: #ffffff !important;
+            border: none !important;
+            border-radius: 12px !important;
+            height: 44px !important;
+            min-height: 44px !important;
+            padding: 0 18px !important;
+            font-size: 14px !important;
+            font-weight: 700 !important;
+            margin-top: 4px !important;
+            box-shadow: 0 4px 14px rgba(239, 68, 68, 0.3) !important;
+            transition: all 0.25s ease !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 100% !important;
+        }
+        section[data-testid="stSidebar"] div.stButton > button p,
+        section[data-testid="stSidebar"] div.stButton > button span,
+        section[data-testid="stSidebar"] div.stButton > button * {
             color: #ffffff !important;
             font-weight: 700 !important;
-            box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35) !important;
         }
-        div[data-testid="stPageLink"] a[aria-current="page"] * {
-            color: #ffffff !important;
+        section[data-testid="stSidebar"] div.stButton > button:hover {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
+            box-shadow: 0 6px 18px rgba(239, 68, 68, 0.45) !important;
+            transform: translateY(-1px) !important;
         }
 
         /* Buttons styling - Default Form Buttons */
@@ -927,6 +1029,11 @@ def inject_custom_css():
 
 def render_top_header():
     """Renders the navigation in a modern horizontal top navbar at the top of the main page."""
+    try:
+        from backend.auth.authentication import restore_session_if_needed
+        restore_session_if_needed()
+    except Exception:
+        pass
     authenticated = st.session_state.get("authenticated", False)
     user = st.session_state.get("user", {}) or {}
     role = user.get("role") if authenticated else "public"
@@ -1078,31 +1185,47 @@ def render_top_header():
             ("pages/login.py", "Login", "🔑"),
         ]
 
-    # Sidebar navigation items (exclusively for Admin or Officer when logged in)
-    sidebar_pages = []
-    if role == "admin":
+    # Sidebar navigation items with category section headers matching Image 2
+    if not authenticated:
         sidebar_pages = [
-            ("pages/admin_dashboard.py", "Dashboard", "📊"),
-            ("pages/case_management.py", "Cases", "📁"),
-            ("pages/admin_face_matching.py", "Face Match", "🔍"),
-            ("pages/video_sightings.py", "CCTV", "📹"),
-            ("pages/admin_map.py", "Map", "📍"),
-            ("pages/admin_public_submissions.py", "Submissions", "🌐"),
-            ("pages/match_review.py", "Reviews", "⚖️"),
+            ("MAIN", "app.py", "Home", "🏠"),
+            ("MAIN", "pages/public_portal.py", "Public Portal", "🌐"),
+            ("CASE DIRECTORY", "pages/cases.py", "Case Directory", "📁"),
+            ("CASE DIRECTORY", "pages/map.py", "Sighting Map", "📍"),
+            ("CASE DIRECTORY", "pages/login.py", "Officer Login", "🔑"),
+        ]
+    elif role == "admin":
+        sidebar_pages = [
+            ("MAIN", "pages/admin_dashboard.py", "Dashboard", "📊"),
+            ("MANAGEMENT", "pages/case_management.py", "Case Management", "📁"),
+            ("MANAGEMENT", "pages/admin_face_matching.py", "AI Face Match", "🔍"),
+            ("MANAGEMENT", "pages/video_sightings.py", "CCTV Surveillance", "📹"),
+            ("MANAGEMENT", "pages/admin_map.py", "GIS Map", "📍"),
+            ("OPERATIONS", "pages/admin_public_submissions.py", "Public Submissions", "🌐"),
+            ("OPERATIONS", "pages/match_review.py", "Match Reviews", "⚖️"),
+            ("SYSTEM", "app.py", "Portal Home", "🏠"),
         ]
     elif role == "officer":
         sidebar_pages = [
-            ("pages/officer_dashboard.py", "Dashboard", "📊"),
-            ("pages/cases.py", "Cases", "📁"),
-            ("pages/map.py", "GIS Map", "📍"),
-            ("pages/sightings.py", "Sightings", "👁️"),
-            ("pages/public_portal.py", "Public Portal", "🌐"),
+            ("MAIN", "pages/officer_dashboard.py", "Dashboard", "📊"),
+            ("MANAGEMENT", "pages/cases.py", "Case Directory", "📁"),
+            ("MANAGEMENT", "pages/map.py", "GIS Map", "📍"),
+            ("MANAGEMENT", "pages/sightings.py", "Sighting Reports", "👁️"),
+            ("OPERATIONS", "pages/public_portal.py", "Public Portal", "🌐"),
+            ("SYSTEM", "app.py", "Portal Home", "🏠"),
+        ]
+    else:
+        sidebar_pages = [
+            ("MAIN", "app.py", "Home", "🏠"),
+            ("MAIN", "pages/public_portal.py", "Public Portal", "🌐"),
+            ("CASE DIRECTORY", "pages/cases.py", "Case Directory", "📁"),
+            ("CASE DIRECTORY", "pages/map.py", "Sighting Map", "📍"),
+            ("CASE DIRECTORY", "pages/login.py", "Officer Login", "🔑"),
         ]
 
     # Dynamically build horizontal layout using st.container & st.columns (ONLY for public guest navigation)
     if not authenticated:
         with st.container(key="navbar_container", border=True):
-            # Calculate dynamic column width spec based on label text length to prevent any wrapping or cutoffs
             col_spec = [2.2]  # Logo and Brand Branding
             for path, label, icon in pages:
                 width = 0.7 + (len(label) * 0.065)
@@ -1110,7 +1233,6 @@ def render_top_header():
                 
             cols = st.columns(col_spec, vertical_alignment="center")
             
-            # 1. Branding (Col 0) - Locked in exact vertical middle of navbar border box
             with cols[0]:
                 st.markdown(f"""
                 <div style="display: flex; align-items: center; justify-content: center; gap: 10px; height: 100%; margin: 0; padding: 0;">
@@ -1124,40 +1246,61 @@ def render_top_header():
                 </div>
                 """, unsafe_allow_html=True)
                 
-            # 2. Navigation Links
             for i, (path, label, icon) in enumerate(pages):
                 with cols[i + 1]:
                     st.page_link(path, label=label, icon=icon)
 
-    # 4. Render custom sidebar navigation exclusively for authenticated users (Admin / Officer dashboards)
+    # Render custom Deep Navy sidebar matching reference design (Image 2)
+    st.sidebar.markdown(f"""
+    <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 24px; padding: 4px 6px;">
+        <div style="width: 44px; height: 44px; border-radius: 50%; background: #ffffff; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.3); flex-shrink: 0; padding: 4px;">
+            {logo_html}
+        </div>
+        <div style="line-height: 1.2;">
+            <div style="font-size: 16px; font-weight: 800; color: #ffffff; letter-spacing: 0.5px; font-family: 'Outfit', sans-serif;">MPIS PORTAL</div>
+            <div style="font-size: 9.5px; color: #93c5fd; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px;">{role.upper()} MANAGEMENT SYSTEM</div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    current_cat = None
+    for item in sidebar_pages:
+        if len(item) == 4:
+            cat, path, label, icon = item
+            if cat != current_cat:
+                current_cat = cat
+                st.sidebar.markdown(f"<span class='sidebar-section-header'>{cat}</span>", unsafe_allow_html=True)
+            st.sidebar.page_link(path, label=label, icon=icon)
+        else:
+            path, label, icon = item
+            st.sidebar.page_link(path, label=label, icon=icon)
+
+    st.sidebar.divider()
+
     if authenticated:
         import sys
         main_mod = sys.modules.get("__main__")
         page_file = getattr(main_mod, "__file__", "default_page")
         page_name = os.path.basename(page_file).replace(".py", "")
-        mobile_logout_key = f"mobile_header_logout_{page_name}"
-        if st.button("🚪", key=mobile_logout_key):
-            from backend.auth.authentication import logout_user
-            logout_user()
+        
+        username = user.get("username") or user.get("name", "User")
+        user_role_str = user.get("role", "user").capitalize()
+        user_initial = username[0].upper() if username else "U"
 
         st.sidebar.markdown(f"""
-        <div class="sidebar-brand-container" style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
-            {logo_html}
-            <div class="sidebar-brand-text">
-                <div style="font-size: 15px; font-weight: 800; color: #0f172a; line-height: 1.1;">MPIS PORTAL</div>
-                <div style="font-size: 10px; color: #4f46e5; font-weight: 700;">{role.upper()}</div>
+        <div class="sidebar-user-card">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="width: 36px; height: 36px; border-radius: 50%; background: #dbeafe; color: #1e3a8a; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px;">
+                    {user_initial}
+                </div>
+                <div style="line-height: 1.2;">
+                    <div style="font-size: 13px; font-weight: 700; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px;">{username}</div>
+                    <div style="font-size: 9.5px; color: #94a3b8; font-weight: 600; text-transform: uppercase;">{user_role_str}</div>
+                </div>
             </div>
         </div>
         """, unsafe_allow_html=True)
-        
-        for path, label, icon in sidebar_pages:
-            st.sidebar.page_link(path, label=label, icon=icon)
-            
-        st.sidebar.divider()
-        import sys
-        main_mod = sys.modules.get("__main__")
-        page_file = getattr(main_mod, "__file__", "default_page")
-        page_name = os.path.basename(page_file).replace(".py", "")
+
         logout_key = f"sidebar_logout_btn_{page_name}"
         if st.sidebar.button("🚪 Logout", key=logout_key, use_container_width=True):
             from backend.auth.authentication import logout_user
