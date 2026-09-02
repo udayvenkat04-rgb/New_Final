@@ -414,13 +414,13 @@ def inject_custom_css():
             display: block !important;
         }
 
-        /* Full-Width Page Link Cards in Deep Navy Sidebar */
-        div[data-testid="stPageLink"] {
+        /* Full-Width Page Link Cards in Deep Navy Sidebar (Scoped to Sidebar) */
+        section[data-testid="stSidebar"] div[data-testid="stPageLink"] {
             width: 100% !important;
             margin-bottom: 4px !important;
             padding: 0 !important;
         }
-        div[data-testid="stPageLink"] a {
+        section[data-testid="stSidebar"] div[data-testid="stPageLink"] a {
             display: flex !important;
             align-items: center !important;
             gap: 12px !important;
@@ -437,10 +437,10 @@ def inject_custom_css():
             border: none !important;
             transition: all 0.2s ease !important;
         }
-        div[data-testid="stPageLink"] a p,
-        div[data-testid="stPageLink"] a span,
-        div[data-testid="stPageLink"] a label,
-        div[data-testid="stPageLink"] a div {
+        section[data-testid="stSidebar"] div[data-testid="stPageLink"] a p,
+        section[data-testid="stSidebar"] div[data-testid="stPageLink"] a span,
+        section[data-testid="stSidebar"] div[data-testid="stPageLink"] a label,
+        section[data-testid="stSidebar"] div[data-testid="stPageLink"] a div {
             color: #cbd5e1 !important;
             font-weight: 500 !important;
             font-size: 14px !important;
@@ -448,28 +448,28 @@ def inject_custom_css():
             padding: 0 !important;
             line-height: 42px !important;
         }
-        div[data-testid="stPageLink"] a:hover {
+        section[data-testid="stSidebar"] div[data-testid="stPageLink"] a:hover {
             background-color: rgba(255, 255, 255, 0.08) !important;
         }
-        div[data-testid="stPageLink"] a:hover p,
-        div[data-testid="stPageLink"] a:hover span,
-        div[data-testid="stPageLink"] a:hover label,
-        div[data-testid="stPageLink"] a:hover div {
+        section[data-testid="stSidebar"] div[data-testid="stPageLink"] a:hover p,
+        section[data-testid="stSidebar"] div[data-testid="stPageLink"] a:hover span,
+        section[data-testid="stSidebar"] div[data-testid="stPageLink"] a:hover label,
+        section[data-testid="stSidebar"] div[data-testid="stPageLink"] a:hover div {
             color: #ffffff !important;
             font-weight: 600 !important;
         }
 
-        /* Active Page Link Card: Light Blue Soft Fill (matching Image 2) */
-        div[data-testid="stPageLink"] a[aria-current="page"] {
+        /* Active Page Link Card in Sidebar: Light Blue Soft Fill (matching Image 2) */
+        section[data-testid="stSidebar"] div[data-testid="stPageLink"] a[aria-current="page"] {
             background-color: #dbeafe !important;
             border-radius: 12px !important;
             box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25) !important;
         }
-        div[data-testid="stPageLink"] a[aria-current="page"] p,
-        div[data-testid="stPageLink"] a[aria-current="page"] span,
-        div[data-testid="stPageLink"] a[aria-current="page"] label,
-        div[data-testid="stPageLink"] a[aria-current="page"] div,
-        div[data-testid="stPageLink"] a[aria-current="page"] * {
+        section[data-testid="stSidebar"] div[data-testid="stPageLink"] a[aria-current="page"] p,
+        section[data-testid="stSidebar"] div[data-testid="stPageLink"] a[aria-current="page"] span,
+        section[data-testid="stSidebar"] div[data-testid="stPageLink"] a[aria-current="page"] label,
+        section[data-testid="stSidebar"] div[data-testid="stPageLink"] a[aria-current="page"] div,
+        section[data-testid="stSidebar"] div[data-testid="stPageLink"] a[aria-current="page"] * {
             color: #1e3a8a !important;
             font-weight: 700 !important;
         }
@@ -1050,7 +1050,7 @@ def render_top_header():
         except Exception:
             pass
 
-    logo_html = f'<img src="data:image/png;base64,{logo_b64}" style="width: 32px; height: 32px; border-radius: 6px; display: block;" />' if logo_b64 else get_svg_icon('brand_logo', size=28)
+    logo_html = f'<img src="data:image/png;base64,{logo_b64}" style="width: 42px; height: 42px; border-radius: 8px; display: block; object-fit: contain;" />' if logo_b64 else get_svg_icon('brand_logo', size=36)
 
     # Styling for the horizontal navbar container and links
     st.markdown("""
@@ -1097,9 +1097,9 @@ def render_top_header():
                 border-top: none !important;
                 border-left: none !important;
                 border-right: none !important;
-                border-bottom: 1px solid #cbd5e1 !important;
+                border-bottom: 1px solid #e2e8f0 !important;
                 border-radius: 0px !important;
-                box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06) !important;
+                box-shadow: 0 2px 12px rgba(15, 23, 42, 0.04) !important;
                 display: flex !important;
                 align-items: center !important;
                 justify-content: center !important;
@@ -1156,6 +1156,73 @@ def render_top_header():
             align-items: center !important;
         }
         
+        /* Top Navbar Horizontal Page Links Styling - Settled Equal Pills with High Contrast Dark Font */
+        div.st-key-navbar_container div[data-testid="stPageLink"] {
+            width: 100% !important;
+            display: flex !important;
+            justify-content: center !important;
+        }
+        div.st-key-navbar_container div[data-testid="stPageLink"] a {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 6px !important;
+            width: 100% !important;
+            min-width: 100% !important;
+            max-width: 100% !important;
+            height: 40px !important;
+            min-height: 40px !important;
+            max-height: 40px !important;
+            box-sizing: border-box !important;
+            background-color: #f8fafc !important;
+            border: 1px solid #cbd5e1 !important;
+            color: #0f172a !important;
+            font-size: 13.5px !important;
+            font-weight: 700 !important;
+            padding: 0 8px !important;
+            border-radius: 10px !important;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            text-align: center !important;
+        }
+        div.st-key-navbar_container div[data-testid="stPageLink"] a p,
+        div.st-key-navbar_container div[data-testid="stPageLink"] a span,
+        div.st-key-navbar_container div[data-testid="stPageLink"] a label,
+        div.st-key-navbar_container div[data-testid="stPageLink"] a div,
+        div.st-key-navbar_container div[data-testid="stPageLink"] a * {
+            color: #0f172a !important;
+            font-weight: 700 !important;
+            font-size: 13.5px !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            white-space: nowrap !important;
+        }
+        div.st-key-navbar_container div[data-testid="stPageLink"] a:hover {
+            background-color: #eef2ff !important;
+            border-color: #c7d2fe !important;
+            transform: translateY(-1px) !important;
+        }
+        div.st-key-navbar_container div[data-testid="stPageLink"] a:hover p,
+        div.st-key-navbar_container div[data-testid="stPageLink"] a:hover span,
+        div.st-key-navbar_container div[data-testid="stPageLink"] a:hover label,
+        div.st-key-navbar_container div[data-testid="stPageLink"] a:hover div,
+        div.st-key-navbar_container div[data-testid="stPageLink"] a:hover * {
+            color: #4f46e5 !important;
+            font-weight: 800 !important;
+        }
+        div.st-key-navbar_container div[data-testid="stPageLink"] a[aria-current="page"] {
+            background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%) !important;
+            border-color: transparent !important;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3) !important;
+        }
+        div.st-key-navbar_container div[data-testid="stPageLink"] a[aria-current="page"] p,
+        div.st-key-navbar_container div[data-testid="stPageLink"] a[aria-current="page"] span,
+        div.st-key-navbar_container div[data-testid="stPageLink"] a[aria-current="page"] label,
+        div.st-key-navbar_container div[data-testid="stPageLink"] a[aria-current="page"] div,
+        div.st-key-navbar_container div[data-testid="stPageLink"] a[aria-current="page"] * {
+            color: #ffffff !important;
+            font-weight: 800 !important;
+        }
+
         /* Seamless Dark Theme Adaptability for the top navbar */
         @media (prefers-color-scheme: dark) and (min-width: 992px) {
             div.st-key-navbar_container div[data-testid="stVerticalBlockBorderWrapper"] {
@@ -1226,28 +1293,27 @@ def render_top_header():
     # Dynamically build horizontal layout using st.container & st.columns (ONLY for public guest navigation)
     if not authenticated:
         with st.container(key="navbar_container", border=True):
-            col_spec = [2.2]  # Logo and Brand Branding
-            for path, label, icon in pages:
-                width = 0.7 + (len(label) * 0.065)
-                col_spec.append(width)
-                
+            # Logo (Left) + Middle Spacer + 5 Right-Aligned Settled Page Buttons
+            col_spec = [2.2, 4.0] + [1.2] * len(pages)
             cols = st.columns(col_spec, vertical_alignment="center")
             
+            # Left Logo & Brand Badge
             with cols[0]:
                 st.markdown(f"""
-                <div style="display: flex; align-items: center; justify-content: center; gap: 10px; height: 100%; margin: 0; padding: 0;">
+                <div style="display: flex; align-items: center; justify-content: flex-start; gap: 10px; height: 40px; margin: 0; padding: 0;">
                     <div style="display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                         {logo_html}
                     </div>
-                    <div style="line-height: 1.15; display: flex; flex-direction: column; justify-content: center;">
-                        <div style="font-size: 13.5px; font-weight: 800; color: #0f172a; letter-spacing: -0.3px; white-space: nowrap;">MPIS PORTAL</div>
-                        <div style="font-size: 8.5px; color: #4f46e5; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">{role.upper()}</div>
+                    <div style="line-height: 1.15; display: flex; flex-direction: column; justify-content: center; text-align: left;">
+                        <div style="font-size: 15px; font-weight: 800; color: #0f172a; letter-spacing: -0.3px; white-space: nowrap; font-family: 'Outfit', sans-serif;">MPIS PORTAL</div>
+                        <div style="font-size: 9px; color: #4f46e5; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px;">{role.upper()} PORTAL</div>
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
-                
+
+            # Right Page Links (Home, Public Portal, Cases, Map, Login)
             for i, (path, label, icon) in enumerate(pages):
-                with cols[i + 1]:
+                with cols[i + 2]:
                     st.page_link(path, label=label, icon=icon)
 
     # Render custom Deep Navy sidebar matching reference design (Image 2)
