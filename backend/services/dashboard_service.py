@@ -33,7 +33,7 @@ class DashboardService:
     def get_active_cases(self, current_user: dict = None) -> int:
         query = self._role_case_filter(current_user)
         query = query or {}
-        query["status"] = "Missing"
+        query["status"] = {"$in": ["Missing", "MISSING", "Active", "ACTIVE", "ACTIVE_INVESTIGATION", "POTENTIAL_MATCH", "UNDER_MATCH_REVIEW", "MATCH_CONFIRMED", "REOPENED"]}
         return self.case_repo.count(query)
 
     def get_pending_cases(self, current_user: dict = None) -> int:
@@ -47,7 +47,7 @@ class DashboardService:
     def get_resolved_cases(self, current_user: dict = None) -> int:
         query = self._role_case_filter(current_user)
         query = query or {}
-        query["status"] = "Found"
+        query["status"] = {"$in": ["Found", "FOUND", "Resolved", "RESOLVED", "Closed", "CLOSED", "Reunited", "REUNITED"]}
         return self.case_repo.count(query)
 
     def get_pending_review_cases(self) -> int:

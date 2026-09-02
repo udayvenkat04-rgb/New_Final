@@ -139,6 +139,22 @@ class CaseService:
         if not photo_bytes:
             raise ValueError("A photograph is required to register a missing person bulletin.")
 
+        # Deduplication Guard: Return existing case if identical record was registered within last 60 seconds
+        try:
+            recent_matches = self.case_repo.find_by_filters({
+                "name": name,
+                "age": age,
+                "created_by": creator_str,
+            })
+            now_dt = datetime.utcnow()
+            for existing in recent_matches:
+                dt = getattr(existing, "created_at", None)
+                if dt and (now_dt - dt).total_seconds() < 60:
+                    logger.info(f"Deduplicated duplicate case submission for '{name}'. Returning existing case {existing.case_number}.")
+                    return existing
+        except Exception:
+            pass
+
         # 3) Save photograph to disk (NEVER use original filename in storage)
         _, ext = os.path.splitext(photo_filename or "")
         photo_relative_path = _save_photo_bytes(photo_bytes, ext)
@@ -224,6 +240,22 @@ class CaseService:
                 raise PermissionError(f"Role '{role}' is not authorized to register cases.")
             # Always stamp ownership from the authenticated user
             created_by = current_user.get("username") or created_by
+
+        # Deduplication Guard: Return existing case if identical record was registered within last 60 seconds
+        try:
+            recent_matches = self.case_repo.find_by_filters({
+                "name": name,
+                "age": age,
+                "created_by": created_by,
+            })
+            now_dt = datetime.utcnow()
+            for existing in recent_matches:
+                dt = getattr(existing, "created_at", None)
+                if dt and (now_dt - dt).total_seconds() < 60:
+                    logger.info(f"Deduplicated duplicate case submission for '{name}'. Returning existing case {existing.case_number}.")
+                    return existing
+        except Exception:
+            pass
 
         new_case = MissingPerson(
             name=name,

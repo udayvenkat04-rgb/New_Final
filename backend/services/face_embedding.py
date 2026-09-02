@@ -316,6 +316,12 @@ def normalize_landmarks(
         raise LandmarkValidationError(
             "Empty landmark input — cannot normalize a face vector."
         )
+
+    # Handle MediaPipe FaceMesh with refined_landmarks returning 478 points (468 face mesh + 10 iris points).
+    # Slicing the first 468 landmarks preserves the canonical 468 3D face mesh points for the 1,404D vector.
+    if expected_landmarks == 468 and len(rows) == 478:
+        rows = rows[:468]
+
     raw = np.asarray(rows, dtype=DEFAULT_VECTOR_DTYPE)  # shape (N, 3)
 
     _validate_raw_landmarks(raw, expected_landmarks)

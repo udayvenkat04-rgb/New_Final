@@ -88,27 +88,27 @@ class Settings:
             str(BASE_DIR / "data" / "models" / "face_landmarker.task")
         )
         try:
-            self.MEDIAPIPE_NUM_FACES: int = int(os.getenv("MEDIAPIPE_NUM_FACES", "5"))
+            self.MEDIAPIPE_NUM_FACES: int = int(os.getenv("MEDIAPIPE_NUM_FACES", "20"))
         except ValueError:
-            self.MEDIAPIPE_NUM_FACES = 5
+            self.MEDIAPIPE_NUM_FACES = 20
         try:
             self.MEDIAPIPE_MIN_DETECTION_CONF: float = float(os.getenv(
-                "MEDIAPIPE_MIN_DETECTION_CONF", "0.5"
+                "MEDIAPIPE_MIN_DETECTION_CONF", "0.25"
             ))
         except ValueError:
-            self.MEDIAPIPE_MIN_DETECTION_CONF = 0.5
+            self.MEDIAPIPE_MIN_DETECTION_CONF = 0.25
         try:
             self.MEDIAPIPE_MIN_PRESENCE_CONF: float = float(os.getenv(
-                "MEDIAPIPE_MIN_PRESENCE_CONF", "0.5"
+                "MEDIAPIPE_MIN_PRESENCE_CONF", "0.25"
             ))
         except ValueError:
-            self.MEDIAPIPE_MIN_PRESENCE_CONF = 0.5
+            self.MEDIAPIPE_MIN_PRESENCE_CONF = 0.25
         try:
             self.MEDIAPIPE_MIN_TRACKING_CONF: float = float(os.getenv(
-                "MEDIAPIPE_MIN_TRACKING_CONF", "0.5"
+                "MEDIAPIPE_MIN_TRACKING_CONF", "0.25"
             ))
         except ValueError:
-            self.MEDIAPIPE_MIN_TRACKING_CONF = 0.5
+            self.MEDIAPIPE_MIN_TRACKING_CONF = 0.25
 
         # Video Processing Configuration
         try:
