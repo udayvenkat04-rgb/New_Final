@@ -34,18 +34,22 @@ st.set_page_config(page_title="Case Management", page_icon="🛡️", layout="wi
 inject_custom_css()
 require_role([ROLE_OFFICER, ROLE_ADMIN])
 
-st.markdown(
-    "<h2 style='color: #10b981;'>🛡️ Case Management Centre</h2>",
-    unsafe_allow_html=True,
-)
-role_label = "Administrator" if is_admin() else "Officer"
-st.markdown(
-    f"<p style='color: #94a3b8;'>"
-    f"Role: <b style='color:#f1f5f9;'>{role_label}</b> — "
-    f"{'Full access to all cases across officers.' if is_admin() else 'Access limited to cases you registered.'}"
-    f"</p>",
-    unsafe_allow_html=True,
-)
+cm_col1, cm_col2 = st.columns([3, 1], vertical_alignment="center")
+with cm_col1:
+    st.markdown(
+        "<h2 style='color: #10b981; margin: 0;'>🛡️ Case Management Centre</h2>",
+        unsafe_allow_html=True,
+    )
+    role_label = "Administrator" if is_admin() else "Officer"
+    st.markdown(
+        f"<p style='color: #94a3b8; margin: 0;'>"
+        f"Role: <b style='color:#f1f5f9;'>{role_label}</b> — "
+        f"{'Full access to all cases across officers.' if is_admin() else 'Access limited to cases you registered.'}"
+        f"</p>",
+        unsafe_allow_html=True,
+    )
+with cm_col2:
+    st.page_link("pages/cases.py", label="✍️ Register New Case", icon="➕", use_container_width=True)
 st.markdown("---", unsafe_allow_html=True)
 
 # ── Database connection check ─────────────────────────────────────────

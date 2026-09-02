@@ -1264,6 +1264,7 @@ def render_top_header():
     elif role == "admin":
         sidebar_pages = [
             ("MAIN", "pages/admin_dashboard.py", "Dashboard", "📊"),
+            ("MANAGEMENT", "pages/cases.py", "Register Case", "✍️"),
             ("MANAGEMENT", "pages/case_management.py", "Case Management", "📁"),
             ("MANAGEMENT", "pages/admin_face_matching.py", "AI Face Match", "🔍"),
             ("MANAGEMENT", "pages/video_sightings.py", "CCTV Surveillance", "📹"),

@@ -234,7 +234,8 @@ def render_recent_cases(cases: list):
     """Renders the 'Recent Cases' tab content."""
     st.markdown("#### 📂 Recently Registered Cases")
     if not cases:
-        st.info("No cases registered yet. Head to **Register Missing Person** to file the first bulletin.")
+        st.info("No cases registered yet. Head to **Register Case** to file the first bulletin.")
+        st.page_link("pages/cases.py", label="✍️ Register New Case Now", icon="➕")
         return
 
     for case in cases:

@@ -51,19 +51,50 @@ def login_user(user: dict):
         pass
 
 
+def sync_session_to_query_params():
+    """Ensures query_params match session_state so browser refresh (F5) on any page preserves the session."""
+    import os
+    if os.environ.get("PYTEST_CURRENT_TEST"):
+        return
+    try:
+        if hasattr(st, "query_params") and st.session_state.get("authenticated"):
+            user = st.session_state.get("user", {}) or {}
+            role = user.get("role", "")
+            username = user.get("username", "")
+            email = user.get("email", "")
+            user_id = str(user.get("id", ""))
+            if role and username:
+                st.query_params["auth_role"] = role
+                st.query_params["auth_user"] = username
+                st.query_params["auth_email"] = email
+                st.query_params["auth_id"] = user_id
+    except Exception:
+        pass
+
+
 def restore_session_if_needed():
     """Restores authenticated session state from query_params on browser refresh if not initialized."""
     import os
     if os.environ.get("PYTEST_CURRENT_TEST"):
         return
 
-    if "authenticated" not in st.session_state:
+    if not st.session_state.get("authenticated"):
         try:
             if hasattr(st, "query_params"):
                 role = st.query_params.get("auth_role")
                 username = st.query_params.get("auth_user")
                 email = st.query_params.get("auth_email")
                 user_id = st.query_params.get("auth_id")
+
+                if isinstance(role, list):
+                    role = role[0] if role else ""
+                if isinstance(username, list):
+                    username = username[0] if username else ""
+                if isinstance(email, list):
+                    email = email[0] if email else ""
+                if isinstance(user_id, list):
+                    user_id = user_id[0] if user_id else ""
+
                 if role and username:
                     st.session_state["authenticated"] = True
                     st.session_state["user"] = {
@@ -74,6 +105,8 @@ def restore_session_if_needed():
                     }
         except Exception:
             pass
+
+    sync_session_to_query_params()
 
 
 def logout_user():
