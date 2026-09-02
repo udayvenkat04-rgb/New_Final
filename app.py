@@ -58,133 +58,146 @@ if os.path.exists(logo_path):
 
 header_logo_html = f'<img src="data:image/png;base64,{logo_b64}" style="width: 48px; height: 48px; border-radius: 10px; box-shadow: 0 4px 12px rgba(37,99,235,0.25);" />' if logo_b64 else get_svg_icon('brand_logo', size=40)
 
-# Fetch current metrics
-case_repo = CaseRepository()
-sighting_repo = SightingRepository()
+# Fetch current metrics (Cached for performance)
+@st.cache_data(ttl=60, show_spinner=False)
+def fetch_system_metrics():
+    try:
+        case_repo = CaseRepository()
+        sighting_repo = SightingRepository()
+        return {
+            "total_cases": len(case_repo.get_all()),
+            "active_missing": len(case_repo.get_all({"status": "Missing"})),
+            "total_found": len(case_repo.get_all({"status": "Found"})),
+            "pending_sightings": len(sighting_repo.get_all({"status": "Pending"}))
+        }
+    except Exception:
+        return {"total_cases": 0, "active_missing": 0, "total_found": 0, "pending_sightings": 0}
 
-total_cases = len(case_repo.get_all())
-active_missing = len(case_repo.get_all({"status": "Missing"}))
-total_found = len(case_repo.get_all({"status": "Found"}))
-pending_sightings = len(sighting_repo.get_all({"status": "Pending"}))
+metrics = fetch_system_metrics()
+total_cases = metrics["total_cases"]
+active_missing = metrics["active_missing"]
+total_found = metrics["total_found"]
+pending_sightings = metrics["pending_sightings"]
 
-# Hero Banner Carousel Section
-carousel_slides = [
-    {
-        "title": "Dissemination of Information & Facial Intelligence",
-        "subtitle": "Centralized AI-Driven Missing Person Identification & Spatial Sighting Tracking Portal",
-        "badge1": ("🔍", "FACE MATCHING", "AI Feature Extraction"),
-        "badge2": ("📍", "GIS SIGHTINGS", "Interactive Spatial Map"),
-        "badge3": ("⚡", "REAL-TIME ALERTS", "Automated Case Matching"),
-        "badge4": ("🛡️", "REUNIFICATION", f"{total_found} Reunited Cases")
-    },
-    {
-        "title": "Citizen Sighting Portal & Law Enforcement Network",
-        "subtitle": "Empowering Citizens and Officers to Rapidly Submit Sightings & Verify Bulletins",
-        "badge1": ("🌐", "PUBLIC REPORTING", "Direct Sighting Submission"),
-        "badge2": ("📹", "SURVEILLANCE", "Video Feed Extraction"),
-        "badge3": ("⚖️", "MATCH REVIEW", "Officer Verification"),
-        "badge4": ("🔔", "NOTIFICATION", "Instant Email Dispatch")
-    }
-]
-
-curr_slide = carousel_slides[st.session_state.carousel_index % len(carousel_slides)]
-
-# Hero Banner Carousel Section (100% Full Width Matching All Containers)
+# Hero Banner Section (100% Full Width, Responsive Client-Side Rotation)
 st.markdown("<span style='font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;'>NATIONAL PORTAL HIGHLIGHT</span>", unsafe_allow_html=True)
 
-# Hidden button to trigger auto-transition of carousel slides
-st.markdown("""
-<style>
-    .st-key-hidden_rerun {
-        display: none !important;
-    }
-</style>
-""", unsafe_allow_html=True)
-
-if st.button("hidden_rerun", key="hidden_rerun"):
-    st.session_state.carousel_index = (st.session_state.carousel_index + 1) % len(carousel_slides)
-    st.rerun()
-
-# Auto-advance carousel timer script (5 seconds)
-import streamlit.components.v1 as components
-components.html(
-    """
-    <script>
-        setTimeout(function() {
-            const parentDoc = window.parent.document;
-            const button = parentDoc.querySelector('.st-key-hidden_rerun button');
-            if (button) {
-                button.click();
-            }
-        }, 5000);
-    </script>
-    """,
-    height=0,
-    width=0
-)
-
-
 st.markdown(f"""
-<div style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #1e1b4b 100%); border-radius: 20px; padding: 36px 40px; color: white; position: relative; overflow: hidden; box-shadow: 0 14px 40px rgba(15, 23, 42, 0.25); border: 1px solid #334155; width: 100%;">
+<style>
+@keyframes slideFade {{
+    0%, 45% {{ opacity: 1; pointer-events: auto; }}
+    50%, 95% {{ opacity: 0; pointer-events: none; }}
+    100% {{ opacity: 1; pointer-events: auto; }}
+}}
+@keyframes slideFadeAlt {{
+    0%, 45% {{ opacity: 0; pointer-events: none; }}
+    50%, 95% {{ opacity: 1; pointer-events: auto; }}
+    100% {{ opacity: 0; pointer-events: none; }}
+}}
+.hero-slide-1 {{
+    animation: slideFade 12s infinite;
+}}
+.hero-slide-2 {{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    padding: 36px 40px;
+    box-sizing: border-box;
+    animation: slideFadeAlt 12s infinite;
+}}
+</style>
+
+<div style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #1e1b4b 100%); border-radius: 20px; padding: 36px 40px; color: white; position: relative; overflow: hidden; box-shadow: 0 14px 40px rgba(15, 23, 42, 0.25); border: 1px solid #334155; width: 100%; min-height: 220px; box-sizing: border-box;">
+
+<div class="hero-slide-1">
 <div style="text-align: center; max-width: 850px; margin: 0 auto 28px auto;">
 <span style="background: rgba(59, 130, 246, 0.2); color: #93c5fd; padding: 6px 16px; border-radius: 9999px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; border: 1px solid rgba(147, 197, 253, 0.3);">Featured System Module</span>
-<h1 style="color: #ffffff; font-size: 30px; font-weight: 800; margin-top: 12px; margin-bottom: 8px; font-family: 'Outfit', sans-serif;">{curr_slide['title']}</h1>
-<p style="color: #cbd5e1; font-size: 15.5px; margin: 0; font-weight: 400;">{curr_slide['subtitle']}</p>
+<h1 style="color: #ffffff; font-size: 30px; font-weight: 800; margin-top: 12px; margin-bottom: 8px; font-family: 'Outfit', sans-serif;">Dissemination of Information & Facial Intelligence</h1>
+<p style="color: #cbd5e1; font-size: 15.5px; margin: 0; font-weight: 400;">Centralized AI-Driven Missing Person Identification & Spatial Sighting Tracking Portal</p>
 </div>
 
 <div style="display: flex; justify-content: center; align-items: center; gap: 36px; flex-wrap: wrap; margin-top: 20px;">
 <div style="text-align: center; width: 150px;">
-<div style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); margin: 0 auto 10px auto; display: flex; align-items: center; justify-content: center; font-size: 32px; box-shadow: 0 8px 20px rgba(2, 132, 199, 0.4); border: 3px solid rgba(255,255,255,0.25);">
-{curr_slide['badge1'][0]}
-</div>
-<div style="font-size: 13px; font-weight: 800; color: #ffffff; text-transform: uppercase; letter-spacing: 0.5px;">{curr_slide['badge1'][1]}</div>
-<div style="font-size: 11.5px; color: #93c5fd;">{curr_slide['badge1'][2]}</div>
+<div style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); margin: 0 auto 10px auto; display: flex; align-items: center; justify-content: center; font-size: 32px; box-shadow: 0 8px 20px rgba(2, 132, 199, 0.4); border: 3px solid rgba(255,255,255,0.25);">🔍</div>
+<div style="font-size: 13px; font-weight: 800; color: #ffffff; text-transform: uppercase; letter-spacing: 0.5px;">FACE MATCHING</div>
+<div style="font-size: 11.5px; color: #93c5fd;">AI Feature Extraction</div>
 </div>
 
 <div style="text-align: center; width: 150px;">
-<div style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #be123c 0%, #9f1239 100%); margin: 0 auto 10px auto; display: flex; align-items: center; justify-content: center; font-size: 32px; box-shadow: 0 8px 20px rgba(190, 18, 60, 0.4); border: 3px solid rgba(255,255,255,0.25);">
-{curr_slide['badge2'][0]}
-</div>
-<div style="font-size: 13px; font-weight: 800; color: #ffffff; text-transform: uppercase; letter-spacing: 0.5px;">{curr_slide['badge2'][1]}</div>
-<div style="font-size: 11.5px; color: #fda4af;">{curr_slide['badge2'][2]}</div>
+<div style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #be123c 0%, #9f1239 100%); margin: 0 auto 10px auto; display: flex; align-items: center; justify-content: center; font-size: 32px; box-shadow: 0 8px 20px rgba(190, 18, 60, 0.4); border: 3px solid rgba(255,255,255,0.25);">📍</div>
+<div style="font-size: 13px; font-weight: 800; color: #ffffff; text-transform: uppercase; letter-spacing: 0.5px;">GIS SIGHTINGS</div>
+<div style="font-size: 11.5px; color: #fda4af;">Interactive Spatial Map</div>
 </div>
 
 <div style="text-align: center; width: 150px;">
-<div style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #d97706 0%, #b45309 100%); margin: 0 auto 10px auto; display: flex; align-items: center; justify-content: center; font-size: 32px; box-shadow: 0 8px 20px rgba(217, 119, 6, 0.4); border: 3px solid rgba(255,255,255,0.25);">
-{curr_slide['badge3'][0]}
-</div>
-<div style="font-size: 13px; font-weight: 800; color: #ffffff; text-transform: uppercase; letter-spacing: 0.5px;">{curr_slide['badge3'][1]}</div>
-<div style="font-size: 11.5px; color: #fde68a;">{curr_slide['badge3'][2]}</div>
+<div style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #d97706 0%, #b45309 100%); margin: 0 auto 10px auto; display: flex; align-items: center; justify-content: center; font-size: 32px; box-shadow: 0 8px 20px rgba(217, 119, 6, 0.4); border: 3px solid rgba(255,255,255,0.25);">⚡</div>
+<div style="font-size: 13px; font-weight: 800; color: #ffffff; text-transform: uppercase; letter-spacing: 0.5px;">REAL-TIME ALERTS</div>
+<div style="font-size: 11.5px; color: #fde68a;">Automated Case Matching</div>
 </div>
 
 <div style="text-align: center; width: 150px;">
-<div style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #15803d 0%, #166534 100%); margin: 0 auto 10px auto; display: flex; align-items: center; justify-content: center; font-size: 32px; box-shadow: 0 8px 20px rgba(21, 128, 61, 0.4); border: 3px solid rgba(255,255,255,0.25);">
-{curr_slide['badge4'][0]}
+<div style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #15803d 0%, #166534 100%); margin: 0 auto 10px auto; display: flex; align-items: center; justify-content: center; font-size: 32px; box-shadow: 0 8px 20px rgba(21, 128, 61, 0.4); border: 3px solid rgba(255,255,255,0.25);">🛡️</div>
+<div style="font-size: 13px; font-weight: 800; color: #ffffff; text-transform: uppercase; letter-spacing: 0.5px;">REUNIFICATION</div>
+<div style="font-size: 11.5px; color: #86efac;">{total_found} Reunited Cases</div>
 </div>
-<div style="font-size: 13px; font-weight: 800; color: #ffffff; text-transform: uppercase; letter-spacing: 0.5px;">{curr_slide['badge4'][1]}</div>
-<div style="font-size: 11.5px; color: #86efac;">{curr_slide['badge4'][2]}</div>
+</div>
+</div>
+
+<div class="hero-slide-2">
+<div style="text-align: center; max-width: 850px; margin: 0 auto 28px auto;">
+<span style="background: rgba(59, 130, 246, 0.2); color: #93c5fd; padding: 6px 16px; border-radius: 9999px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; border: 1px solid rgba(147, 197, 253, 0.3);">Featured System Module</span>
+<h1 style="color: #ffffff; font-size: 30px; font-weight: 800; margin-top: 12px; margin-bottom: 8px; font-family: 'Outfit', sans-serif;">Citizen Sighting Portal & Law Enforcement Network</h1>
+<p style="color: #cbd5e1; font-size: 15.5px; margin: 0; font-weight: 400;">Empowering Citizens and Officers to Rapidly Submit Sightings & Verify Bulletins</p>
+</div>
+
+<div style="display: flex; justify-content: center; align-items: center; gap: 36px; flex-wrap: wrap; margin-top: 20px;">
+<div style="text-align: center; width: 150px;">
+<div style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); margin: 0 auto 10px auto; display: flex; align-items: center; justify-content: center; font-size: 32px; box-shadow: 0 8px 20px rgba(2, 132, 199, 0.4); border: 3px solid rgba(255,255,255,0.25);">🌐</div>
+<div style="font-size: 13px; font-weight: 800; color: #ffffff; text-transform: uppercase; letter-spacing: 0.5px;">PUBLIC REPORTING</div>
+<div style="font-size: 11.5px; color: #93c5fd;">Direct Sighting Submission</div>
+</div>
+
+<div style="text-align: center; width: 150px;">
+<div style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #be123c 0%, #9f1239 100%); margin: 0 auto 10px auto; display: flex; align-items: center; justify-content: center; font-size: 32px; box-shadow: 0 8px 20px rgba(190, 18, 60, 0.4); border: 3px solid rgba(255,255,255,0.25);">📹</div>
+<div style="font-size: 13px; font-weight: 800; color: #ffffff; text-transform: uppercase; letter-spacing: 0.5px;">SURVEILLANCE</div>
+<div style="font-size: 11.5px; color: #fda4af;">Video Feed Extraction</div>
+</div>
+
+<div style="text-align: center; width: 150px;">
+<div style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #d97706 0%, #b45309 100%); margin: 0 auto 10px auto; display: flex; align-items: center; justify-content: center; font-size: 32px; box-shadow: 0 8px 20px rgba(217, 119, 6, 0.4); border: 3px solid rgba(255,255,255,0.25);">⚖️</div>
+<div style="font-size: 13px; font-weight: 800; color: #ffffff; text-transform: uppercase; letter-spacing: 0.5px;">MATCH REVIEW</div>
+<div style="font-size: 11.5px; color: #fde68a;">Officer Verification</div>
+</div>
+
+<div style="text-align: center; width: 150px;">
+<div style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #15803d 0%, #166534 100%); margin: 0 auto 10px auto; display: flex; align-items: center; justify-content: center; font-size: 32px; box-shadow: 0 8px 20px rgba(21, 128, 61, 0.4); border: 3px solid rgba(255,255,255,0.25);">🔔</div>
+<div style="font-size: 13px; font-weight: 800; color: #ffffff; text-transform: uppercase; letter-spacing: 0.5px;">NOTIFICATION</div>
+<div style="font-size: 11.5px; color: #86efac;">Instant Email Dispatch</div>
+</div>
 </div>
 </div>
 </div>
 """, unsafe_allow_html=True)
 
-# System Statistics Cards
+# System Statistics Cards (Equal Width and Equal Height Grid Layout)
 st.markdown(f"""
-<div style="display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 20px; margin-bottom: 10px;">
-    <div class="metric-card" style="border-left: 4px solid #ef4444; background: #ffffff; padding: 18px 22px; border-radius: 14px; box-shadow: 0 4px 16px rgba(15,23,42,0.05); flex: 1; max-width: 270px; min-width: 200px;">
-        <span style="font-size: 11px; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Active Missing Bulletins</span>
+<div class="system-stats-grid">
+    <div class="metric-card" style="border-left: 4px solid #ef4444; background: #ffffff; padding: 20px 24px; border-radius: 16px; box-shadow: 0 4px 16px rgba(15,23,42,0.05); display: flex; flex-direction: column; justify-content: space-between; height: 125px; box-sizing: border-box;">
+        <span style="font-size: 11.5px; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Active Missing Bulletins</span>
         <h2 style="margin: 4px 0 0 0; color: #ef4444; font-size: 34px; font-weight: 800;">{active_missing}</h2>
     </div>
-    <div class="metric-card" style="border-left: 4px solid #10b981; background: #ffffff; padding: 18px 22px; border-radius: 14px; box-shadow: 0 4px 16px rgba(15,23,42,0.05); flex: 1; max-width: 270px; min-width: 200px;">
-        <span style="font-size: 11px; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Found & Reunited</span>
+    <div class="metric-card" style="border-left: 4px solid #10b981; background: #ffffff; padding: 20px 24px; border-radius: 16px; box-shadow: 0 4px 16px rgba(15,23,42,0.05); display: flex; flex-direction: column; justify-content: space-between; height: 125px; box-sizing: border-box;">
+        <span style="font-size: 11.5px; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Found & Reunited</span>
         <h2 style="margin: 4px 0 0 0; color: #10b981; font-size: 34px; font-weight: 800;">{total_found}</h2>
     </div>
-    <div class="metric-card" style="border-left: 4px solid #f59e0b; background: #ffffff; padding: 18px 22px; border-radius: 14px; box-shadow: 0 4px 16px rgba(15,23,42,0.05); flex: 1; max-width: 270px; min-width: 200px;">
-        <span style="font-size: 11px; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Pending Sightings</span>
+    <div class="metric-card" style="border-left: 4px solid #f59e0b; background: #ffffff; padding: 20px 24px; border-radius: 16px; box-shadow: 0 4px 16px rgba(15,23,42,0.05); display: flex; flex-direction: column; justify-content: space-between; height: 125px; box-sizing: border-box;">
+        <span style="font-size: 11.5px; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Pending Sightings</span>
         <h2 style="margin: 4px 0 0 0; color: #f59e0b; font-size: 34px; font-weight: 800;">{pending_sightings}</h2>
     </div>
-    <div class="metric-card" style="border-left: 4px solid #3b82f6; background: #ffffff; padding: 18px 22px; border-radius: 14px; box-shadow: 0 4px 16px rgba(15,23,42,0.05); flex: 1; max-width: 270px; min-width: 200px;">
-        <span style="font-size: 11px; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Total Cases Logged</span>
+    <div class="metric-card" style="border-left: 4px solid #3b82f6; background: #ffffff; padding: 20px 24px; border-radius: 16px; box-shadow: 0 4px 16px rgba(15,23,42,0.05); display: flex; flex-direction: column; justify-content: space-between; height: 125px; box-sizing: border-box;">
+        <span style="font-size: 11.5px; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Total Cases Logged</span>
         <h2 style="margin: 4px 0 0 0; color: #3b82f6; font-size: 34px; font-weight: 800;">{total_cases}</h2>
     </div>
 </div>

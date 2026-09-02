@@ -73,22 +73,25 @@ def inject_custom_css():
         }
         */
         
+        /* Sidebar Collapse (<<) & Expand (>>) Responsive Arrow Buttons Styling */
         button[data-testid="stSidebarCollapseButton"],
         button[data-testid="stHeaderSidebarCollapseButton"],
         div[data-testid="collapsedControl"] button,
         header[data-testid="stHeader"] button {
             background-color: #ffffff !important;
             border: 1.5px solid #cbd5e1 !important;
-            border-radius: 8px !important;
-            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08) !important;
-            transition: all 0.2s ease !important;
+            border-radius: 10px !important;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.1) !important;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
             display: inline-flex !important;
             align-items: center !important;
             justify-content: center !important;
             z-index: 999999 !important;
-            width: 40px !important;
-            height: 40px !important;
+            width: 38px !important;
+            height: 38px !important;
             color: #0f172a !important;
+            cursor: pointer !important;
+            pointer-events: auto !important;
         }
         
         button[data-testid="stSidebarCollapseButton"] svg,
@@ -97,15 +100,52 @@ def inject_custom_css():
         header[data-testid="stHeader"] button svg {
             fill: #0f172a !important;
             color: #0f172a !important;
+            transition: fill 0.2s ease, transform 0.2s ease !important;
         }
 
         button[data-testid="stSidebarCollapseButton"]:hover,
         button[data-testid="stHeaderSidebarCollapseButton"]:hover,
         div[data-testid="collapsedControl"] button:hover,
         header[data-testid="stHeader"] button:hover {
-            background-color: #f1f5f9 !important;
-            border-color: #94a3b8 !important;
-            transform: scale(1.05) !important;
+            background-color: #4f46e5 !important;
+            border-color: #4338ca !important;
+            box-shadow: 0 6px 18px rgba(79, 70, 229, 0.35) !important;
+            transform: scale(1.08) !important;
+        }
+
+        button[data-testid="stSidebarCollapseButton"]:hover svg,
+        button[data-testid="stHeaderSidebarCollapseButton"]:hover svg,
+        div[data-testid="collapsedControl"] button:hover svg,
+        header[data-testid="stHeader"] button:hover svg {
+            fill: #ffffff !important;
+            color: #ffffff !important;
+        }
+
+        /* Fixed High-Visibility Positioning for Collapsed Expand Arrow Button (>>) */
+        div[data-testid="collapsedControl"],
+        [data-testid="collapsedControl"] {
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            position: fixed !important;
+            top: 14px !important;
+            left: 14px !important;
+            z-index: 999999 !important;
+        }
+
+        /* Mobile & Tablet Responsiveness for Arrow Controls */
+        @media screen and (max-width: 991px) {
+            button[data-testid="stSidebarCollapseButton"],
+            button[data-testid="stHeaderSidebarCollapseButton"],
+            div[data-testid="collapsedControl"] button {
+                width: 36px !important;
+                height: 36px !important;
+                border-radius: 8px !important;
+            }
+            div[data-testid="collapsedControl"] {
+                top: 10px !important;
+                left: 10px !important;
+            }
         }
 
         /* Global font & light theme background */
@@ -832,48 +872,15 @@ def inject_custom_css():
     else:
         st.markdown("""
         <style>
+            /* Dynamic Sidebar Responsiveness & Content Layout */
             @media screen and (min-width: 992px) {
-                /* Force the sidebar to be permanently visible and expanded at 280px width on the left */
-                section[data-testid="stSidebar"],
-                [data-testid="stSidebar"] {
-                    display: block !important;
-                    visibility: visible !important;
-                    width: 280px !important;
-                    min-width: 280px !important;
+                /* When sidebar is visible, main content automatically adjusts margin */
+                div[data-testid="stAppViewContainer"]:has(section[data-testid="stSidebar"]:not([data-collapsed="true"])) > section.main {
                     margin-left: 0px !important;
-                    transform: none !important; /* Force it to stay on screen */
-                }
-
-                /* Hide all collapse/expand trigger buttons and arrows completely on desktop */
-                button[data-testid="stSidebarCollapseButton"],
-                button[data-testid="stHeaderSidebarCollapseButton"],
-                div[data-testid="collapsedControl"],
-                [data-testid="collapsedControl"],
-                .stSidebarCollapseButton {
-                    display: none !important;
-                    visibility: hidden !important;
-                    width: 0px !important;
-                    height: 0px !important;
-                }
-
-                /* Hide the default empty space reserved for the sidebar header on desktop */
-                div[data-testid="stSidebarHeader"] {
-                    padding: 0 !important;
-                    min-height: 0px !important;
-                    height: 0px !important;
-                }
-
-                /* Force the main container viewport layout (section.main) to fit exactly next to the static left sidebar */
-                div[data-testid="stAppViewContainer"] > section.main {
-                    margin-left: 280px !important;
-                    width: calc(100% - 280px) !important;
-                    max-width: calc(100% - 280px) !important;
                 }
             }
 
-            /* On mobile/tablet, let sidebar collapse and push content naturally */
             @media screen and (max-width: 991px) {
-                /* Ensure main content takes full width when sidebar is collapsed */
                 div[data-testid="stAppViewContainer"] > section.main {
                     margin-left: 0px !important;
                     width: 100% !important;
@@ -881,16 +888,39 @@ def inject_custom_css():
                 }
             }
 
-            /* Align the top of the brand container and remove any top padding spacing */
-            div[data-testid="stSidebarUserContent"] {
-                padding-top: 20px !important;
-            }
-            .sidebar-brand-container {
-                padding-right: 0px !important;
-                margin-bottom: 24px !important;
-            }
-        </style>
-        """, unsafe_allow_html=True)
+        /* Sidebar Header & Brand Container Layout - 100% Fully Visible with No Top Clipping */
+        div[data-testid="stSidebarHeader"] {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: flex-end !important;
+            padding: 20px 16px 0px 16px !important;
+            height: 56px !important;
+            min-height: 56px !important;
+            margin-bottom: 0px !important;
+        }
+
+        div[data-testid="stSidebarUserContent"] {
+            padding-top: 0px !important;
+            margin-top: 0px !important;
+        }
+
+        .sidebar-brand-container {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: flex-start !important;
+            gap: 10px !important;
+            height: 44px !important;
+            margin-top: -44px !important; /* Safely align with arrow button inside the 56px padded header */
+            margin-bottom: 28px !important;
+            padding-left: 10px !important;
+            padding-right: 52px !important;
+        }
+
+        div[data-testid="stSidebarUserContent"] > div[data-testid="stPageLink"]:first-of-type {
+            margin-top: 0px !important;
+        }
+    </style>
+    """, unsafe_allow_html=True)
     
     render_top_header()
 
@@ -913,11 +943,33 @@ def render_top_header():
         except Exception:
             pass
 
-    logo_html = f'<img src="data:image/png;base64,{logo_b64}" style="width: 32px; height: 32px; border-radius: 6px;" />' if logo_b64 else get_svg_icon('brand_logo', size=28)
+    logo_html = f'<img src="data:image/png;base64,{logo_b64}" style="width: 32px; height: 32px; border-radius: 6px; display: block;" />' if logo_b64 else get_svg_icon('brand_logo', size=28)
 
     # Styling for the horizontal navbar container and links
     st.markdown("""
     <style>
+        /* System Statistics Equal Width Grid Layout */
+        .system-stats-grid {
+            display: grid !important;
+            grid-template-columns: repeat(4, 1fr) !important;
+            gap: 20px !important;
+            width: 100% !important;
+            margin-top: 20px !important;
+            margin-bottom: 20px !important;
+            box-sizing: border-box !important;
+        }
+        @media screen and (max-width: 991px) {
+            .system-stats-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 14px !important;
+            }
+        }
+        @media screen and (max-width: 480px) {
+            .system-stats-grid {
+                grid-template-columns: 1fr !important;
+            }
+        }
+
         /* Target the top navbar container by its Streamlit key to stretch edge-to-edge on Desktop */
         @media screen and (min-width: 992px) {
             div.st-key-navbar_container {
@@ -926,7 +978,7 @@ def render_top_header():
                 padding: 0 !important;
             }
             div.st-key-navbar_container div[data-testid="stVerticalBlockBorderWrapper"] {
-                padding: 10px 24px !important;
+                padding: 8px 24px !important;
                 margin-top: 0px !important;
                 margin-left: -0.5rem !important;
                 margin-right: -0.5rem !important;
@@ -941,6 +993,9 @@ def render_top_header():
                 border-bottom: 1px solid #cbd5e1 !important;
                 border-radius: 0px !important;
                 box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06) !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
             }
         }
 
@@ -953,7 +1008,7 @@ def render_top_header():
                 box-sizing: border-box !important;
             }
             div.st-key-navbar_container div[data-testid="stVerticalBlockBorderWrapper"] {
-                padding: 16px 20px !important;
+                padding: 10px 16px !important;
                 margin-top: 10px !important;
                 margin-left: 0px !important;
                 margin-right: 0px !important;
@@ -966,7 +1021,32 @@ def render_top_header():
                 border-radius: 16px !important;
                 box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05) !important;
                 box-sizing: border-box !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
             }
+        }
+
+        /* Zero out internal padding & margins inside the top navbar container to lock logo dead-center vertically */
+        div.st-key-navbar_container div[data-testid="stHorizontalBlock"] {
+            align-items: center !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        div.st-key-navbar_container div[data-testid="column"] {
+            display: flex !important;
+            align-items: center !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        div.st-key-navbar_container .element-container,
+        div.st-key-navbar_container .stMarkdown {
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            display: flex !important;
+            align-items: center !important;
         }
         
         /* Seamless Dark Theme Adaptability for the top navbar */
@@ -983,11 +1063,6 @@ def render_top_header():
                 border-color: #334155 !important;
                 box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25) !important;
             }
-        }
-        
-        /* Ensure all Streamlit columns stay in a horizontal row and align centered */
-        div[data-testid="stHorizontalBlock"] {
-            align-items: center !important;
         }
     </style>
     """, unsafe_allow_html=True)
@@ -1033,16 +1108,18 @@ def render_top_header():
                 width = 0.7 + (len(label) * 0.065)
                 col_spec.append(width)
                 
-            cols = st.columns(col_spec)
+            cols = st.columns(col_spec, vertical_alignment="center")
             
-            # 1. Branding (Col 0)
+            # 1. Branding (Col 0) - Locked in exact vertical middle of navbar border box
             with cols[0]:
                 st.markdown(f"""
-                <div style="display: flex; align-items: center; gap: 8px; padding-top: 4px;">
-                    {logo_html}
-                    <div style="line-height: 1.1;">
-                        <div style="font-size: 13px; font-weight: 800; color: #0f172a; letter-spacing: -0.3px;">MPIS PORTAL</div>
-                        <div style="font-size: 8px; color: #4f46e5; font-weight: 700; text-transform: uppercase;">{role.upper()}</div>
+                <div style="display: flex; align-items: center; justify-content: center; gap: 10px; height: 100%; margin: 0; padding: 0;">
+                    <div style="display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                        {logo_html}
+                    </div>
+                    <div style="line-height: 1.15; display: flex; flex-direction: column; justify-content: center;">
+                        <div style="font-size: 13.5px; font-weight: 800; color: #0f172a; letter-spacing: -0.3px; white-space: nowrap;">MPIS PORTAL</div>
+                        <div style="font-size: 8.5px; color: #4f46e5; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">{role.upper()}</div>
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
@@ -1086,39 +1163,7 @@ def render_top_header():
             from backend.auth.authentication import logout_user
             logout_user()
 
-        # Force sidebar to expand programmatically if collapsed when page loads (using multiple selectors for robustness)
-        import streamlit.components.v1 as components
-        components.html("""
-        <script>
-            function checkAndOpenSidebar() {
-                if (window.parent.innerWidth < 992) {
-                    // Do not force expand sidebar on mobile/tablet to keep it clean and responsive
-                    return;
-                }
-                try {
-                    const selectors = [
-                        'button[data-testid="stHeaderSidebarCollapseButton"]',
-                        'div[data-testid="collapsedControl"] button',
-                        '.stHeaderSidebarCollapseButton',
-                        'div[data-testid="collapsedControl"]'
-                    ];
-                    for (const sel of selectors) {
-                        const btn = window.parent.document.querySelector(sel);
-                        if (btn) {
-                            btn.click();
-                            console.log("Forced sidebar expansion via selector: " + sel);
-                            break;
-                        }
-                    }
-                } catch (e) {
-                    console.error("Error opening sidebar:", e);
-                }
-            }
-            setTimeout(checkAndOpenSidebar, 200);
-            setTimeout(checkAndOpenSidebar, 500);
-            setTimeout(checkAndOpenSidebar, 1000);
-        </script>
-        """, height=0, width=0)
+        pass
 
 
 
