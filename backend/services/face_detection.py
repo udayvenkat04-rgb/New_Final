@@ -450,6 +450,66 @@ def _build_result_from_mp(
     )
 
 
+
+def _refine_face_landmarks_with_crop(
+    face: DetectedFace,
+    rgb_processed: np.ndarray,
+    landmarker: Any,
+    margin_ratio: float = 0.35,
+) -> DetectedFace:
+    """Refine landmarks for a detected face by cropping its bounding box (padded 1:1 square)
+    and re-running the landmarker on the zoomed face patch.
+    This gives small faces in group photos high-resolution landmark accuracy matching close-up selfies.
+    """
+    if rgb_processed is None or face.bounding_box_pixels is None or landmarker is None:
+        return face
+
+    h, w = rgb_processed.shape[:2]
+    px, py, pw, ph = face.bounding_box_pixels
+    if pw <= 0 or ph <= 0:
+        return face
+
+    cx = px + pw / 2.0
+    cy = py + ph / 2.0
+    side = max(pw, ph) * (1.0 + margin_ratio)
+
+    x1 = max(0, int(round(cx - side / 2.0)))
+    y1 = max(0, int(round(cy - side / 2.0)))
+    x2 = min(w, int(round(cx + side / 2.0)))
+    y2 = min(h, int(round(cy + side / 2.0)))
+
+    crop_w = x2 - x1
+    crop_h = y2 - y1
+    if crop_w < 10 or crop_h < 10:
+        return face
+
+    crop = rgb_processed[y1:y2, x1:x2]
+
+    try:
+        mp_crop_img = MPImage(image_format=ImageFormat.SRGB, data=crop)
+        crop_res = landmarker.detect(mp_crop_img)
+        if crop_res and getattr(crop_res, "face_landmarks", None) and len(crop_res.face_landmarks) > 0:
+            crop_lms = crop_res.face_landmarks[0]
+            refined_landmarks: List[FaceLandmark] = []
+            for idx, clm in enumerate(crop_lms):
+                cx_val = float(getattr(clm, "x", 0.0))
+                cy_val = float(getattr(clm, "y", 0.0))
+                cz_val = float(getattr(clm, "z", 0.0))
+
+                img_x = (cx_val * crop_w + x1) / float(w)
+                img_y = (cy_val * crop_h + y1) / float(h)
+                img_z = cz_val * (crop_w / float(w))
+
+                refined_landmarks.append(FaceLandmark(index=idx, x=img_x, y=img_y, z=img_z))
+
+            if len(refined_landmarks) >= 468:
+                face.landmarks = refined_landmarks
+    except Exception:
+        pass
+
+    return face
+
+
 # ---------------------------------------------------------------------------
 # Public API
 # ---------------------------------------------------------------------------
@@ -465,6 +525,7 @@ def detect_faces(
     min_tracking_confidence: Optional[float] = None,
     max_image_dimension: int = _MAX_IMAGE_DIMENSION,
     fallback_on_unclear: bool = True,
+    refine_crops: bool = True,
 ) -> FaceDetectionResult:
     """Run MediaPipe Face Landmarker on ``image``.
 
@@ -477,6 +538,8 @@ def detect_faces(
         fallback_on_unclear: if True, will automatically retry detection
             with lower confidence thresholds and higher max face counts if
             0 faces are detected with default parameters.
+        refine_crops: if True, will perform 2-stage crop-based landmark refinement
+            on detected face bounding boxes to maximize group-photo facial accuracy.
 
     Returns:
         FaceDetectionResult — always a concrete instance, never None.
@@ -576,6 +639,11 @@ def detect_faces(
         # 5. Convert MP result to our pure-Python structures
         res = _build_result_from_mp(mp_result, rgb_processed)
         if res.success and res.num_faces > 0:
+            if refine_crops and landmarker is not None:
+                res.faces = [
+                    _refine_face_landmarks_with_crop(f, rgb_processed, landmarker)
+                    for f in res.faces
+                ]
             return res
         last_result = res
 

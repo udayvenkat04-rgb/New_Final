@@ -281,6 +281,8 @@ def normalize_landmarks(
     landmarks: Sequence[Any],
     *,
     expected_landmarks: Optional[int] = DEFAULT_LANDMARKS_PER_FACE,
+    image_width: Optional[int] = None,
+    image_height: Optional[int] = None,
 ) -> np.ndarray:
     """Normalize raw landmarks into a translation- and scale-invariant (N,3) array.
 
@@ -294,6 +296,9 @@ def normalize_landmarks(
         The mandatory landmark count, or ``None`` to accept any N (strongly
         discouraged — defaults to :data:`DEFAULT_LANDMARKS_PER_FACE` = 468
         so we get a 1,404-D vector downstream).
+    image_width / image_height:
+        Optional dimensions of input image to apply aspect-ratio correction
+        so horizontal/vertical physical proportions match across image formats.
 
     Returns
     -------
@@ -329,6 +334,12 @@ def normalize_landmarks(
     # 1) Translation invariance — mean-center
     mean = raw.mean(axis=0)  # shape (3,)
     centered = raw - mean
+
+    # Aspect ratio adjustment: if image_width and image_height are provided,
+    # scale x by aspect ratio (W / H) so x and y distances represent true physical pixel proportions.
+    if image_width is not None and image_height is not None and image_height > 0:
+        aspect_ratio = float(image_width) / float(image_height)
+        centered[:, 0] = centered[:, 0] * aspect_ratio
 
     # 2) Scale invariance — divide by the xy-plane radius to the farthest point
     xy_radii = np.sqrt(centered[:, 0] ** 2 + centered[:, 1] ** 2)
@@ -386,6 +397,8 @@ def generate_face_vector(
     *,
     expected_landmarks: Optional[int] = DEFAULT_LANDMARKS_PER_FACE,
     validate: bool = True,
+    image_width: Optional[int] = None,
+    image_height: Optional[int] = None,
 ) -> np.ndarray:
     """Full pipeline: landmarks → normalized (N,3) → 1,404-D float32 vector.
 
@@ -402,6 +415,8 @@ def generate_face_vector(
     validate:
         When True (default), also run :func:`validate_face_vector` on the
         final vector.
+    image_width / image_height:
+        Optional original image dimensions for aspect-ratio invariant normalization.
 
     Returns
     -------
@@ -413,7 +428,12 @@ def generate_face_vector(
     else:
         landmarks = face
 
-    normed = normalize_landmarks(landmarks, expected_landmarks=expected_landmarks)
+    normed = normalize_landmarks(
+        landmarks,
+        expected_landmarks=expected_landmarks,
+        image_width=image_width,
+        image_height=image_height,
+    )
     vector = landmarks_to_vector(normed, expected_landmarks=expected_landmarks)
 
     if validate:
@@ -551,7 +571,12 @@ def generate_vectors_for_all_faces(
     for idx, face in enumerate(result.faces):
         try:
             vectors.append(
-                generate_face_vector(face, expected_landmarks=expected_landmarks)
+                generate_face_vector(
+                    face,
+                    expected_landmarks=expected_landmarks,
+                    image_width=result.image_width,
+                    image_height=result.image_height,
+                )
             )
         except FaceEmbeddingError as exc:
             raise FaceEmbeddingError(
@@ -594,7 +619,12 @@ def generate_face_vector_by_index(
             f"0…{result.num_faces - 1})."
         )
     face = result.faces[int(face_index)]
-    return generate_face_vector(face, expected_landmarks=expected_landmarks)
+    return generate_face_vector(
+        face,
+        expected_landmarks=expected_landmarks,
+        image_width=result.image_width,
+        image_height=result.image_height,
+    )
 
 
 # ---------------------------------------------------------------------------
