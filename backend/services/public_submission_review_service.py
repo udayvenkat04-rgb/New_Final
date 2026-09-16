@@ -142,6 +142,14 @@ class PublicSubmissionReviewService:
             created_case = self.case_repo.create(case_obj)
             created_case_id = created_case.id if hasattr(created_case, "id") else None
 
+            # Automatically extract and attach 1,404-D face vector for AI matching
+            if created_case_id and sub.photo_path:
+                try:
+                    self.case_service.attach_face_vector(created_case_id, image_input=sub.photo_path)
+                    logger.info("Successfully attached face vector for approved public submission Case ID #%s.", created_case_id)
+                except Exception as vexc:
+                    logger.warning("Could not attach face vector for approved public submission Case ID #%s: %s", created_case_id, vexc)
+
             # Update Submission Record to APPROVED
             self.submission_repo.update_submission_status(
                 submission_id=submission_id,

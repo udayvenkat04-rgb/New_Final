@@ -204,8 +204,20 @@ class VideoAIService:
                 }
             )
 
-        # 3. Check for Database Reference Vectors
-        # We perform a quick test query or check count to avoid scanning frames if DB is empty
+        # 3. Check and Auto-Index Database Reference Vectors
+        try:
+            from backend.services.case_service import CaseService
+            case_svc = CaseService(case_repo=self.case_repo)
+            all_cases = self.case_repo.get_all()
+            for case_doc in all_cases:
+                if getattr(case_doc, "photo_path", None):
+                    try:
+                        case_svc.attach_face_vector(case_doc.id)
+                    except Exception:
+                        pass
+        except Exception:
+            pass
+
         ref_count = len(self.face_repo.get_all_registered())
         if ref_count == 0:
             return VideoAIScanResult(

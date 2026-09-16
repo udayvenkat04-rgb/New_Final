@@ -190,7 +190,7 @@ def render_admin_face_matching_page():
         st.markdown("### ⚙️ KNN Matching Options")
         st.info("Configure matching parameters for this search session.")
         top_k_input = st.number_input("Top Candidates (K)", min_value=1, max_value=20, value=int(KNN_N_NEIGHBORS), step=1)
-        threshold_input = st.slider("Match Distance Threshold", min_value=0.10, max_value=20.00, value=float(getattr(settings, "FACE_MATCH_THRESHOLD", 5.00)), step=0.10, help="Candidates with Euclidean distance <= threshold are flagged as Potential Matches.")
+        threshold_input = st.slider("Match Distance Threshold", min_value=0.10, max_value=20.00, value=float(FACE_MATCH_THRESHOLD), step=0.10, help="Candidates with Euclidean distance <= threshold are flagged as Potential Matches.")
 
     # ── 4. Step 1 & 2: Image Upload & Preview ────────────────────────────
     st.markdown("### Step 1: Upload Query Image")
