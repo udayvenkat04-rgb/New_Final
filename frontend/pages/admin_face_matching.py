@@ -441,13 +441,19 @@ def render_admin_face_matching_page():
             st.warning("⚠️ **No Reference Vectors Stored**: The database currently contains 0 registered missing person face profiles. Please register missing person cases with photos first.")
             st.stop()
 
-        potential_candidates = [c for c in candidates if c.get("is_potential_match")]
-        non_potential_candidates = [c for c in candidates if not c.get("is_potential_match")]
+        potential_count = sum(1 for c in candidates if c.get("is_potential_match"))
+
+        if potential_count > 0:
+            st.success(f"🎉 **POTENTIAL MATCH IDENTIFIED**: Found **{potential_count}** candidate(s) meeting the match threshold!")
+        else:
+            st.info("ℹ️ **KNN Facial Search Completed**: Displaying closest registered missing person candidates ranked by facial similarity:")
 
         case_service = CaseService()
         current_user = st.session_state.get("user")
 
-        def _render_candidate_card(cand):
+        st.markdown("#### 📊 Ranked Candidates")
+
+        for cand in candidates:
             rank = cand.get("rank")
             case_id = cand.get("case_id")
             distance = cand.get("distance")
@@ -467,10 +473,10 @@ def render_admin_face_matching_page():
             city = getattr(case_obj, "last_seen_city", "N/A") if case_obj else "N/A"
             state = getattr(case_obj, "last_seen_state", "N/A") if case_obj else "N/A"
 
-            decision_label = "POTENTIAL MATCH" if is_potential else "NO MATCH (REJECTED)"
-            border_color = "#10b981" if is_potential else "#ef4444"
-            badge_bg = "rgba(16, 185, 129, 0.15)" if is_potential else "rgba(239, 68, 68, 0.15)"
-            badge_color = "#047857" if is_potential else "#b91c1c"
+            decision_label = "POTENTIAL MATCH" if is_potential else "CLOSEST CANDIDATE"
+            border_color = "#10b981" if is_potential else "#3b82f6"
+            badge_bg = "rgba(16, 185, 129, 0.15)" if is_potential else "rgba(59, 130, 246, 0.15)"
+            badge_color = "#047857" if is_potential else "#1d4ed8"
 
             st.markdown(f"""
             <div class="glass-card" style="border-left: 5px solid {border_color}; padding: 18px; margin-bottom: 16px; background: #ffffff; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.08), 0 2px 4px -1px rgba(0,0,0,0.04);">
@@ -528,34 +534,6 @@ def render_admin_face_matching_page():
                         st.markdown(f"**Description:** {case_obj.description or 'No additional description.'}")
                         st.markdown(f"**Calculated Distance:** `{distance:.4f}`")
                         st.markdown(f"**Calculated Similarity:** `{similarity:.1f}%`")
-
-        if not potential_candidates:
-            st.error("❌ **NO MATCH FOUND — UNKNOWN / UNREGISTERED PERSON**: The uploaded photograph does NOT match any registered missing person in the database (all candidates exceeded distance threshold).")
-            st.markdown("""
-            <div style="background: rgba(239, 68, 68, 0.08); border: 1px solid #ef4444; border-radius: 8px; padding: 14px 18px; margin-bottom: 20px;">
-                <h4 style="margin: 0; color: #b91c1c;">🚫 Verification Decision: REJECTED</h4>
-                <p style="margin: 4px 0 0 0; color: #334155; font-size: 14px;">
-                    The facial landmarks in the uploaded query image do not match any active missing person record in our database. 
-                    The system has classified this face as an <b>Unregistered / Non-Matching Individual</b>.
-                </p>
-            </div>
-            """, unsafe_allow_html=True)
-
-            if non_potential_candidates:
-                with st.expander("🔍 Inspect Closest Database Entries (Distance Threshold Exceeded)"):
-                    st.info("The entries below were rejected by the match threshold and are displayed for administrator reference only:")
-                    for cand in non_potential_candidates:
-                        _render_candidate_card(cand)
-        else:
-            st.success(f"🎉 **POTENTIAL MATCH IDENTIFIED**: Found **{len(potential_candidates)}** registered case(s) matching the uploaded person!")
-            st.markdown("#### 📊 Matched Person Profiles")
-            for cand in potential_candidates:
-                _render_candidate_card(cand)
-
-            if non_potential_candidates:
-                with st.expander("🔍 Inspect Remaining Non-Matching Database Cases"):
-                    for cand in non_potential_candidates:
-                        _render_candidate_card(cand)
 
     # ── 9. Footer ───────────────────────────────────────────────────────
     st.markdown("---", unsafe_allow_html=True)
