@@ -104,7 +104,7 @@ def distance_to_similarity_score(distance: float) -> float:
     if distance is None or np.isnan(distance) or np.isinf(distance) or float(distance) < 0:
         return 0.0
     dist_val = float(distance)
-    score = 100.0 * np.exp(-0.35 * dist_val)
+    score = 100.0 * np.exp(-0.15 * dist_val)
     return round(float(max(0.0, min(100.0, score))), 2)
 
 
