@@ -49,9 +49,9 @@ class Settings:
         self.SECRET_KEY: str = os.getenv("SECRET_KEY", "default-secret-key-32-chars-long-or-more")
         
         try:
-            self.FACE_MATCH_THRESHOLD: float = float(os.getenv("FACE_MATCH_THRESHOLD", 0.60))
+            self.FACE_MATCH_THRESHOLD: float = float(os.getenv("FACE_MATCH_THRESHOLD", 5.00))
         except ValueError:
-            self.FACE_MATCH_THRESHOLD = 0.60
+            self.FACE_MATCH_THRESHOLD = 5.00
 
         try:
             self.KNN_N_NEIGHBORS: int = int(os.getenv("KNN_N_NEIGHBORS", 5))
