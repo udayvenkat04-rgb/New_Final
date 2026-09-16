@@ -100,12 +100,12 @@ def calculate_similarity(emb1: Sequence[float], emb2: Sequence[float]) -> float:
 
 
 def distance_to_similarity_score(distance: float) -> float:
-    """Convert Euclidean distance to a 0–100% similarity score."""
-    if distance is None or np.isnan(distance) or np.isinf(distance):
+    """Convert Euclidean distance to a 0–100% similarity score using exponential decay scaling."""
+    if distance is None or np.isnan(distance) or np.isinf(distance) or float(distance) < 0:
         return 0.0
-    # Euclidean distance on unit-scaled landmarks is bounded approx in [0, 2.0]
-    score = max(0.0, 1.0 - (float(distance) / 2.0)) * 100.0
-    return round(score, 2)
+    dist_val = float(distance)
+    score = 100.0 * np.exp(-0.35 * dist_val)
+    return round(float(max(0.0, min(100.0, score))), 2)
 
 
 def validate_query_vector(
@@ -258,22 +258,28 @@ class KNNFaceMatchingEngine:
         dist_row = distances[0]
         idx_row = indices[0]
 
-        # 5. Format candidates list
+        # 5. Format candidates list (deduplicating by case_id for unique ranked cases)
         candidates: List[Dict[str, Any]] = []
+        seen_case_ids = set()
         has_potential_match = False
 
-        for rank_idx, (dist_val, ref_idx) in enumerate(zip(dist_row, idx_row), start=1):
+        for dist_val, ref_idx in zip(dist_row, idx_row):
+            ref_doc = valid_docs[ref_idx]
+            case_id = ref_doc.case_id
+            if case_id in seen_case_ids:
+                continue
+            seen_case_ids.add(case_id)
+
             dist_float = round(float(dist_val), 6)
             sim_score = distance_to_similarity_score(dist_float)
-            ref_doc = valid_docs[ref_idx]
 
             is_potential = bool(dist_float <= thresh)
             if is_potential:
                 has_potential_match = True
 
             candidate_info = {
-                "rank": rank_idx,
-                "case_id": ref_doc.case_id,
+                "rank": len(candidates) + 1,
+                "case_id": case_id,
                 "vector_id": ref_doc.id,
                 "distance": dist_float,
                 "similarity_score": sim_score,

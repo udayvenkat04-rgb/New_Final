@@ -429,21 +429,21 @@ def render_admin_face_matching_page():
             state = getattr(case_obj, "last_seen_state", "N/A") if case_obj else "N/A"
 
             decision_label = "POTENTIAL MATCH" if is_potential else "NO POTENTIAL MATCH"
-            border_color = "#10b981" if is_potential else "#475569"
-            badge_bg = "rgba(16, 185, 129, 0.2)" if is_potential else "rgba(100, 116, 139, 0.2)"
-            badge_color = "#10b981" if is_potential else "#94a3b8"
+            border_color = "#10b981" if is_potential else "#64748b"
+            badge_bg = "rgba(16, 185, 129, 0.15)" if is_potential else "rgba(100, 116, 139, 0.15)"
+            badge_color = "#047857" if is_potential else "#475569"
 
             st.markdown(f"""
-            <div class="glass-card" style="border-left: 5px solid {border_color}; padding: 18px; margin-bottom: 16px;">
+            <div class="glass-card" style="border-left: 5px solid {border_color}; padding: 18px; margin-bottom: 16px; background: #ffffff; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.08), 0 2px 4px -1px rgba(0,0,0,0.04);">
                 <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
                     <div>
-                        <span style="background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 4px; font-weight: 700; color: #f1f5f9; font-size: 13px;">
+                        <span style="background: #e2e8f0; padding: 4px 10px; border-radius: 4px; font-weight: 700; color: #1e293b; font-size: 13px;">
                             RANK #{rank}
                         </span>
-                        <span style="font-size: 18px; font-weight: 700; color: #f1f5f9; margin-left: 12px;">
+                        <span style="font-size: 18px; font-weight: 700; color: #0f172a; margin-left: 12px;">
                             {person_name}
                         </span>
-                        <span style="font-size: 14px; color: #94a3b8; margin-left: 8px;">
+                        <span style="font-size: 14px; color: #475569; margin-left: 8px; font-weight: 600;">
                             ({case_num})
                         </span>
                     </div>
@@ -453,11 +453,11 @@ def render_admin_face_matching_page():
                         </span>
                     </div>
                 </div>
-                <div style="display: flex; gap: 24px; margin-top: 12px; color: #cbd5e1; font-size: 14px; flex-wrap: wrap;">
-                    <div><b>Age / Gender:</b> {age} | {gender}</div>
-                    <div><b>Location:</b> {city}, {state}</div>
-                    <div><b>Euclidean Distance:</b> {distance:.4f}</div>
-                    <div><b>Similarity Score:</b> <span style="color: {border_color}; font-weight: 700;">{similarity:.1f}%</span></div>
+                <div style="display: flex; gap: 24px; margin-top: 12px; color: #334155; font-size: 14px; flex-wrap: wrap;">
+                    <div><b style="color: #0f172a;">Age / Gender:</b> {age} | {gender}</div>
+                    <div><b style="color: #0f172a;">Location:</b> {city}, {state}</div>
+                    <div><b style="color: #0f172a;">Euclidean Distance:</b> {distance:.4f}</div>
+                    <div><b style="color: #0f172a;">Similarity Score:</b> <span style="color: {border_color}; font-weight: 700;">{similarity:.1f}%</span></div>
                 </div>
             </div>
             """, unsafe_allow_html=True)
