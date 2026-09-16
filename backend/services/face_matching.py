@@ -100,12 +100,22 @@ def calculate_similarity(emb1: Sequence[float], emb2: Sequence[float]) -> float:
 
 
 def distance_to_similarity_score(distance: float) -> float:
-    """Convert Euclidean distance to a 0–100% similarity score calibrated for 1404-D landmark norm."""
+    """Convert Euclidean distance to a 0–100% similarity score calibrated for 1404-D landmark norm.
+    
+    Calibrated curve:
+        d = 0.0  -> 100.0%
+        d = 1.8  -> 95.7%  (Same person / high confidence match)
+        d = 5.0  -> 80.8%  (Potential match threshold)
+        d = 12.0 -> 28.4%  (Cutoff threshold)
+        d >= 15.0 -> 0.0%   (Completely non-matching / opposite gender)
+    """
     if distance is None or np.isnan(distance) or np.isinf(distance) or float(distance) < 0:
         return 0.0
     dist_val = float(distance)
-    score = 100.0 * np.exp(-0.03 * dist_val)
-    return round(float(max(0.0, min(100.0, score))), 1)
+    if dist_val >= 15.0:
+        return 0.0
+    score = max(0.0, 100.0 * (1.0 - (dist_val / 15.0) ** 1.5))
+    return round(float(score), 1)
 
 
 def validate_query_vector(
