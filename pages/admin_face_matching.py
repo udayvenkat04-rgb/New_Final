@@ -368,9 +368,55 @@ def render_admin_face_matching_page():
     # ── 8. Step 6 & 7: KNN Matching & Ranked Candidates (Phase 15) ────────
     st.markdown("### Step 6 & 7: KNN Search & Potential Match Results")
 
-    run_matching = st.button("🚀 Run KNN Face Vector Search", type="primary", use_container_width=True)
+    run_batch_matching = False
+    if det_result.num_faces > 1:
+        col_btn1, col_btn2 = st.columns(2)
+        with col_btn1:
+            run_matching = st.button(f"🚀 Match Selected Face (Face #{selected_face_idx + 1})", type="primary", use_container_width=True)
+        with col_btn2:
+            run_batch_matching = st.button(f"👥 Batch Match ALL {det_result.num_faces} Faces in Group Photo", use_container_width=True)
+    else:
+        run_matching = st.button("🚀 Run KNN Face Vector Search", type="primary", use_container_width=True)
 
-    if run_matching or "match_result" in st.session_state and st.session_state.match_result is not None:
+    if run_batch_matching:
+        with st.spinner(f"Scanning all {det_result.num_faces} faces in group photo against missing persons database..."):
+            try:
+                _ensure_all_cases_indexed()
+                knn_engine = KNNFaceMatchingEngine()
+                all_batch_cands = []
+                for f_idx in range(det_result.num_faces):
+                    try:
+                        q_vec = generate_face_vector_by_index(det_result, face_index=f_idx, expected_landmarks=468)
+                        v_vec = validate_query_vector(q_vec, expected_dim=1404)
+                        m_res = knn_engine.match_vector(v_vec, top_k=top_k_input, threshold=threshold_input)
+                        for c in m_res.get("candidates", []):
+                            c_copy = dict(c)
+                            c_copy["face_source_idx"] = f_idx + 1
+                            all_batch_cands.append(c_copy)
+                    except Exception:
+                        pass
+
+                best_by_case = {}
+                for c in all_batch_cands:
+                    cid = c.get("case_id")
+                    if cid not in best_by_case or c.get("distance", 999.0) < best_by_case[cid].get("distance", 999.0):
+                        best_by_case[cid] = c
+
+                sorted_batch = sorted(best_by_case.values(), key=lambda x: x.get("distance", 999.0))
+                for r_idx, c in enumerate(sorted_batch, start=1):
+                    c["rank"] = r_idx
+
+                has_pot = any(c.get("is_potential_match") for c in sorted_batch)
+                st.session_state.match_result = {
+                    "status": "POTENTIAL_MATCH" if has_pot else "NO_POTENTIAL_MATCH",
+                    "candidates": sorted_batch,
+                    "num_reference_vectors": len(sorted_batch),
+                }
+            except Exception as exc:
+                st.error(f"❌ **Batch Matching Error**: {exc}")
+                st.stop()
+
+    elif run_matching or ("match_result" in st.session_state and st.session_state.match_result is not None):
         with st.spinner("Searching reference database, computing Euclidean distances, and ranking candidates..."):
             try:
                 _ensure_all_cases_indexed()

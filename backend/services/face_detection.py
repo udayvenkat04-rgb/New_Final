@@ -780,7 +780,7 @@ def _detect_faces_via_opencv_cascade(rgb: np.ndarray, landmarker: Any) -> List[D
 
     detected_faces: List[DetectedFace] = []
     margin_ratio = 0.4
-    for idx, (fx, fy, fw, fh) in enumerate(rects[:5]):
+    for idx, (fx, fy, fw, fh) in enumerate(rects[:20]):
         cx = fx + fw / 2.0
         cy = fy + fh / 2.0
         side = max(fw, fh) * (1.0 + margin_ratio)
