@@ -15,7 +15,7 @@ try:
     restore_session_if_needed()
     if st.session_state.get("authenticated"):
         user = st.session_state.get("user", {}) or {}
-        role = user.get("role")
+        role = str(user.get("role") or "").lower().strip()
         if role == "admin":
             st.switch_page("pages/admin_dashboard.py")
         elif role == "officer":
@@ -264,8 +264,8 @@ if not connected:
 
 # Check if already authenticated — auto-redirect directly to role dashboard
 if st.session_state.get("authenticated", False):
-    user = st.session_state.get("user", {})
-    role = user.get("role", "")
+    user = st.session_state.get("user", {}) or {}
+    role = str(user.get("role") or "").lower().strip()
     if role == "admin":
         st.switch_page("pages/admin_dashboard.py")
     elif role == "officer":
@@ -387,7 +387,7 @@ with col_form:
                 user = authenticate_user(email, password)
                 if user:
                     login_user(user)
-                    user_role = user.get("role")
+                    user_role = str(user.get("role") or "").lower().strip()
                     if user_role == "admin":
                         st.switch_page("pages/admin_dashboard.py")
                     elif user_role == "officer":

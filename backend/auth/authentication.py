@@ -34,16 +34,17 @@ def login_user(user: dict):
     Establishes an authenticated session.
     Stores user info in session_state and syncs session tokens to query_params to preserve state on browser refresh.
     """
+    role = str(user.get("role") or "").lower().strip()
     st.session_state.authenticated = True
     st.session_state.user = {
         "id": user.get("id"),
         "username": user.get("username") or user.get("name"),
-        "role": user.get("role"),
+        "role": role,
         "email": user.get("email"),
     }
     try:
         if hasattr(st, "query_params"):
-            st.query_params["auth_role"] = user.get("role", "")
+            st.query_params["auth_role"] = role
             st.query_params["auth_user"] = user.get("username") or user.get("name", "")
             st.query_params["auth_email"] = user.get("email", "")
             st.query_params["auth_id"] = str(user.get("id", ""))
@@ -59,7 +60,7 @@ def sync_session_to_query_params():
     try:
         if hasattr(st, "query_params") and st.session_state.get("authenticated"):
             user = st.session_state.get("user", {}) or {}
-            role = user.get("role", "")
+            role = str(user.get("role") or "").lower().strip()
             username = user.get("username", "")
             email = user.get("email", "")
             user_id = str(user.get("id", ""))
@@ -96,6 +97,7 @@ def restore_session_if_needed():
                     user_id = user_id[0] if user_id else ""
 
                 if role and username:
+                    role = str(role).lower().strip()
                     st.session_state["authenticated"] = True
                     st.session_state["user"] = {
                         "id": user_id,

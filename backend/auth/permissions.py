@@ -34,7 +34,7 @@ def _current_role() -> str:
         pass
     user = st.session_state.get("user")
     if user:
-        return user.get("role", "")
+        return str(user.get("role", "")).lower().strip()
     return ""
 
 
@@ -215,7 +215,7 @@ def authorize_view_cases(user: dict) -> dict | None:
 
     Raises PermissionError if the user has no case-viewing rights.
     """
-    role = user.get("role", "")
+    role = str(user.get("role", "")).lower().strip()
     if role == ROLE_ADMIN:
         return None  # no restriction
     if role == ROLE_OFFICER:
@@ -231,7 +231,7 @@ def authorize_edit_case(user: dict, case_created_by: str) -> bool:
     Returns True if the user is allowed to edit this case.
     Raises PermissionError if not.
     """
-    role = user.get("role", "")
+    role = str(user.get("role", "")).lower().strip()
     if role == ROLE_ADMIN:
         return True
     if role == ROLE_OFFICER:
@@ -244,34 +244,34 @@ def authorize_edit_case(user: dict, case_created_by: str) -> bool:
 
 def authorize_delete_case(user: dict) -> bool:
     """Only Admin. Raises PermissionError otherwise."""
-    if user.get("role") == ROLE_ADMIN:
+    if str(user.get("role", "")).lower().strip() == ROLE_ADMIN:
         return True
     raise PermissionError("Only administrators can delete cases.")
 
 
 def authorize_trigger_matching(user: dict) -> bool:
     """Only Admin. Raises PermissionError otherwise."""
-    if user.get("role") == ROLE_ADMIN:
+    if str(user.get("role", "")).lower().strip() == ROLE_ADMIN:
         return True
     raise PermissionError("Only administrators can trigger face matching.")
 
 
 def authorize_process_video(user: dict) -> bool:
     """Only Admin. Raises PermissionError otherwise."""
-    if user.get("role") == ROLE_ADMIN:
+    if str(user.get("role", "")).lower().strip() == ROLE_ADMIN:
         return True
     raise PermissionError("Only administrators can process video sightings.")
 
 
 def authorize_review_match(user: dict) -> bool:
     """Only Admin. Raises PermissionError otherwise."""
-    if user.get("role") == ROLE_ADMIN:
+    if str(user.get("role", "")).lower().strip() == ROLE_ADMIN:
         return True
     raise PermissionError("Only administrators can review matches.")
 
 
 def authorize_manage_users(user: dict) -> bool:
     """Only Admin. Raises PermissionError otherwise."""
-    if user.get("role") == ROLE_ADMIN:
+    if str(user.get("role", "")).lower().strip() == ROLE_ADMIN:
         return True
     raise PermissionError("Only administrators can manage users.")
