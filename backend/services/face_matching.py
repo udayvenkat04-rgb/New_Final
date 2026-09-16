@@ -100,12 +100,12 @@ def calculate_similarity(emb1: Sequence[float], emb2: Sequence[float]) -> float:
 
 
 def distance_to_similarity_score(distance: float) -> float:
-    """Convert Euclidean distance to a 0–100% similarity score using exponential decay scaling."""
+    """Convert Euclidean distance to a 0–100% similarity score calibrated for 1404-D landmark norm."""
     if distance is None or np.isnan(distance) or np.isinf(distance) or float(distance) < 0:
         return 0.0
     dist_val = float(distance)
-    score = 100.0 * np.exp(-0.15 * dist_val)
-    return round(float(max(0.0, min(100.0, score))), 2)
+    score = 100.0 * np.exp(-0.03 * dist_val)
+    return round(float(max(0.0, min(100.0, score))), 1)
 
 
 def validate_query_vector(
