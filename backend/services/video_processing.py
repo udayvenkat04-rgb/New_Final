@@ -223,6 +223,19 @@ def validate_video(
         fps = float(cap.get(cv2.CAP_PROP_FPS))
         frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
+        # Test frame read to confirm decodability and fallback dimension/metadata extraction
+        ret, frame = cap.read()
+        if not ret or frame is None or frame.size == 0:
+            return VideoValidationResult(
+                is_valid=False,
+                error_message="Video file has no decodable frames or is corrupted."
+            )
+
+        # Fallback for dimensions if metadata properties return 0 or negative
+        if width <= 0 or height <= 0:
+            if len(frame.shape) >= 2:
+                height, width = frame.shape[0], frame.shape[1]
+
         if width <= 0 or height <= 0:
             return VideoValidationResult(
                 is_valid=False,
@@ -235,13 +248,14 @@ def validate_video(
                 error_message="Invalid or zero FPS detected in video metadata."
             )
 
-        # Test frame read to confirm decodability
-        ret, frame = cap.read()
-        if not ret or frame is None or frame.size == 0:
-            return VideoValidationResult(
-                is_valid=False,
-                error_message="Video file has no decodable frames or is corrupted."
-            )
+        if frame_count <= 0:
+            frame_count = 1
+
+        # Reset capture back to start frame
+        try:
+            cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+        except Exception:
+            pass
 
         # Compute metadata
         duration = frame_count / fps if (fps > 0 and frame_count > 0) else 0.0

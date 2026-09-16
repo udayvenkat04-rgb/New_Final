@@ -264,3 +264,22 @@ def test_large_video_protection(synthetic_video):
     res = validate_video(synthetic_video, max_size_mb=0.0001)
     assert res.is_valid is False
     assert "exceeds maximum allowed limit" in res.error_message.lower()
+
+
+def test_fallback_zero_dimensions(monkeypatch, synthetic_video):
+    """17. Test fallback dimension extraction when metadata returns 0x0."""
+    orig_get = cv2.VideoCapture.get
+
+    def mock_get(self, propId):
+        if propId in (cv2.CAP_PROP_FRAME_WIDTH, cv2.CAP_PROP_FRAME_HEIGHT):
+            return 0.0
+        return orig_get(self, propId)
+
+    monkeypatch.setattr(cv2.VideoCapture, "get", mock_get)
+
+    res = validate_video(synthetic_video)
+    assert res.is_valid is True
+    assert res.metadata is not None
+    assert res.metadata.width == 320
+    assert res.metadata.height == 240
+
