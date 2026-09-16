@@ -331,17 +331,34 @@ def normalize_landmarks(
 
     _validate_raw_landmarks(raw, expected_landmarks)
 
-    # 1) Translation invariance — mean-center
-    mean = raw.mean(axis=0)  # shape (3,)
-    centered = raw - mean
+    # 1) Physical Aspect-Ratio & Bounding Box Normalization
+    pts = raw.copy()
+    if image_width is not None and image_height is not None and image_height > 0 and image_width > 0:
+        aspect = float(image_width) / float(image_height)
+        pts[:, 0] = pts[:, 0] * aspect
 
-    # Aspect ratio adjustment: if image_width and image_height are provided,
-    # scale x by aspect ratio (W / H) so x and y distances represent true physical pixel proportions.
-    if image_width is not None and image_height is not None and image_height > 0:
-        aspect_ratio = float(image_width) / float(image_height)
-        centered[:, 0] = centered[:, 0] * aspect_ratio
+    min_x = pts[:, 0].min()
+    max_x = pts[:, 0].max()
+    min_y = pts[:, 1].min()
+    max_y = pts[:, 1].max()
 
-    # 2) Scale invariance — divide by the xy-plane radius to the farthest point
+    w_box = max_x - min_x
+    h_box = max_y - min_y
+    max_dim = max(w_box, h_box)
+
+    if max_dim > 1e-6:
+        box_rel = np.zeros_like(pts)
+        box_rel[:, 0] = (pts[:, 0] - min_x) / max_dim
+        box_rel[:, 1] = (pts[:, 1] - min_y) / max_dim
+        box_rel[:, 2] = pts[:, 2] / max_dim
+    else:
+        box_rel = pts.copy()
+
+    # 2) Translation invariance — mean-center
+    mean = box_rel.mean(axis=0)  # shape (3,)
+    centered = box_rel - mean
+
+    # 3) Scale invariance — divide by max radial distance in XY plane
     xy_radii = np.sqrt(centered[:, 0] ** 2 + centered[:, 1] ** 2)
     scale = float(xy_radii.max()) if xy_radii.size > 0 else 0.0
     if scale <= 0.0:

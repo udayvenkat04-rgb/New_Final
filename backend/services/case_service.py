@@ -624,7 +624,7 @@ class CaseService:
         return self.case_repo.get_unique_cities(state=state)
 
     def attach_face_vector(
-        self, case_id: int, image_input=None, current_user: dict = None
+        self, case_id: int, image_input=None, current_user: dict = None, override: bool = False
     ):
         """
         Modular integration point for registering/updating a case's face vector.
@@ -644,10 +644,16 @@ class CaseService:
         if not target_image:
             raise ValueError(f"No photo available for case ID {case_id}.")
 
+        if override:
+            try:
+                self.case_repo.db.face_vectors.delete_many({"case_id": int(case_id)})
+            except Exception:
+                pass
+
         storage_service = FaceStorageService(case_repo=self.case_repo)
         return storage_service.process_and_store_image(
             case_id=case_id,
             image_input=target_image,
-            prevent_duplicates=True,
+            prevent_duplicates=not override,
         )
 
