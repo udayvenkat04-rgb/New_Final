@@ -183,7 +183,23 @@ def _to_rgb_array(image: Any) -> Tuple[Optional[np.ndarray], Optional[str]]:
                 f"Allowed: {sorted(_ALLOWED_INPUT_EXTENSIONS)}."
             )
         if not os.path.isfile(path):
-            return None, f"Image file not found: {path}"
+            candidate_paths = [
+                path,
+                os.path.join(os.getcwd(), path),
+                os.path.join(os.getcwd(), "uploads", "cases", os.path.basename(path)),
+                os.path.join(os.getcwd(), "uploads", "public_submissions", os.path.basename(path)),
+                os.path.join(os.getcwd(), "data", "faces", os.path.basename(path)),
+                os.path.join(os.getcwd(), "missing_person_db", os.path.basename(path)),
+            ]
+            found_path = None
+            for cp in candidate_paths:
+                if cp and os.path.isfile(cp):
+                    found_path = cp
+                    break
+            if found_path:
+                path = found_path
+            else:
+                return None, f"Image file not found: {path}"
         try:
             pil_img = PILImage.open(path).convert("RGB")
         except Exception as exc:

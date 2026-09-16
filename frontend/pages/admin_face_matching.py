@@ -442,8 +442,7 @@ def render_admin_face_matching_page():
             st.stop()
 
         if status_code == "NO_POTENTIAL_MATCH" or not any(c.get("is_potential_match") for c in candidates):
-            st.warning("ℹ️ **No Potential Matches Found**: No candidate in the database met the specified match threshold.")
-            st.write(f"Displaying top **{len(candidates)}** closest reference candidates for review:")
+            st.info("ℹ️ **KNN Search Completed**: Displaying closest registered missing person candidates ranked by facial similarity:")
         else:
             potential_count = sum(1 for c in candidates if c.get("is_potential_match"))
             st.success(f"🎉 **Potential Matches Identified**: Found **{potential_count}** candidate(s) meeting the match threshold!")
