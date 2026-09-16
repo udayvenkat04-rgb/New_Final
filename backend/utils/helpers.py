@@ -78,78 +78,130 @@ def inject_custom_css():
         }
         */
         
-        /* Sidebar Collapse (<<) & Expand (>>) Responsive Arrow Buttons Styling */
-        button[data-testid="stSidebarCollapseButton"],
-        button[data-testid="stHeaderSidebarCollapseButton"],
-        div[data-testid="collapsedControl"] button,
-        header[data-testid="stHeader"] button {
-            background-color: #ffffff !important;
-            border: 1.5px solid #cbd5e1 !important;
-            border-radius: 10px !important;
-            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.1) !important;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
-            display: inline-flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            z-index: 999999 !important;
-            width: 38px !important;
-            height: 38px !important;
-            color: #0f172a !important;
-            cursor: pointer !important;
-            pointer-events: auto !important;
-        }
-        
-        button[data-testid="stSidebarCollapseButton"] svg,
-        button[data-testid="stHeaderSidebarCollapseButton"] svg,
-        div[data-testid="collapsedControl"] button svg,
-        header[data-testid="stHeader"] button svg {
-            fill: #0f172a !important;
-            color: #0f172a !important;
-            transition: fill 0.2s ease, transform 0.2s ease !important;
-        }
-
-        button[data-testid="stSidebarCollapseButton"]:hover,
-        button[data-testid="stHeaderSidebarCollapseButton"]:hover,
-        div[data-testid="collapsedControl"] button:hover,
-        header[data-testid="stHeader"] button:hover {
-            background-color: #4f46e5 !important;
-            border-color: #4338ca !important;
-            box-shadow: 0 6px 18px rgba(79, 70, 229, 0.35) !important;
-            transform: scale(1.08) !important;
-        }
-
-        button[data-testid="stSidebarCollapseButton"]:hover svg,
-        button[data-testid="stHeaderSidebarCollapseButton"]:hover svg,
-        div[data-testid="collapsedControl"] button:hover svg,
-        header[data-testid="stHeader"] button:hover svg {
-            fill: #ffffff !important;
-            color: #ffffff !important;
-        }
-
-        /* Fixed High-Visibility Positioning for Collapsed Expand Arrow Button (>>) */
+        /* High-Visibility Collapsed Control / Open Sidebar Button (fixed top-left 8px, 10px) */
         div[data-testid="collapsedControl"],
-        [data-testid="collapsedControl"] {
-            display: block !important;
+        [data-testid="collapsedControl"],
+        header[data-testid="stHeader"] button,
+        .stAppHeader button,
+        button[data-testid="stHeaderSidebarCollapseButton"],
+        button[data-testid="stSidebarCollapseButton"],
+        [data-testid="stBaseButton-header"] {
+            display: inline-flex !important;
             visibility: visible !important;
             opacity: 1 !important;
             position: fixed !important;
-            top: 14px !important;
-            left: 14px !important;
-            z-index: 999999 !important;
+            top: 8px !important;
+            left: 10px !important;
+            z-index: 9999999 !important;
+            pointer-events: auto !important;
+            background-color: #4f46e5 !important;
+            background: #4f46e5 !important;
+            border: 2px solid #ffffff !important;
+            border-radius: 10px !important;
+            width: 40px !important;
+            height: 40px !important;
+            min-width: 40px !important;
+            min-height: 40px !important;
+            color: #ffffff !important;
+            align-items: center !important;
+            justify-content: center !important;
+            box-shadow: 0 4px 14px rgba(79, 70, 229, 0.45) !important;
+            cursor: pointer !important;
+            padding: 0 !important;
+            margin: 0 !important;
         }
 
-        /* Mobile & Tablet Responsiveness for Arrow Controls */
+        /* Bright white SVG icon inside open sidebar button */
+        div[data-testid="collapsedControl"] button svg,
+        [data-testid="collapsedControl"] button svg,
+        header[data-testid="stHeader"] button svg,
+        .stAppHeader button svg,
+        button[data-testid="stHeaderSidebarCollapseButton"] svg,
+        button[data-testid="stSidebarCollapseButton"] svg,
+        [data-testid="stBaseButton-header"] svg {
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            fill: #ffffff !important;
+            color: #ffffff !important;
+            stroke: #ffffff !important;
+            width: 22px !important;
+            height: 22px !important;
+        }
+
+        /* Override when sidebar is OPEN: position close button inside sidebar header */
+        section[data-testid="stSidebar"] button[data-testid="stSidebarCollapseButton"],
+        section[data-testid="stSidebar"] [data-testid="stSidebarHeader"] button,
+        section[data-testid="stSidebar"] [data-testid="stHeaderSidebarCollapseButton"] {
+            position: relative !important;
+            top: auto !important;
+            left: auto !important;
+            background: #1e293b !important;
+            border: 1px solid #334155 !important;
+            border-radius: 8px !important;
+            width: 36px !important;
+            height: 36px !important;
+            min-width: 36px !important;
+            min-height: 36px !important;
+            box-shadow: none !important;
+        }
+
+        /* Mobile & Tablet View (max-width: 991px): Top Header Bar & Content Offset */
         @media screen and (max-width: 991px) {
-            button[data-testid="stSidebarCollapseButton"],
-            button[data-testid="stHeaderSidebarCollapseButton"],
-            div[data-testid="collapsedControl"] button {
-                width: 36px !important;
-                height: 36px !important;
-                border-radius: 8px !important;
+            header[data-testid="stHeader"],
+            .stAppHeader {
+                background-color: #ffffff !important;
+                border-bottom: 1px solid #e2e8f0 !important;
+                height: 56px !important;
+                min-height: 56px !important;
+                max-height: 56px !important;
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                width: 100% !important;
+                z-index: 999990 !important;
+                pointer-events: auto !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: flex-start !important;
+                padding-left: 10px !important;
+                box-shadow: 0 2px 10px rgba(15, 23, 42, 0.05) !important;
             }
-            div[data-testid="collapsedControl"] {
-                top: 10px !important;
-                left: 10px !important;
+
+            .block-container,
+            div[data-testid="stAppViewBlockContainer"] {
+                padding-top: 4.5rem !important;
+                padding-left: 1rem !important;
+                padding-right: 1rem !important;
+            }
+
+            [data-testid="stSidebarHeader"] {
+                display: flex !important;
+                visibility: visible !important;
+                justify-content: flex-end !important;
+                padding: 10px 14px !important;
+                background-color: #0b192c !important;
+            }
+        }
+
+        /* Desktop View (min-width: 992px): Transparent Header Overlay & Default Padding */
+        @media screen and (min-width: 992px) {
+            header[data-testid="stHeader"],
+            .stAppHeader {
+                background-color: transparent !important;
+                border: none !important;
+                box-shadow: none !important;
+                pointer-events: none !important;
+            }
+
+            .block-container,
+            div[data-testid="stAppViewBlockContainer"],
+            .st-emotion-cache-zy6yx3 {
+                padding-left: 2rem !important;
+                padding-right: 2rem !important;
+                padding-top: 1.5rem !important;
+                padding-bottom: 2rem !important;
             }
         }
 
@@ -164,36 +216,9 @@ def inject_custom_css():
             color: #0f172a !important;
         }
 
-        /* Remove default Streamlit paddings that were left unchecked by the user and apply compact margins */
-        .block-container,
-        div[data-testid="stAppViewBlockContainer"],
-        .st-emotion-cache-zy6yx3 {
-            padding-left: 2rem !important;
-            padding-right: 2rem !important;
-            padding-top: 1.5rem !important;
-            padding-bottom: 2rem !important;
-        }
-
         /* Override generated column block wrapper display property to block as requested */
         .st-emotion-cache-tn0cau {
             display: block !important;
-        }
-
-        header[data-testid="stHeader"],
-        .stAppHeader {
-            background-color: transparent !important;
-            border: none !important;
-            box-shadow: none !important;
-            pointer-events: none !important;
-        }
-
-        /* Re-enable pointer events for all interactive header controls (like expand/collapse buttons) */
-        button[data-testid="stSidebarCollapseButton"],
-        button[data-testid="stHeaderSidebarCollapseButton"],
-        div[data-testid="collapsedControl"],
-        div[data-testid="collapsedControl"] *,
-        .stSidebarCollapseButton {
-            pointer-events: auto !important;
         }
 
         /* Keep header native height so expand chevron/hamburger is always visible */
@@ -379,10 +404,38 @@ def inject_custom_css():
             padding-top: 0px !important;
         }
 
-        /* Deep Navy Sidebar Styling matching Reference Design (Image 2) */
-        section[data-testid="stSidebar"] {
-            background-color: #0b192c !important;
-            border-right: 1px solid #1e293b !important;
+        /* Desktop: Deep Navy Sidebar Permanently Fixed & Open */
+        @media screen and (min-width: 992px) {
+            section[data-testid="stSidebar"],
+            section[data-testid="stSidebar"][data-collapsed="true"],
+            div[data-testid="stAppViewContainer"][data-sidebar-state="collapsed"] section[data-testid="stSidebar"] {
+                background-color: #0b192c !important;
+                border-right: 1px solid #1e293b !important;
+                display: block !important;
+                visibility: visible !important;
+                transform: none !important;
+                margin-left: 0 !important;
+                width: 290px !important;
+                min-width: 290px !important;
+                max-width: 290px !important;
+            }
+        }
+
+        /* Mobile View: Responsive Slide-out Overlay Drawer with Scrollable Links & Logout */
+        @media screen and (max-width: 991px) {
+            section[data-testid="stSidebar"] {
+                background-color: #0b192c !important;
+                border-right: 1px solid #1e293b !important;
+                width: 85vw !important;
+                max-width: 320px !important;
+                z-index: 999999 !important;
+                box-shadow: 4px 0 24px rgba(0, 0, 0, 0.4) !important;
+            }
+            section[data-testid="stSidebar"] [data-testid="stSidebarUserContent"] {
+                overflow-y: auto !important;
+                max-height: calc(100vh - 60px) !important;
+                padding-bottom: 3rem !important;
+            }
         }
         section[data-testid="stSidebar"] [data-testid="stSidebarUserContent"] {
             padding: 1.25rem 0.8rem 1.5rem 0.8rem !important;
@@ -1036,7 +1089,7 @@ def render_top_header():
         pass
     authenticated = st.session_state.get("authenticated", False)
     user = st.session_state.get("user", {}) or {}
-    role = user.get("role") if authenticated else "public"
+    role = str(user.get("role") or "").lower() if authenticated else "public"
 
     import os, base64
     from backend.utils.icons import get_svg_icon
