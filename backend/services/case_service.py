@@ -9,7 +9,10 @@ Officer access is filtered by `created_by` ownership — not only at the UI laye
 import os
 import uuid
 import io
+import logging
 from datetime import datetime
+
+logger = logging.getLogger(__name__)
 from pymongo.errors import DuplicateKeyError
 from backend.repositories.case_repository import CaseRepository
 from backend.models import MissingPerson, CaseHistory
@@ -215,6 +218,13 @@ class CaseService:
             ),
         ))
 
+        # 7) Automatically extract and attach 1,404-D face vector for AI matching
+        try:
+            self.attach_face_vector(saved_case.id, image_input=photo_relative_path)
+            logger.info(f"Successfully attached face vector for case ID {saved_case.id}.")
+        except Exception as exc:
+            logger.warning(f"Could not automatically attach face vector for case ID {saved_case.id}: {exc}")
+
         return saved_case
 
     # ------------------------------------------------------------------
@@ -282,6 +292,14 @@ class CaseService:
             details=f"Bulletin created for {name} by {created_by or 'system'}."
         )
         self.case_repo.log_history(history_log)
+
+        # Automatically extract and attach 1,404-D face vector for AI matching
+        if photo_path:
+            try:
+                self.attach_face_vector(saved_case.id, image_input=photo_path)
+                logger.info(f"Successfully attached face vector for case ID {saved_case.id}.")
+            except Exception as exc:
+                logger.warning(f"Could not automatically attach face vector for case ID {saved_case.id}: {exc}")
 
         return saved_case
 

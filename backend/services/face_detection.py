@@ -647,11 +647,169 @@ def detect_faces(
             return res
         last_result = res
 
+    # --- Robust Fallback Stage 1: CLAHE Contrast Enhancement ---
+    if fallback_on_unclear and rgb_processed is not None:
+        try:
+            rgb_clahe = _enhance_contrast_clahe(rgb_processed)
+            landmarker_fb, _ = initialize_face_landmarker(
+                model_path=model_path,
+                num_faces=max(req_num, 10),
+                min_face_detection_confidence=0.05,
+                min_face_presence_confidence=0.05,
+            )
+            if landmarker_fb is not None:
+                mp_img_clahe = MPImage(image_format=ImageFormat.SRGB, data=rgb_clahe)
+                res_clahe = landmarker_fb.detect(mp_img_clahe)
+                built_clahe = _build_result_from_mp(res_clahe, rgb_processed)
+                if built_clahe.success and built_clahe.num_faces > 0:
+                    if refine_crops:
+                        built_clahe.faces = [
+                            _refine_face_landmarks_with_crop(f, rgb_processed, landmarker_fb)
+                            for f in built_clahe.faces
+                        ]
+                    return built_clahe
+        except Exception:
+            pass
+
+    # --- Robust Fallback Stage 2: OpenCV Cascade Detection + MediaPipe Patch Extraction ---
+    if fallback_on_unclear and rgb_processed is not None:
+        try:
+            landmarker_fb, _ = initialize_face_landmarker(
+                model_path=model_path,
+                num_faces=1,
+                min_face_detection_confidence=0.05,
+                min_face_presence_confidence=0.05,
+            )
+            if landmarker_fb is not None:
+                cascade_faces = _detect_faces_via_opencv_cascade(rgb_processed, landmarker_fb)
+                if cascade_faces:
+                    h, w = rgb_processed.shape[:2]
+                    return FaceDetectionResult(
+                        success=True,
+                        num_faces=len(cascade_faces),
+                        faces=cascade_faces,
+                        image_width=w,
+                        image_height=h,
+                        processed_image_rgb=rgb_processed,
+                    )
+        except Exception:
+            pass
+
     return last_result or FaceDetectionResult(
         success=False,
         error_message="Unknown detection error occurred.",
         processed_image_rgb=rgb_processed,
     )
+
+
+def _enhance_contrast_clahe(rgb: np.ndarray) -> np.ndarray:
+    """Enhance image contrast using LAB color space + CLAHE on L channel."""
+    try:
+        lab = cv2.cvtColor(rgb, cv2.COLOR_RGB2LAB)
+        l, a, b = cv2.split(lab)
+        clahe = cv2.createCLAHE(clipLimit=2.5, tileGridSize=(8, 8))
+        cl = clahe.apply(l)
+        limg = cv2.merge((cl, a, b))
+        return cv2.cvtColor(limg, cv2.COLOR_LAB2RGB)
+    except Exception:
+        return rgb
+
+
+def _detect_faces_via_opencv_cascade(rgb: np.ndarray, landmarker: Any) -> List[DetectedFace]:
+    """Fallback: Uses OpenCV Haar Cascades to find candidate face bounding boxes,
+    crops each box with padding, and runs MediaPipe landmarker on the crop.
+    Landmarks are mapped back to original full image coordinates.
+    """
+    if rgb is None or landmarker is None:
+        return []
+    h, w = rgb.shape[:2]
+    gray = cv2.cvtColor(rgb, cv2.COLOR_RGB2GRAY)
+
+    cascade_paths = [
+        os.path.join(cv2.data.haarcascades, "haarcascade_frontalface_default.xml"),
+        os.path.join(cv2.data.haarcascades, "haarcascade_frontalface_alt2.xml"),
+        os.path.join(cv2.data.haarcascades, "haarcascade_profileface.xml"),
+    ]
+
+    rects = []
+    for cpath in cascade_paths:
+        if os.path.exists(cpath):
+            try:
+                cascade = cv2.CascadeClassifier(cpath)
+                found = cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=3, minSize=(30, 30))
+                if len(found) > 0:
+                    for (fx, fy, fw, fh) in found:
+                        rects.append((fx, fy, fw, fh))
+            except Exception:
+                pass
+        if len(rects) > 0:
+            break
+
+    if not rects:
+        return []
+
+    detected_faces: List[DetectedFace] = []
+    margin_ratio = 0.4
+    for idx, (fx, fy, fw, fh) in enumerate(rects[:5]):
+        cx = fx + fw / 2.0
+        cy = fy + fh / 2.0
+        side = max(fw, fh) * (1.0 + margin_ratio)
+
+        x1 = max(0, int(round(cx - side / 2.0)))
+        y1 = max(0, int(round(cy - side / 2.0)))
+        x2 = min(w, int(round(cx + side / 2.0)))
+        y2 = min(h, int(round(cy + side / 2.0)))
+
+        crop_w = x2 - x1
+        crop_h = y2 - y1
+        if crop_w < 10 or crop_h < 10:
+            continue
+
+        crop = rgb[y1:y2, x1:x2]
+        try:
+            mp_crop_img = MPImage(image_format=ImageFormat.SRGB, data=crop)
+            crop_res = landmarker.detect(mp_crop_img)
+            if crop_res and getattr(crop_res, "face_landmarks", None) and len(crop_res.face_landmarks) > 0:
+                crop_lms = crop_res.face_landmarks[0]
+                landmarks: List[FaceLandmark] = []
+                xs: List[float] = []
+                ys: List[float] = []
+                for lidx, clm in enumerate(crop_lms):
+                    cx_val = float(getattr(clm, "x", 0.0))
+                    cy_val = float(getattr(clm, "y", 0.0))
+                    cz_val = float(getattr(clm, "z", 0.0))
+
+                    img_x = (cx_val * crop_w + x1) / float(w)
+                    img_y = (cy_val * crop_h + y1) / float(h)
+                    img_z = cz_val * (crop_w / float(w))
+
+                    landmarks.append(FaceLandmark(index=lidx, x=img_x, y=img_y, z=img_z))
+                    xs.append(img_x)
+                    ys.append(img_y)
+
+                if len(landmarks) >= 468:
+                    x_min = max(0.0, min(xs))
+                    y_min = max(0.0, min(ys))
+                    x_max = min(1.0, max(xs))
+                    y_max = min(1.0, max(ys))
+                    px = int(round(x_min * w))
+                    py = int(round(y_min * h))
+                    pw = max(1, int(round((x_max - x_min) * w)))
+                    ph = max(1, int(round((y_max - y_min) * h)))
+                    bbox = (px, py, pw, ph)
+
+                    detected_faces.append(
+                        DetectedFace(
+                            face_index=len(detected_faces),
+                            landmarks=landmarks,
+                            bounding_box_pixels=bbox,
+                            presence_score=0.9,
+                        )
+                    )
+        except Exception:
+            pass
+
+    return detected_faces
 
 
 def extract_landmarks(
