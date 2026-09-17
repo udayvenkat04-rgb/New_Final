@@ -1095,7 +1095,10 @@ def render_top_header():
     import os, base64
     from backend.utils.icons import get_svg_icon
 
-    logo_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "assets", "mpis_brand_logo.png")
+    proj_root = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+    logo_path = os.path.join(proj_root, "frontend", "assets", "mpis_brand_logo.png")
+    if not os.path.exists(logo_path):
+        logo_path = os.path.join(proj_root, "assets", "mpis_brand_logo.png")
     logo_b64 = ""
     if os.path.exists(logo_path):
         try:

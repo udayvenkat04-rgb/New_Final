@@ -47,7 +47,9 @@ if "carousel_index" not in st.session_state:
     st.session_state.carousel_index = 0
 
 # Base64 Brand Logo
-logo_path = os.path.join(ROOT_DIR, "assets", "mpis_brand_logo.png")
+logo_path = os.path.join(ROOT_DIR, "frontend", "assets", "mpis_brand_logo.png")
+if not os.path.exists(logo_path):
+    logo_path = os.path.join(ROOT_DIR, "assets", "mpis_brand_logo.png")
 logo_b64 = ""
 if os.path.exists(logo_path):
     try:
