@@ -31,72 +31,73 @@ map_service = MapService()
 current_user = st.session_state.get("user")
 
 # ── Control Filters Section ──────────────────────────────────────────
-st.markdown("#### ⚙️ Map Display Filters & Controls")
-fcol1, fcol2, fcol3, fcol4 = st.columns([2, 2, 3, 2])
+with st.container(key="map_filters_container_page", border=True):
+    st.markdown("<h4 style='color: #1e3a8a; margin-top: 4px; margin-bottom: 12px; font-weight: 800;'>⚙️ Map Display Filters & Controls</h4>", unsafe_allow_html=True)
+    fcol1, fcol2, fcol3, fcol4 = st.columns([2.5, 2.5, 3.5, 2])
 
-with fcol1:
-    status_choice = st.selectbox(
-        "Case Status",
-        options=["All", "Active", "Resolved", "Closed"],
-        index=0,
-        key="map_filter_status_page",
-    )
+    with fcol1:
+        status_choice = st.selectbox(
+            "Case Status",
+            options=["All", "Active", "Resolved", "Closed"],
+            index=0,
+            key="map_filter_status_page",
+        )
 
-with fcol2:
-    time_choice = st.selectbox(
-        "Time Range",
-        options=["All Time", "Last 7 Days", "Last 30 Days", "Last 90 Days"],
-        index=0,
-        key="map_filter_time_page",
-    )
+    with fcol2:
+        time_choice = st.selectbox(
+            "Time Range",
+            options=["All Time", "Last 7 Days", "Last 30 Days", "Last 90 Days"],
+            index=0,
+            key="map_filter_time_page",
+        )
 
-days_param = None
-if time_choice == "Last 7 Days":
-    days_param = 7
-elif time_choice == "Last 30 Days":
-    days_param = 30
-elif time_choice == "Last 90 Days":
-    days_param = 90
+    days_param = None
+    if time_choice == "Last 7 Days":
+        days_param = 7
+    elif time_choice == "Last 30 Days":
+        days_param = 30
+    elif time_choice == "Last 90 Days":
+        days_param = 90
 
-try:
-    initial_data = map_service.get_map_dashboard_data(
-        user=current_user,
-        status_filter=status_choice,
-        days_filter=days_param,
-        state_filter="All India",
-    )
-    all_indian_states = [
-        "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
-        "Delhi", "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jammu & Kashmir",
-        "Jharkhand", "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra",
-        "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab",
-        "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura",
-        "Uttar Pradesh", "Uttarakhand", "West Bengal"
-    ]
-    db_states = [
-        s["state"] for s in initial_data.get("states_summary", [])
-        if s.get("state") and s.get("state") != "Unknown State"
-    ]
-    available_states = ["All India"] + sorted(list(set(all_indian_states + db_states)))
-except Exception as exc:
-    st.error(f"Failed to load map statistics: {exc}")
-    st.stop()
+    try:
+        initial_data = map_service.get_map_dashboard_data(
+            user=current_user,
+            status_filter=status_choice,
+            days_filter=days_param,
+            state_filter="All India",
+        )
+        all_indian_states = [
+            "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
+            "Delhi", "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jammu & Kashmir",
+            "Jharkhand", "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra",
+            "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab",
+            "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura",
+            "Uttar Pradesh", "Uttarakhand", "West Bengal"
+        ]
+        db_states = [
+            s["state"] for s in initial_data.get("states_summary", [])
+            if s.get("state") and s.get("state") != "Unknown State"
+        ]
+        available_states = ["All India"] + sorted(list(set(all_indian_states + db_states)))
+    except Exception as exc:
+        st.error(f"Failed to load map statistics: {exc}")
+        st.stop()
 
-with fcol3:
-    if "map_filter_state_page" in st.session_state and st.session_state["map_filter_state_page"] not in available_states:
-        del st.session_state["map_filter_state_page"]
-    state_choice = st.selectbox(
-        "Geographic State",
-        options=available_states,
-        index=0,
-        key="map_filter_state_page",
-    )
+    with fcol3:
+        if "map_filter_state_page" in st.session_state and st.session_state["map_filter_state_page"] not in available_states:
+            del st.session_state["map_filter_state_page"]
+        state_choice = st.selectbox(
+            "Geographic State",
+            options=available_states,
+            index=0,
+            key="map_filter_state_page",
+        )
 
-with fcol4:
-    st.write("<div style='height: 28px;'></div>", unsafe_allow_html=True)
-    if st.button("🔄 Refresh Map Data", use_container_width=True, key="btn_refresh_map_page"):
-        st.cache_data.clear()
-        st.rerun()
+    with fcol4:
+        st.write("<div style='height: 28px;'></div>", unsafe_allow_html=True)
+        if st.button("🔄 Refresh Map Data", use_container_width=True, key="btn_refresh_map_page"):
+            st.cache_data.clear()
+            st.rerun()
 
 # Fetch Map Data
 map_data = map_service.get_map_dashboard_data(
@@ -108,14 +109,29 @@ map_data = map_service.get_map_dashboard_data(
 
 summary = map_data.get("summary", {})
 
+# ── Divider Spacing ───────────────────────────────────────────────────
+st.markdown("<div style='margin-top: 32px; margin-bottom: 20px;'></div>", unsafe_allow_html=True)
+
+# ── Summary Metrics Section ───────────────────────────────────────────
+st.markdown("""
+<div style="margin-bottom: 16px;">
+    <h4 style="color: #1e3a8a; margin: 0; font-weight: 800; font-size: 18px; display: flex; align-items: center; gap: 8px;">
+        📊 Live System Summary Metrics
+    </h4>
+    <p style="color: #64748b; font-size: 13px; margin: 3px 0 0 0; font-weight: 500;">
+        Real-time case statistics and spatial metrics based on selected filters
+    </p>
+</div>
+""", unsafe_allow_html=True)
+
 # Summary Metrics
 m1, m2, m3, m4, m5, m6 = st.columns(6)
 
 def _metric_box(label: str, value: int, color: str, icon: str):
     st.markdown(f"""
-    <div class="metric-card" style="border-left-color: {color}; padding: 12px 14px;">
-        <span style="font-size: 11px; color: #94a3b8; text-transform: uppercase;">{icon} {label}</span>
-        <h3 style="margin: 2px 0 0 0; color: {color}; font-size: 26px; font-weight: 700;">{value}</h3>
+    <div class="metric-card" style="border-left-color: {color}; padding: 14px 16px; margin-top: 0px; margin-bottom: 8px; background: #ffffff; border-radius: 14px; box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04); border: 1px solid #cbd5e1; border-left: 4px solid {color};">
+        <span style="font-size: 11px; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">{icon} {label}</span>
+        <h3 style="margin: 4px 0 0 0; color: {color}; font-size: 28px; font-weight: 800;">{value}</h3>
     </div>
     """, unsafe_allow_html=True)
 

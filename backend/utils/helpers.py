@@ -244,6 +244,7 @@ def inject_custom_css():
             border: 1px solid #cbd5e1 !important;
             border-radius: 12px !important;
             padding: 16px 20px !important;
+            margin-top: 20px !important;
             margin-bottom: 24px !important; /* Increased distance between cards vertically */
             box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03) !important;
             transition: all 0.25s ease !important;
