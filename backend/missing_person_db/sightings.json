@@ -1,0 +1,72 @@
+[
+  {
+    "id": 1,
+    "case_id": 2,
+    "photo_path": "data/faces/priya_sighting_1.jpg",
+    "latitude": 12.9716,
+    "longitude": 77.5946,
+    "address": "Cubbon Park Metro Station, Bengaluru",
+    "sighting_time": "2026-08-12T11:00:00",
+    "reporter_name": "Karan Kumar",
+    "reporter_contact": "8877665544",
+    "details": "Saw a woman matching the description buying tickets at the metro counter. Wearing the same outfit.",
+    "status": "Verified",
+    "created_at": "2026-08-12T11:15:00"
+  },
+  {
+    "id": 2,
+    "case_id": 2,
+    "photo_path": "",
+    "latitude": 12.9800,
+    "longitude": 77.6000,
+    "address": "MG Road Market, Bengaluru",
+    "sighting_time": "2026-08-13T03:45:00",
+    "reporter_name": "Sneha Rao",
+    "reporter_contact": "7766554433",
+    "details": "Saw someone matching her photo sitting at a coffee shop. Not 100% sure.",
+    "status": "Pending",
+    "created_at": "2026-08-13T04:00:00"
+  },
+  {
+    "id": 3,
+    "case_id": 1,
+    "photo_path": "data/faces/aarav_sighting_1.jpg",
+    "latitude": 28.5830,
+    "longitude": 77.3150,
+    "address": "Sector 15 Metro Station, Noida",
+    "sighting_time": "2026-08-10T17:20:00",
+    "reporter_name": "Rajiv Mehta",
+    "reporter_contact": "9811223344",
+    "details": "A boy wearing a blue t-shirt and white shorts was playing near the park exit. Had a distinct scar on his hand.",
+    "status": "Verified",
+    "created_at": "2026-08-10T17:45:00"
+  },
+  {
+    "id": 4,
+    "case_id": 5,
+    "photo_path": "data/faces/rohan_sighting_1.jpg",
+    "latitude": 22.5800,
+    "longitude": 88.4200,
+    "address": "City Centre Mall, Salt Lake, Kolkata",
+    "sighting_time": "2026-08-13T08:30:00",
+    "reporter_name": "Pooja Sen",
+    "reporter_contact": "9830088990",
+    "details": "Saw a young boy with a green school uniform looking lost near the main entrance escalators.",
+    "status": "Pending",
+    "created_at": "2026-08-13T08:45:00"
+  },
+  {
+    "id": 5,
+    "case_id": 6,
+    "photo_path": "data/faces/ananya_sighting_1.jpg",
+    "latitude": 22.5180,
+    "longitude": 88.3490,
+    "address": "Kalighat Temple, Kolkata",
+    "sighting_time": "2026-08-07T10:00:00",
+    "reporter_name": "Arjun Banerjee",
+    "reporter_contact": "9831155667",
+    "details": "Spotted her walking near the temple entrance wearing a blue saree. She looked a bit confused.",
+    "status": "Verified",
+    "created_at": "2026-08-07T10:30:00"
+  }
+]

@@ -186,6 +186,10 @@ def _to_rgb_array(image: Any) -> Tuple[Optional[np.ndarray], Optional[str]]:
             candidate_paths = [
                 path,
                 os.path.join(os.getcwd(), path),
+                os.path.join(os.getcwd(), "backend", "data", "faces", os.path.basename(path)),
+                os.path.join(os.getcwd(), "backend", "uploads", "cases", os.path.basename(path)),
+                os.path.join(os.getcwd(), "backend", "uploads", "public_submissions", os.path.basename(path)),
+                os.path.join(os.getcwd(), "backend", "missing_person_db", os.path.basename(path)),
                 os.path.join(os.getcwd(), "uploads", "cases", os.path.basename(path)),
                 os.path.join(os.getcwd(), "uploads", "public_submissions", os.path.basename(path)),
                 os.path.join(os.getcwd(), "data", "faces", os.path.basename(path)),
@@ -309,7 +313,9 @@ def initialize_face_landmarker(
         default_trk = _cfg.MEDIAPIPE_MIN_TRACKING_CONF
     except Exception:
         # Fallback (tests / headless environments)
-        default_path = os.path.join("data", "models", "face_landmarker.task")
+        default_path = os.path.join("backend", "data", "models", "face_landmarker.task")
+        if not os.path.exists(default_path):
+            default_path = os.path.join("data", "models", "face_landmarker.task")
         default_num = 5
         default_det = 0.5
         default_pres = 0.5

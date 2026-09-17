@@ -1,0 +1,114 @@
+[
+  {
+    "id": 1,
+    "case_id": 1,
+    "action": "Case Created",
+    "user_id": 2,
+    "timestamp": "2026-08-08T16:00:00",
+    "details": "Missing bulletin created by Officer for Aarav Sharma."
+  },
+  {
+    "id": 2,
+    "case_id": 1,
+    "action": "Sighting Reported",
+    "user_id": null,
+    "timestamp": "2026-08-10T17:20:00",
+    "details": "Public tip received about a sighting at Noida Sector 15."
+  },
+  {
+    "id": 3,
+    "case_id": 1,
+    "action": "Sighting Verified",
+    "user_id": 2,
+    "timestamp": "2026-08-10T18:00:00",
+    "details": "Sighting at Noida verified by Officer based on photo confirmation."
+  },
+  {
+    "id": 4,
+    "case_id": 2,
+    "action": "Case Created",
+    "user_id": 2,
+    "timestamp": "2026-08-11T10:45:00",
+    "details": "Missing bulletin created by Officer for Priya Patel."
+  },
+  {
+    "id": 5,
+    "case_id": 2,
+    "action": "Sighting Reported",
+    "user_id": null,
+    "timestamp": "2026-08-12T11:00:00",
+    "details": "Public tip received: spotted at Cubbon Park Metro Station, Bengaluru."
+  },
+  {
+    "id": 6,
+    "case_id": 2,
+    "action": "Sighting Verified",
+    "user_id": 2,
+    "timestamp": "2026-08-12T11:30:00",
+    "details": "Automated face match verified by Officer. Match confidence: 91.4%."
+  },
+  {
+    "id": 7,
+    "case_id": 3,
+    "action": "Case Created",
+    "user_id": 1,
+    "timestamp": "2026-08-03T20:00:00",
+    "details": "Missing bulletin created by Admin for Vikram Singh."
+  },
+  {
+    "id": 8,
+    "case_id": 4,
+    "action": "Case Created",
+    "user_id": 2,
+    "timestamp": "2026-07-29T13:00:00",
+    "details": "Missing bulletin created by Officer for Neha Verma."
+  },
+  {
+    "id": 9,
+    "case_id": 4,
+    "action": "Status Changed to Found",
+    "user_id": 1,
+    "timestamp": "2026-08-13T09:00:00",
+    "details": "Case status updated to 'Found' and closed by Admin. Family reunited."
+  },
+  {
+    "id": 10,
+    "case_id": 5,
+    "action": "Case Created",
+    "user_id": 2,
+    "timestamp": "2026-08-12T17:30:00",
+    "details": "Missing bulletin created by Officer for Rohan Das."
+  },
+  {
+    "id": 11,
+    "case_id": 5,
+    "action": "Sighting Reported",
+    "user_id": null,
+    "timestamp": "2026-08-13T08:30:00",
+    "details": "Public tip received: spotted near main entrance of City Centre Mall, Salt Lake, Kolkata."
+  },
+  {
+    "id": 12,
+    "case_id": 6,
+    "action": "Case Created",
+    "user_id": 2,
+    "timestamp": "2026-08-06T08:00:00",
+    "details": "Missing bulletin created by Officer for Ananya Roy."
+  },
+  {
+    "id": 13,
+    "case_id": 6,
+    "action": "Sighting Reported",
+    "user_id": null,
+    "timestamp": "2026-08-07T10:00:00",
+    "details": "Public tip received: spotted near Kalighat Temple entrance."
+  },
+  {
+    "id": 14,
+    "case_id": 6,
+    "action": "Sighting Verified",
+    "user_id": 2,
+    "timestamp": "2026-08-07T11:00:00",
+    "details": "Sighting at Kalighat Temple verified by Officer. Match confidence: 94.2%."
+  }
+]
