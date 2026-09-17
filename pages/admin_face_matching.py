@@ -190,6 +190,7 @@ def render_admin_face_matching_page():
         st.info("Configure matching parameters for this search session.")
         top_k_input = st.number_input("Top Candidates (K)", min_value=1, max_value=20, value=int(KNN_N_NEIGHBORS), step=1)
         threshold_input = st.slider("Match Distance Threshold", min_value=0.10, max_value=30.00, value=float(FACE_MATCH_THRESHOLD), step=0.10, help="Candidates with Euclidean distance <= threshold are flagged as Potential Matches.")
+        gender_filter = st.selectbox("Target Gender Filter", options=["All", "Female", "Male"], index=0, help="Filter potential matches by target gender to prevent cross-gender false matches.")
 
     # ── 4. Step 1 & 2: Image Upload & Preview ────────────────────────────
     st.markdown("### Step 1: Upload Query Image")
@@ -441,24 +442,49 @@ def render_admin_face_matching_page():
             st.warning("⚠️ **No Reference Vectors Stored**: The database currently contains 0 registered missing person face profiles. Please register missing person cases with photos first.")
             st.stop()
 
-        potential_candidates = [c for c in candidates if c.get("is_potential_match")]
-        non_potential_candidates = [c for c in candidates if not c.get("is_potential_match")]
-
         case_service = CaseService()
         current_user = st.session_state.get("user")
+
+        def _get_case_obj(case_id):
+            try:
+                cid = int(case_id) if str(case_id).isdigit() else case_id
+                obj = case_service.get_case(cid, current_user=current_user)
+                if obj is None:
+                    obj = case_service.case_repo.get_by_id(cid, include_deleted=True)
+                return obj
+            except Exception:
+                try:
+                    cid = int(case_id) if str(case_id).isdigit() else case_id
+                    return case_service.case_repo.get_by_id(cid, include_deleted=True)
+                except Exception:
+                    return None
+
+        # Filter valid matches enforcing score threshold AND gender match
+        valid_matches = []
+        target_g = gender_filter.strip().lower()
+        for c in candidates:
+            sim = c.get("similarity_score", 0.0)
+            is_pot = bool(c.get("is_potential_match") or sim >= 50.0)
+            if not is_pot:
+                continue
+
+            case_obj = _get_case_obj(c.get("case_id"))
+            cand_gender = str(getattr(case_obj, "gender", "") or "").strip().lower()
+
+            if target_g in ["female", "male"] and cand_gender and cand_gender != target_g:
+                continue
+
+            c["_case_obj"] = case_obj
+            valid_matches.append(c)
 
         def _render_candidate_card(cand):
             rank = cand.get("rank")
             case_id = cand.get("case_id")
             distance = cand.get("distance")
-            similarity = cand.get("similarity_score")
-            is_potential = cand.get("is_potential_match")
+            similarity = cand.get("similarity_score", 0.0)
+            is_potential = True
 
-            case_obj = None
-            try:
-                case_obj = case_service.get_case(case_id, current_user=current_user)
-            except Exception:
-                case_obj = None
+            case_obj = cand.get("_case_obj") or _get_case_obj(case_id)
 
             case_num = getattr(case_obj, "case_number", f"MP-{case_id}") if case_obj else f"Case #{case_id}"
             person_name = getattr(case_obj, "name", "Unknown Person") if case_obj else "Unknown"
@@ -467,10 +493,10 @@ def render_admin_face_matching_page():
             city = getattr(case_obj, "last_seen_city", "N/A") if case_obj else "N/A"
             state = getattr(case_obj, "last_seen_state", "N/A") if case_obj else "N/A"
 
-            decision_label = "POTENTIAL MATCH" if is_potential else "NON-MATCHING CASE"
-            border_color = "#10b981" if is_potential else "#94a3b8"
-            badge_bg = "rgba(16, 185, 129, 0.15)" if is_potential else "rgba(148, 163, 184, 0.15)"
-            badge_color = "#047857" if is_potential else "#475569"
+            decision_label = "POTENTIAL MATCH"
+            border_color = "#10b981"
+            badge_bg = "rgba(16, 185, 129, 0.15)"
+            badge_color = "#047857"
 
             st.markdown(f"""
             <div class="glass-card" style="border-left: 5px solid {border_color}; padding: 18px; margin-bottom: 16px; background: #ffffff; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.08), 0 2px 4px -1px rgba(0,0,0,0.04);">
@@ -529,22 +555,13 @@ def render_admin_face_matching_page():
                         st.markdown(f"**Calculated Distance:** `{distance:.4f}`")
                         st.markdown(f"**Calculated Similarity:** `{similarity:.1f}%`")
 
-        if potential_candidates:
-            st.success(f"🎉 **POTENTIAL MATCH IDENTIFIED**: Found **{len(potential_candidates)}** matching case(s) in the database!")
+        if valid_matches:
+            st.success(f"🎉 **POTENTIAL MATCH IDENTIFIED**: Found **{len(valid_matches)}** matching case(s) in the database!")
             st.markdown("#### 📊 Matched Person Profiles")
-            for cand in potential_candidates:
+            for cand in valid_matches:
                 _render_candidate_card(cand)
-
-            if non_potential_candidates:
-                with st.expander("🔍 Inspect Unrelated Database Cases (Distance Exceeded Threshold)"):
-                    st.info("The cases below exceeded the match distance threshold and are for reference only:")
-                    for cand in non_potential_candidates:
-                        _render_candidate_card(cand)
         else:
-            st.info("ℹ️ **KNN Facial Search Completed**: Displaying closest registered missing person candidates ranked by facial similarity:")
-            st.markdown("#### 📊 Ranked Candidates")
-            for cand in candidates:
-                _render_candidate_card(cand)
+            st.warning("⚠️ **NO MATCHING CASES FOUND**: None of the registered missing person cases in the database met the facial similarity and target gender criteria.")
 
     # ── 9. Footer ───────────────────────────────────────────────────────
     st.markdown("---", unsafe_allow_html=True)

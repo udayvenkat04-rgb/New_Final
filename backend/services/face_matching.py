@@ -283,7 +283,7 @@ class KNNFaceMatchingEngine:
             dist_float = round(float(dist_val), 6)
             sim_score = distance_to_similarity_score(dist_float)
 
-            is_potential = bool(dist_float <= thresh)
+            is_potential = bool(dist_float <= thresh or sim_score >= 50.0)
             if is_potential:
                 has_potential_match = True
 
