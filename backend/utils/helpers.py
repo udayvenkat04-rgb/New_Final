@@ -1103,7 +1103,11 @@ def render_top_header():
         except Exception:
             pass
 
-    logo_html = f'<img src="data:image/png;base64,{logo_b64}" style="width: 42px; height: 42px; border-radius: 8px; display: block; object-fit: contain;" />' if logo_b64 else get_svg_icon('brand_logo', size=36)
+    logo_html = f'''<div style="width: 36px; height: 36px; border-radius: 10px; background: #0f172a; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 10px rgba(15, 23, 42, 0.15); border: 1.5px solid #1e293b; overflow: hidden; flex-shrink: 0;">
+        <img src="data:image/png;base64,{logo_b64}" style="width: 100%; height: 100%; object-fit: cover;" />
+    </div>''' if logo_b64 else f'''<div style="width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%); display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 10px rgba(79, 70, 229, 0.25); flex-shrink: 0;">
+        {get_svg_icon('brand_logo', size=22)}
+    </div>'''
 
     # Styling for the horizontal navbar container and links
     st.markdown("""
@@ -1190,12 +1194,15 @@ def render_top_header():
         /* Zero out internal padding & margins inside the top navbar container to lock logo dead-center vertically */
         div.st-key-navbar_container div[data-testid="stHorizontalBlock"] {
             align-items: center !important;
+            gap: 6px !important;
             margin: 0 !important;
             padding: 0 !important;
+            width: 100% !important;
         }
         div.st-key-navbar_container div[data-testid="column"] {
             display: flex !important;
             align-items: center !important;
+            justify-content: center !important;
             margin: 0 !important;
             padding: 0 !important;
         }
@@ -1207,6 +1214,7 @@ def render_top_header():
             padding-bottom: 0 !important;
             display: flex !important;
             align-items: center !important;
+            width: 100% !important;
         }
         
         /* Top Navbar Horizontal Page Links Styling - Settled Equal Pills with High Contrast Dark Font */
@@ -1232,10 +1240,11 @@ def render_top_header():
             color: #0f172a !important;
             font-size: 13.5px !important;
             font-weight: 700 !important;
-            padding: 0 8px !important;
+            padding: 0 10px !important;
             border-radius: 10px !important;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
             text-align: center !important;
+            white-space: nowrap !important;
         }
         div.st-key-navbar_container div[data-testid="stPageLink"] a p,
         div.st-key-navbar_container div[data-testid="stPageLink"] a span,
@@ -1346,14 +1355,14 @@ def render_top_header():
     # Dynamically build horizontal layout using st.container & st.columns (ONLY for public guest navigation)
     if not authenticated:
         with st.container(key="navbar_container", border=True):
-            # Logo (Left) + Middle Spacer + 5 Right-Aligned Settled Page Buttons
-            col_spec = [2.2, 4.0] + [1.2] * len(pages)
+            # Proportional column weights: Logo (2.4), Spacer (1.6), Home (1.1), Public Portal (1.6), Cases (1.1), Map (0.9), Login (1.1)
+            col_spec = [2.4, 1.6, 1.1, 1.6, 1.1, 0.9, 1.1]
             cols = st.columns(col_spec, vertical_alignment="center")
             
             # Left Logo & Brand Badge
             with cols[0]:
                 st.markdown(f"""
-                <div style="display: flex; align-items: center; justify-content: flex-start; gap: 10px; height: 40px; margin: 0; padding: 0;">
+                <div style="display: flex; align-items: center; justify-content: flex-start; gap: 10px; height: 38px; margin: 0; padding-left: 14px; transform: translateY(-5px);">
                     <div style="display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                         {logo_html}
                     </div>
@@ -1371,10 +1380,8 @@ def render_top_header():
 
     # Render custom Deep Navy sidebar matching reference design (Image 2)
     st.sidebar.markdown(f"""
-    <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 24px; padding: 4px 6px;">
-        <div style="width: 44px; height: 44px; border-radius: 50%; background: #ffffff; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.3); flex-shrink: 0; padding: 4px;">
-            {logo_html}
-        </div>
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px; padding: 4px 6px;">
+        {logo_html}
         <div style="line-height: 1.2;">
             <div style="font-size: 16px; font-weight: 800; color: #ffffff; letter-spacing: 0.5px; font-family: 'Outfit', sans-serif;">MPIS PORTAL</div>
             <div style="font-size: 9.5px; color: #93c5fd; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px;">{role.upper()} MANAGEMENT SYSTEM</div>
