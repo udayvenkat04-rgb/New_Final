@@ -13,6 +13,7 @@ Upload Query Image → Face Detection → Select Face → 1,404-D Vector → KNN
 """
 import io
 import hashlib
+import textwrap
 import numpy as np
 import streamlit as st
 from PIL import Image as PILImage
@@ -482,7 +483,7 @@ def render_admin_face_matching_page():
             case_id = cand.get("case_id")
             distance = cand.get("distance")
             similarity = cand.get("similarity_score", 0.0)
-            is_potential = True
+            face_src_idx = cand.get("face_source_idx")
 
             case_obj = cand.get("_case_obj") or _get_case_obj(case_id)
 
@@ -493,39 +494,20 @@ def render_admin_face_matching_page():
             city = getattr(case_obj, "last_seen_city", "N/A") if case_obj else "N/A"
             state = getattr(case_obj, "state", "N/A") if case_obj else "N/A"
 
-            decision_label = "POTENTIAL MATCH"
-            border_color = "#10b981"
-            badge_bg = "rgba(16, 185, 129, 0.15)"
-            badge_color = "#047857"
+            group_str = f" | 📷 Group Photo: Face #{face_src_idx}" if face_src_idx else ""
 
-            st.markdown(f"""
-            <div class="glass-card" style="border-left: 5px solid {border_color}; padding: 18px; margin-bottom: 16px; background: #ffffff; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.08), 0 2px 4px -1px rgba(0,0,0,0.04);">
-                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
-                    <div>
-                        <span style="background: #e2e8f0; padding: 4px 10px; border-radius: 4px; font-weight: 700; color: #1e293b; font-size: 13px;">
-                            RANK #{rank}
-                        </span>
-                        <span style="font-size: 18px; font-weight: 700; color: #0f172a; margin-left: 12px;">
-                            {person_name}
-                        </span>
-                        <span style="font-size: 14px; color: #475569; margin-left: 8px; font-weight: 600;">
-                            ({case_num})
-                        </span>
-                    </div>
-                    <div>
-                        <span style="background: {badge_bg}; color: {badge_color}; padding: 6px 14px; border-radius: 12px; font-weight: 700; font-size: 13px;">
-                            {decision_label}
-                        </span>
-                    </div>
-                </div>
-                <div style="display: flex; gap: 24px; margin-top: 12px; color: #334155; font-size: 14px; flex-wrap: wrap;">
-                    <div><b style="color: #0f172a;">Age / Gender:</b> {age} | {gender}</div>
-                    <div><b style="color: #0f172a;">Location:</b> {city}, {state}</div>
-                    <div><b style="color: #0f172a;">Euclidean Distance:</b> {distance:.4f}</div>
-                    <div><b style="color: #0f172a;">Similarity Score:</b> <span style="color: {border_color}; font-weight: 700;">{similarity:.1f}%</span></div>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
+            with st.container(border=True):
+                st.markdown(f"### 🟢 RANK #{rank} — {person_name} ({case_num}){group_str} — POTENTIAL MATCH")
+                
+                col_m1, col_m2, col_m3, col_m4 = st.columns(4)
+                with col_m1:
+                    st.markdown(f"**Age / Gender:** {age} | {gender}")
+                with col_m2:
+                    st.markdown(f"**Location:** {city}, {state}")
+                with col_m3:
+                    st.markdown(f"**Euclidean Distance:** {distance:.4f}")
+                with col_m4:
+                    st.markdown(f"**Similarity Score:** {similarity:.1f}%")
 
             with st.expander(f"🔍 View Detailed Case Files — {person_name} ({case_num})"):
                 if not case_obj:
@@ -537,23 +519,18 @@ def render_admin_face_matching_page():
                         st.image(photo_pil, caption=f"Registered Photo: {person_name}", use_container_width=True)
 
                     with d_col2:
-                        st.markdown(f"""
-                        <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid #f59e0b; padding: 10px 14px; border-radius: 6px; margin-bottom: 12px;">
-                            <b style="color: #f59e0b;">⚠️ Match Assessment</b>
-                            <p style="margin: 2px 0 0 0; font-size: 12px; color: #334155;">Biometric recommendation based on 1,404-D landmark KNN distance. Final confirmation requires manual verification by an authorized investigating officer.</p>
-                        </div>
-                        """, unsafe_allow_html=True)
+                        st.info("⚠️ **Match Assessment**: Biometric recommendation based on 1,404-D landmark KNN distance. Final confirmation requires manual verification by an authorized investigating officer.")
 
-                        st.markdown(f"**Case Number:** `{case_obj.case_number}`")
+                        st.markdown(f"**Case Number:** {case_obj.case_number}")
                         st.markdown(f"**Full Name:** {case_obj.name}")
                         st.markdown(f"**Age / Gender:** {case_obj.age} years | {case_obj.gender}")
-                        st.markdown(f"**Current Status:** `{case_obj.status}`")
+                        st.markdown(f"**Current Status:** {case_obj.status}")
                         st.markdown(f"**Last Seen Location:** {case_obj.last_seen_location or 'N/A'}")
                         st.markdown(f"**City / State:** {case_obj.last_seen_city or 'N/A'}, {case_obj.last_seen_state or 'N/A'}")
                         st.markdown(f"**Last Seen Date:** {case_obj.last_seen_date.strftime('%Y-%m-%d') if case_obj.last_seen_date else 'N/A'}")
                         st.markdown(f"**Description:** {case_obj.description or 'No additional description.'}")
-                        st.markdown(f"**Calculated Distance:** `{distance:.4f}`")
-                        st.markdown(f"**Calculated Similarity:** `{similarity:.1f}%`")
+                        st.markdown(f"**Calculated Distance:** {distance:.4f}")
+                        st.markdown(f"**Calculated Similarity:** {similarity:.1f}%")
 
         if valid_matches:
             st.success(f"🎉 **POTENTIAL MATCH IDENTIFIED**: Found **{len(valid_matches)}** matching case(s) in the database!")
