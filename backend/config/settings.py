@@ -10,7 +10,7 @@ env_path_backend = BASE_DIR / ".env"
 env_path_root = BASE_DIR.parent / ".env"
 
 if env_path_backend.exists():
-    load_dotenv(dotenv_path=env_path_backend)
+    load_dotenv(dotenv_path=env_path_backend, override=False)
 if env_path_root.exists():
     load_dotenv(dotenv_path=env_path_root, override=False)
 
