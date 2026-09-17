@@ -11,9 +11,9 @@ from backend.database.collections import (
     get_case_history_collection
 )
 
-# Go up 3 levels from backend/database/seed_mongo.py to reach project root
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-JSON_DB_DIR = os.path.join(PROJECT_ROOT, "missing_person_db")
+backend_db_dir = os.path.join(PROJECT_ROOT, "backend", "missing_person_db")
+JSON_DB_DIR = backend_db_dir if os.path.exists(backend_db_dir) else os.path.join(PROJECT_ROOT, "missing_person_db")
 
 def parse_date(date_str):
     if not date_str:
