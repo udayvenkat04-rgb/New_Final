@@ -358,6 +358,23 @@ def normalize_landmarks(
     mean = box_rel.mean(axis=0)  # shape (3,)
     centered = box_rel - mean
 
+    # 2b) Rotation Invariance — Eye-line Horizontal Alignment (Canonical Facing)
+    # Fixes variation across different photos, group photos, head tilts, and clothing.
+    if centered.shape[0] >= 363:
+        left_eye_center = (centered[33, :2] + centered[133, :2]) / 2.0
+        right_eye_center = (centered[362, :2] + centered[263, :2]) / 2.0
+        dx = float(right_eye_center[0] - left_eye_center[0])
+        dy = float(right_eye_center[1] - left_eye_center[1])
+        if abs(dx) > 1e-6 or abs(dy) > 1e-6:
+            angle = float(np.arctan2(dy, dx))
+            if np.isfinite(angle) and abs(angle) > 1e-4:
+                cos_a = float(np.cos(-angle))
+                sin_a = float(np.sin(-angle))
+                rx = centered[:, 0] * cos_a - centered[:, 1] * sin_a
+                ry = centered[:, 0] * sin_a + centered[:, 1] * cos_a
+                centered[:, 0] = rx
+                centered[:, 1] = ry
+
     # 3) Scale invariance — divide by max radial distance in XY plane
     xy_radii = np.sqrt(centered[:, 0] ** 2 + centered[:, 1] ** 2)
     scale = float(xy_radii.max()) if xy_radii.size > 0 else 0.0

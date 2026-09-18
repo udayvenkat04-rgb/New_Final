@@ -180,6 +180,9 @@ def render_admin_face_matching_page():
         st.warning("Please ensure MongoDB is running and your `DATABASE_URL` is configured in `.env`.")
         st.stop()
 
+    # Auto-index all registered missing person cases with updated rotation-invariant face vectors
+    _ensure_all_cases_indexed()
+
     # ── 3. Header & Page Layout ───────────────────────────────────────────
     st.markdown("<h2 style='color: #10b981; margin-bottom: 0;'>🔬 Admin Face Matching Engine</h2>", unsafe_allow_html=True)
     st.markdown("<p style='color: #94a3b8;'>Centralized AI biometric search portal. Upload a query photograph to execute face detection, 1,404-D vector generation, and KNN similarity matching against registered missing person profiles.</p>", unsafe_allow_html=True)
@@ -190,7 +193,7 @@ def render_admin_face_matching_page():
         st.markdown("### ⚙️ KNN Matching Options")
         st.info("Configure matching parameters for this search session.")
         top_k_input = st.number_input("Top Candidates (K)", min_value=1, max_value=20, value=int(KNN_N_NEIGHBORS), step=1)
-        threshold_input = st.slider("Match Distance Threshold", min_value=0.10, max_value=2.00, value=0.65, step=0.05, help="Candidates with Euclidean distance <= threshold are flagged as Potential Matches.")
+        threshold_input = st.slider("Match Distance Threshold", min_value=0.10, max_value=15.00, value=5.00, step=0.10, help="Candidates with Euclidean distance <= threshold are flagged as Potential Matches.")
         gender_filter = st.selectbox("Target Gender Filter", options=["All", "Female", "Male"], index=0, help="Filter potential matches by target gender to prevent cross-gender false matches.")
 
     # ── 4. Step 1 & 2: Image Upload & Preview ────────────────────────────
@@ -466,7 +469,7 @@ def render_admin_face_matching_page():
         for c in candidates:
             dist = c.get("distance", 999.0)
             sim = c.get("similarity_score", 0.0)
-            is_pot = bool(c.get("is_potential_match") and dist <= threshold_input and sim >= 40.0)
+            is_pot = bool(c.get("is_potential_match") or dist <= threshold_input or sim >= 40.0)
             if not is_pot:
                 continue
 
