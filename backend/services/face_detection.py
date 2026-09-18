@@ -798,6 +798,49 @@ def _detect_faces_via_opencv_cascade(rgb: np.ndarray, landmarker: Any) -> List[D
             break
 
     if not rects:
+        # Fallback: scan upper-body / top 65% region where head/face resides in full-body photos
+        try:
+            h_top = int(round(h * 0.65))
+            top_crop = rgb[0:h_top, :]
+            mp_top_img = MPImage(image_format=ImageFormat.SRGB, data=top_crop)
+            top_res = landmarker.detect(mp_top_img)
+            if top_res and getattr(top_res, "face_landmarks", None) and len(top_res.face_landmarks) > 0:
+                top_lms = top_res.face_landmarks[0]
+                landmarks: List[FaceLandmark] = []
+                xs: List[float] = []
+                ys: List[float] = []
+                for lidx, clm in enumerate(top_lms):
+                    cx_val = float(getattr(clm, "x", 0.0))
+                    cy_val = float(getattr(clm, "y", 0.0))
+                    cz_val = float(getattr(clm, "z", 0.0))
+                    img_x = cx_val
+                    img_y = cy_val * (h_top / float(h))
+                    img_z = cz_val
+                    landmarks.append(FaceLandmark(index=lidx, x=img_x, y=img_y, z=img_z))
+                    xs.append(img_x)
+                    ys.append(img_y)
+
+                if len(landmarks) >= 468:
+                    x_min = max(0.0, min(xs))
+                    y_min = max(0.0, min(ys))
+                    x_max = min(1.0, max(xs))
+                    y_max = min(1.0, max(ys))
+                    px = int(round(x_min * w))
+                    py = int(round(y_min * h))
+                    pw = max(1, int(round((x_max - x_min) * w)))
+                    ph = max(1, int(round((y_max - y_min) * h)))
+                    bbox = (px, py, pw, ph)
+                    return [
+                        DetectedFace(
+                            face_index=0,
+                            landmarks=landmarks,
+                            bounding_box_pixels=bbox,
+                            presence_score=0.9,
+                        )
+                    ]
+        except Exception:
+            pass
+
         return []
 
     detected_faces: List[DetectedFace] = []

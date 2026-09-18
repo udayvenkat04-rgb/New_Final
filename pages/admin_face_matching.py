@@ -119,7 +119,7 @@ def _build_fallback_face(image_width: int, image_height: int) -> DetectedFace:
 
 def _ensure_all_cases_indexed():
     """Scans all registered missing person cases in MongoDB.
-    Automatically refreshes and attaches 1,404-D face vectors using current landmark normalization.
+    Ensures every missing person case has a 1,404-D face vector attached without wiping existing vectors.
     """
     try:
         from backend.repositories.case_repository import CaseRepository
@@ -130,7 +130,10 @@ def _ensure_all_cases_indexed():
         for case in all_cases:
             if getattr(case, "photo_path", None):
                 try:
-                    case_svc.attach_face_vector(case.id, override=True)
+                    cid = int(case.id)
+                    existing = case_repo.db.face_vectors.find_one({"case_id": cid})
+                    if not existing:
+                        case_svc.attach_face_vector(case.id, override=False)
                 except Exception:
                     pass
     except Exception:

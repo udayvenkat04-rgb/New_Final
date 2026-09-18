@@ -104,8 +104,8 @@ def distance_to_similarity_score(distance: float) -> float:
     
     Calibrated scale:
         d = 0.00 -> 100.0%
-        d = 1.00 -> 90.0%  (Same person / high confidence match)
-        d = 2.50 -> 75.0%  (Same person / different clothes, lighting, angle)
+        d = 1.00 -> 90.0%  (Same person / high confidence facial match)
+        d = 2.50 -> 75.0%  (Same person / facial pose, expression, lighting, angle variations)
         d = 5.00 -> 50.0%  (Cutoff threshold)
         d >= 10.0 -> 0.0%  (Non-matching)
     """

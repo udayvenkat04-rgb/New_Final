@@ -119,7 +119,7 @@ def _build_fallback_face(image_width: int, image_height: int) -> DetectedFace:
 
 def _ensure_all_cases_indexed():
     """Scans all registered missing person cases in MongoDB.
-    Automatically refreshes and attaches 1,404-D face vectors using current landmark normalization.
+    Ensures every missing person case has a 1,404-D face vector attached without wiping existing vectors.
     """
     try:
         from backend.repositories.case_repository import CaseRepository
@@ -130,7 +130,10 @@ def _ensure_all_cases_indexed():
         for case in all_cases:
             if getattr(case, "photo_path", None):
                 try:
-                    case_svc.attach_face_vector(case.id, override=True)
+                    cid = int(case.id)
+                    existing = case_repo.db.face_vectors.find_one({"case_id": cid})
+                    if not existing:
+                        case_svc.attach_face_vector(case.id, override=False)
                 except Exception:
                     pass
     except Exception:
@@ -496,7 +499,7 @@ def render_admin_face_matching_page():
             age = getattr(case_obj, "age", "N/A") if case_obj else "N/A"
             gender = getattr(case_obj, "gender", "N/A") if case_obj else "N/A"
             city = getattr(case_obj, "last_seen_city", "N/A") if case_obj else "N/A"
-            state = getattr(case_obj, "state", "N/A") if case_obj else "N/A"
+            state = getattr(case_obj, "last_seen_state", "N/A") if case_obj else "N/A"
 
             group_str = f" | 📷 Group Photo: Face #{face_src_idx}" if face_src_idx else ""
 
@@ -542,7 +545,7 @@ def render_admin_face_matching_page():
             for cand in valid_matches:
                 _render_candidate_card(cand)
         else:
-            st.warning("⚠️ **NO MATCHING CASES FOUND**: None of the registered missing person cases in the database met the facial similarity match threshold.")
+            st.warning("⚠️ **NO MATCHING CASES FOUND**: None of the registered missing person cases in the database met the facial similarity and target gender criteria.")
 
     # ── 9. Footer ───────────────────────────────────────────────────────
     st.markdown("---", unsafe_allow_html=True)
@@ -557,4 +560,3 @@ def render_admin_face_matching_page():
 
 if __name__ == "__main__":
     render_admin_face_matching_page()
-

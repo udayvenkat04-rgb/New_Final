@@ -331,35 +331,25 @@ def normalize_landmarks(
 
     _validate_raw_landmarks(raw, expected_landmarks)
 
-    # 1) Physical Aspect-Ratio & Bounding Box Normalization
+    # 1) Isotropic Coordinate Alignment
     pts = raw.copy()
     if image_width is not None and image_height is not None and image_height > 0 and image_width > 0:
         aspect = float(image_width) / float(image_height)
         pts[:, 0] = pts[:, 0] * aspect
 
-    min_x = pts[:, 0].min()
-    max_x = pts[:, 0].max()
-    min_y = pts[:, 1].min()
-    max_y = pts[:, 1].max()
+    # 2) Face Box Mean-Centering
+    min_x, max_x = float(pts[:, 0].min()), float(pts[:, 0].max())
+    min_y, max_y = float(pts[:, 1].min()), float(pts[:, 1].max())
+    center_x = (min_x + max_x) / 2.0
+    center_y = (min_y + max_y) / 2.0
+    center_z = float(pts[:, 2].mean())
 
-    w_box = max_x - min_x
-    h_box = max_y - min_y
-    max_dim = max(w_box, h_box)
+    centered = np.zeros_like(pts)
+    centered[:, 0] = pts[:, 0] - center_x
+    centered[:, 1] = pts[:, 1] - center_y
+    centered[:, 2] = pts[:, 2] - center_z
 
-    if max_dim > 1e-6:
-        box_rel = np.zeros_like(pts)
-        box_rel[:, 0] = (pts[:, 0] - min_x) / max_dim
-        box_rel[:, 1] = (pts[:, 1] - min_y) / max_dim
-        box_rel[:, 2] = pts[:, 2] / max_dim
-    else:
-        box_rel = pts.copy()
-
-    # 2) Translation invariance — mean-center
-    mean = box_rel.mean(axis=0)  # shape (3,)
-    centered = box_rel - mean
-
-    # 2b) Rotation Invariance — Eye-line Horizontal Alignment (Canonical Facing)
-    # Fixes variation across different photos, group photos, head tilts, and clothing.
+    # 3) Rotation Invariance — Eye-line Horizontal Alignment (Canonical Facing)
     if centered.shape[0] >= 363:
         left_eye_center = (centered[33, :2] + centered[133, :2]) / 2.0
         right_eye_center = (centered[362, :2] + centered[263, :2]) / 2.0
@@ -375,15 +365,25 @@ def normalize_landmarks(
                 centered[:, 0] = rx
                 centered[:, 1] = ry
 
-    # 3) Scale invariance — divide by max radial distance in XY plane
+    # 4) Isotropic Radial & Depth Scale Normalization
     xy_radii = np.sqrt(centered[:, 0] ** 2 + centered[:, 1] ** 2)
-    scale = float(xy_radii.max()) if xy_radii.size > 0 else 0.0
-    if scale <= 0.0:
+    scale_xy = float(xy_radii.max()) if xy_radii.size > 0 else 0.0
+    if scale_xy <= 0.0:
         raise DegenerateFaceError(
             "All landmarks collapsed to a single point in the XY plane "
             "(scale factor = 0). Cannot build a normalized face vector."
         )
-    normed = centered / scale
+
+    normed = np.zeros_like(centered)
+    normed[:, 0] = centered[:, 0] / scale_xy
+    normed[:, 1] = centered[:, 1] / scale_xy
+
+    # Depth Z normalization: scale by Z range if available, else by scale_xy
+    z_range = float(centered[:, 2].max() - centered[:, 2].min())
+    if z_range > 1e-6:
+        normed[:, 2] = centered[:, 2] / z_range
+    else:
+        normed[:, 2] = centered[:, 2] / scale_xy
 
     # Ensure final dtype is exactly float32 so downstream math is consistent
     return np.asarray(normed, dtype=DEFAULT_VECTOR_DTYPE)
