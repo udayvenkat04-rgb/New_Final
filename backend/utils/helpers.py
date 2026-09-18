@@ -3,7 +3,7 @@ from backend.utils.file_utils import save_uploaded_file, load_image_safely, get_
 
 
 def inject_custom_css():
-    """Injects a modern, premium 100% Light Theme styling in Streamlit."""
+    """Injects a modern, premium 100% Light Theme styling in Streamlit (with Mobile Sidebar Controls)."""
     try:
         from backend.auth.authentication import restore_session_if_needed
         restore_session_if_needed()
@@ -11,6 +11,7 @@ def inject_custom_css():
         pass
     authenticated = st.session_state.get("authenticated", False)
     st.markdown("""
+    <base href="/" />
     <style>
         /* Import Outfit Google Font */
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
@@ -78,30 +79,52 @@ def inject_custom_css():
         }
         */
         
-        /* High-Visibility Collapsed Control / Open Sidebar Button (fixed top-left 8px, 10px) */
+        /* High-Visibility Collapsed Control / Open Sidebar Button Container & Button */
         div[data-testid="collapsedControl"],
+        div[data-testid="stSidebarCollapsedControl"],
         [data-testid="collapsedControl"],
+        [data-testid="stSidebarCollapsedControl"],
+        header[data-testid="stHeader"] [data-testid="stSidebarCollapsedControl"],
+        header[data-testid="stHeader"] [data-testid="collapsedControl"] {
+            display: flex !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            position: fixed !important;
+            top: 7px !important;
+            left: 10px !important;
+            z-index: 99999999 !important;
+            pointer-events: auto !important;
+            width: 42px !important;
+            height: 42px !important;
+        }
+
+        div[data-testid="collapsedControl"] button,
+        div[data-testid="stSidebarCollapsedControl"] button,
+        [data-testid="collapsedControl"] button,
+        [data-testid="stSidebarCollapsedControl"] button,
         header[data-testid="stHeader"] button,
         .stAppHeader button,
         button[data-testid="stHeaderSidebarCollapseButton"],
         button[data-testid="stSidebarCollapseButton"],
-        [data-testid="stBaseButton-header"] {
-            display: inline-flex !important;
+        button[data-testid="stBaseButton-header"],
+        button[aria-label="Open sidebar"],
+        button[aria-label="Expand sidebar"],
+        button[aria-label="Toggle sidebar"] {
+            display: flex !important;
             visibility: visible !important;
             opacity: 1 !important;
             position: fixed !important;
-            top: 8px !important;
+            top: 7px !important;
             left: 10px !important;
-            z-index: 9999999 !important;
+            z-index: 99999999 !important;
             pointer-events: auto !important;
-            background-color: #4f46e5 !important;
-            background: #4f46e5 !important;
+            background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%) !important;
             border: 2px solid #ffffff !important;
-            border-radius: 10px !important;
-            width: 40px !important;
-            height: 40px !important;
-            min-width: 40px !important;
-            min-height: 40px !important;
+            border-radius: 12px !important;
+            width: 42px !important;
+            height: 42px !important;
+            min-width: 42px !important;
+            min-height: 42px !important;
             color: #ffffff !important;
             align-items: center !important;
             justify-content: center !important;
@@ -109,41 +132,80 @@ def inject_custom_css():
             cursor: pointer !important;
             padding: 0 !important;
             margin: 0 !important;
+            transition: all 0.2s ease !important;
         }
 
-        /* Bright white SVG icon inside open sidebar button */
+        /* Bright white SVG icon inside sidebar toggle button */
         div[data-testid="collapsedControl"] button svg,
+        div[data-testid="stSidebarCollapsedControl"] button svg,
         [data-testid="collapsedControl"] button svg,
+        [data-testid="stSidebarCollapsedControl"] button svg,
         header[data-testid="stHeader"] button svg,
         .stAppHeader button svg,
         button[data-testid="stHeaderSidebarCollapseButton"] svg,
         button[data-testid="stSidebarCollapseButton"] svg,
-        [data-testid="stBaseButton-header"] svg {
+        [data-testid="stBaseButton-header"] svg,
+        button[aria-label="Open sidebar"] svg,
+        button[aria-label="Expand sidebar"] svg {
             display: block !important;
             visibility: visible !important;
             opacity: 1 !important;
             fill: #ffffff !important;
             color: #ffffff !important;
             stroke: #ffffff !important;
-            width: 22px !important;
-            height: 22px !important;
+            width: 24px !important;
+            height: 24px !important;
         }
 
-        /* Override when sidebar is OPEN: position close button inside sidebar header */
-        section[data-testid="stSidebar"] button[data-testid="stSidebarCollapseButton"],
-        section[data-testid="stSidebar"] [data-testid="stSidebarHeader"] button,
-        section[data-testid="stSidebar"] [data-testid="stHeaderSidebarCollapseButton"] {
+        div[data-testid="collapsedControl"] button svg *,
+        div[data-testid="stSidebarCollapsedControl"] button svg *,
+        [data-testid="collapsedControl"] button svg * {
+            fill: #ffffff !important;
+            stroke: #ffffff !important;
+        }
+
+        /* Fallback hamburger text icon if SVG is hidden/missing */
+        div[data-testid="collapsedControl"] button::before,
+        div[data-testid="stSidebarCollapsedControl"] button::before,
+        button[data-testid="stHeaderSidebarCollapseButton"]::before {
+            content: "☰";
+            font-size: 20px !important;
+            font-weight: 800 !important;
+            color: #ffffff !important;
+            display: inline-block !important;
+        }
+        div[data-testid="collapsedControl"] button:has(svg)::before,
+        div[data-testid="stSidebarCollapsedControl"] button:has(svg)::before,
+        button[data-testid="stHeaderSidebarCollapseButton"]:has(svg)::before {
+            display: none !important;
+        }
+
+        /* Override ONLY when sidebar is EXPANDED/OPEN: position close button inside sidebar header */
+        section[data-testid="stSidebar"]:not([data-collapsed="true"]) [data-testid="stSidebarHeader"] button,
+        section[data-testid="stSidebar"]:not([data-collapsed="true"]) button[data-testid="stSidebarCollapseButton"],
+        section[data-testid="stSidebar"]:not([data-collapsed="true"]) [data-testid="stHeaderSidebarCollapseButton"] {
             position: relative !important;
             top: auto !important;
             left: auto !important;
+            z-index: auto !important;
             background: #1e293b !important;
-            border: 1px solid #334155 !important;
-            border-radius: 8px !important;
-            width: 36px !important;
-            height: 36px !important;
-            min-width: 36px !important;
-            min-height: 36px !important;
-            box-shadow: none !important;
+            border: 2px solid #4f46e5 !important;
+            border-radius: 10px !important;
+            width: 40px !important;
+            height: 40px !important;
+            min-width: 40px !important;
+            min-height: 40px !important;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3) !important;
+            cursor: pointer !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+
+        section[data-testid="stSidebar"]:not([data-collapsed="true"]) [data-testid="stSidebarHeader"] button:hover,
+        section[data-testid="stSidebar"]:not([data-collapsed="true"]) button[data-testid="stSidebarCollapseButton"]:hover {
+            background: #4f46e5 !important;
+            border-color: #ffffff !important;
         }
 
         /* Mobile & Tablet View (max-width: 991px): Top Header Bar & Content Offset */
@@ -180,8 +242,9 @@ def inject_custom_css():
                 display: flex !important;
                 visibility: visible !important;
                 justify-content: flex-end !important;
-                padding: 10px 14px !important;
+                padding: 12px 14px !important;
                 background-color: #0b192c !important;
+                border-bottom: 1px solid #1e293b !important;
             }
         }
 

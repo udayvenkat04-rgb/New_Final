@@ -403,16 +403,28 @@ def _get_image_as_base64(file_path):
     if file_path and os.path.exists(file_path):
         with open(file_path, "rb") as f:
             data = f.read()
-        return base64.b64encode(data).decode()
-    return ""
+        mime = "image/jpeg" if file_path.lower().endswith((".jpg", ".jpeg")) else "image/png"
+        return base64.b64encode(data).decode(), mime
+    return "", ""
 
 with col_graphic:
-    graphic_b64 = _get_image_as_base64(RIGHT_GRAPHIC_PATH) or _get_image_as_base64(FULL_PNG_PATH)
+    candidate_paths = [
+        RIGHT_GRAPHIC_PATH,
+        FULL_PNG_PATH,
+        os.path.join("frontend", "assets", "login_right_graphic.png"),
+        os.path.join("frontend", "assets", "face_scan_3d_icon.png"),
+    ]
+    graphic_b64, mime_type = "", ""
+    for path in candidate_paths:
+        graphic_b64, mime_type = _get_image_as_base64(path)
+        if graphic_b64:
+            break
+
     if graphic_b64:
         st.markdown(
             f'''
             <div class="login-graphic-container" style="width: 100%; text-align: center; pointer-events: none; user-select: none;">
-                <img src="data:image/png;base64,{graphic_b64}" 
+                <img src="data:{mime_type};base64,{graphic_b64}" 
                      style="width: 100%; border-radius: 20px; display: block; margin: 0 auto; pointer-events: none; user-select: none; box-shadow: 0 8px 24px rgba(124, 58, 237, 0.15);" 
                      alt="Biometric Authentication Graphic" />
             </div>
