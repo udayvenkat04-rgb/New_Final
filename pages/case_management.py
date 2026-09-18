@@ -34,7 +34,7 @@ st.set_page_config(page_title="Case Management", page_icon="🛡️", layout="wi
 inject_custom_css()
 require_role([ROLE_OFFICER, ROLE_ADMIN])
 
-cm_col1, cm_col2 = st.columns([3, 1], vertical_alignment="center")
+cm_col1, cm_col2 = st.columns([2.5, 1.5], vertical_alignment="center")
 with cm_col1:
     st.markdown(
         "<h2 style='color: #10b981; margin: 0;'>🛡️ Case Management Centre</h2>",
@@ -49,7 +49,18 @@ with cm_col1:
         unsafe_allow_html=True,
     )
 with cm_col2:
-    st.page_link("pages/cases.py", label="✍️ Register New Case", icon="➕", use_container_width=True)
+    btn_col1, btn_col2 = st.columns([1.2, 1])
+    with btn_col1:
+        st.page_link("pages/cases.py", label="✍️ Register New Case", icon="➕", use_container_width=True)
+    with btn_col2:
+        if st.button("🗑️ Clear Demo Cases", key="purge_demo_cases_btn", use_container_width=True, help="Clear pre-seeded sample cases"):
+            try:
+                from backend.database.clear_seed_data import clear_seed_data
+                clear_seed_data()
+                st.session_state["cm_ui"]["banner"] = {"type": "success", "msg": "🧹 All sample/demo cases cleared successfully! Your database is now clean for your own cases."}
+                st.rerun()
+            except Exception as e:
+                st.error(f"Failed to clear demo cases: {e}")
 st.markdown("---", unsafe_allow_html=True)
 
 # ── Database connection check ─────────────────────────────────────────

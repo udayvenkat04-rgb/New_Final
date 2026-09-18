@@ -34,18 +34,33 @@ st.set_page_config(page_title="Case Management", page_icon="🛡️", layout="wi
 inject_custom_css()
 require_role([ROLE_OFFICER, ROLE_ADMIN])
 
-st.markdown(
-    "<h2 style='color: #10b981;'>🛡️ Case Management Centre</h2>",
-    unsafe_allow_html=True,
-)
-role_label = "Administrator" if is_admin() else "Officer"
-st.markdown(
-    f"<p style='color: #94a3b8;'>"
-    f"Role: <b style='color:#f1f5f9;'>{role_label}</b> — "
-    f"{'Full access to all cases across officers.' if is_admin() else 'Access limited to cases you registered.'}"
-    f"</p>",
-    unsafe_allow_html=True,
-)
+cm_col1, cm_col2 = st.columns([2.5, 1.5], vertical_alignment="center")
+with cm_col1:
+    st.markdown(
+        "<h2 style='color: #10b981; margin: 0;'>🛡️ Case Management Centre</h2>",
+        unsafe_allow_html=True,
+    )
+    role_label = "Administrator" if is_admin() else "Officer"
+    st.markdown(
+        f"<p style='color: #94a3b8; margin: 0;'>"
+        f"Role: <b style='color:#f1f5f9;'>{role_label}</b> — "
+        f"{'Full access to all cases across officers.' if is_admin() else 'Access limited to cases you registered.'}"
+        f"</p>",
+        unsafe_allow_html=True,
+    )
+with cm_col2:
+    btn_col1, btn_col2 = st.columns([1.2, 1])
+    with btn_col1:
+        st.page_link("pages/cases.py", label="✍️ Register New Case", icon="➕", use_container_width=True)
+    with btn_col2:
+        if st.button("🗑️ Clear Demo Cases", key="purge_demo_cases_btn", use_container_width=True, help="Clear pre-seeded sample cases"):
+            try:
+                from backend.database.clear_seed_data import clear_seed_data
+                clear_seed_data()
+                st.session_state["cm_ui"]["banner"] = {"type": "success", "msg": "🧹 All sample/demo cases cleared successfully! Your database is now clean for your own cases."}
+                st.rerun()
+            except Exception as e:
+                st.error(f"Failed to clear demo cases: {e}")
 st.markdown("---", unsafe_allow_html=True)
 
 # ── Database connection check ─────────────────────────────────────────

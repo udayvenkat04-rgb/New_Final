@@ -102,19 +102,19 @@ def calculate_similarity(emb1: Sequence[float], emb2: Sequence[float]) -> float:
 def distance_to_similarity_score(distance: float) -> float:
     """Convert Euclidean distance to a 0–100% similarity score calibrated for 1404-D landmark norm.
     
-    Calibrated curve:
+    Calibrated scale:
         d = 0.0  -> 100.0%
-        d = 1.8  -> 95.7%  (Same person / high confidence match)
-        d = 5.0  -> 80.8%  (Potential match threshold)
-        d = 12.0 -> 28.4%  (Cutoff threshold)
-        d >= 15.0 -> 0.0%   (Completely non-matching / opposite gender)
+        d = 0.35 -> 82.5%  (High confidence match)
+        d = 0.50 -> 62.5%  (Moderate match)
+        d = 0.65 -> 40.0%  (Cutoff threshold)
+        d >= 1.0 -> 0.0%   (Non-matching / different person)
     """
     if distance is None or np.isnan(distance) or np.isinf(distance) or float(distance) < 0:
         return 0.0
     dist_val = float(distance)
-    if dist_val >= 15.0:
+    if dist_val >= 1.0:
         return 0.0
-    score = max(0.0, 100.0 * (1.0 - (dist_val / 15.0) ** 1.5))
+    score = max(0.0, 100.0 * (1.0 - (dist_val / 1.0) ** 1.2))
     return round(float(score), 1)
 
 
@@ -283,7 +283,7 @@ class KNNFaceMatchingEngine:
             dist_float = round(float(dist_val), 6)
             sim_score = distance_to_similarity_score(dist_float)
 
-            is_potential = bool(dist_float <= thresh or sim_score >= 50.0)
+            is_potential = bool(dist_float <= min(thresh, 0.65) and sim_score >= 40.0)
             if is_potential:
                 has_potential_match = True
 

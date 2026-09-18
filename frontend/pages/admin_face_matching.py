@@ -190,7 +190,7 @@ def render_admin_face_matching_page():
         st.markdown("### ⚙️ KNN Matching Options")
         st.info("Configure matching parameters for this search session.")
         top_k_input = st.number_input("Top Candidates (K)", min_value=1, max_value=20, value=int(KNN_N_NEIGHBORS), step=1)
-        threshold_input = st.slider("Match Distance Threshold", min_value=0.10, max_value=30.00, value=float(FACE_MATCH_THRESHOLD), step=0.10, help="Candidates with Euclidean distance <= threshold are flagged as Potential Matches.")
+        threshold_input = st.slider("Match Distance Threshold", min_value=0.10, max_value=2.00, value=0.65, step=0.05, help="Candidates with Euclidean distance <= threshold are flagged as Potential Matches.")
         gender_filter = st.selectbox("Target Gender Filter", options=["All", "Female", "Male"], index=0, help="Filter potential matches by target gender to prevent cross-gender false matches.")
 
     # ── 4. Step 1 & 2: Image Upload & Preview ────────────────────────────
@@ -464,8 +464,9 @@ def render_admin_face_matching_page():
         valid_matches = []
         target_g = gender_filter.strip().lower()
         for c in candidates:
+            dist = c.get("distance", 999.0)
             sim = c.get("similarity_score", 0.0)
-            is_pot = bool(c.get("is_potential_match") or sim >= 50.0)
+            is_pot = bool(c.get("is_potential_match") and dist <= threshold_input and sim >= 40.0)
             if not is_pot:
                 continue
 
