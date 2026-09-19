@@ -23,8 +23,7 @@ class UserRepository:
         data = self.collection.find_one({
             "$or": [
                 {"username": {"$regex": f"^{re.escape(clean_user)}$", "$options": "i"}},
-                {"name": {"$regex": f"^{re.escape(clean_user)}$", "$options": "i"}},
-                {"role": {"$regex": f"^{re.escape(clean_user)}$", "$options": "i"}}
+                {"name": {"$regex": f"^{re.escape(clean_user)}$", "$options": "i"}}
             ]
         })
         return User.from_dict(data) if data else None

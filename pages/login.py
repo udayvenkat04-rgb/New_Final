@@ -9,19 +9,7 @@ from backend.utils.helpers import inject_custom_css
 st.set_page_config(page_title="Login - MPIS Portal", page_icon="🔐", layout="wide", initial_sidebar_state="expanded")
 inject_custom_css()
 
-# Auto-redirect authenticated users directly to their dashboard if already logged in
-try:
-    from backend.auth.authentication import restore_session_if_needed
-    restore_session_if_needed()
-    if st.session_state.get("authenticated"):
-        user = st.session_state.get("user", {}) or {}
-        role = str(user.get("role") or "").lower().strip()
-        if role == "admin":
-            st.switch_page("pages/admin_dashboard.py")
-        elif role == "officer":
-            st.switch_page("pages/officer_dashboard.py")
-except Exception:
-    pass
+
 
 # Path to the user-provided PNG illustration graphics
 RIGHT_GRAPHIC_PATH = os.path.join("data", "login_right_graphic.png")

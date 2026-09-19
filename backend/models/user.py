@@ -14,6 +14,7 @@ class User:
 
     def __init__(self, name: str = "", email: str = "", password_hash: str = "", role: str = "",
                  is_active: bool = True, created_at: datetime = None, id: Optional[int] = None, username: str = None):
+        self._username = username or name or ""
         self.name = name or username or ""
         self.email = email
         self.password_hash = password_hash
@@ -22,22 +23,29 @@ class User:
         self.created_at = created_at or datetime.utcnow()
         self.id = id
 
-    # Property alias for backward compatibility with systems importing 'username'
     @property
     def username(self) -> str:
-        return self.name
+        return getattr(self, "_username", None) or self.name
 
     @username.setter
     def username(self, val: str):
-        self.name = val
+        self._username = val
+        if not self.name:
+            self.name = val
 
     def to_dict(self):
-        d = asdict(self)
-        if self.id is None:
-            d.pop("id")
-        d["username"] = self.name
+        d = {
+            "name": self.name,
+            "email": self.email,
+            "password_hash": self.password_hash,
+            "role": self.role,
+            "is_active": self.is_active,
+            "created_at": self.created_at,
+            "username": self.username
+        }
+        if self.id is not None:
+            d["id"] = self.id
         return d
-
 
     @classmethod
     def from_dict(cls, data: dict):
@@ -46,6 +54,7 @@ class User:
         return cls(
             id=data.get("id"),
             name=data.get("name") or data.get("username"),
+            username=data.get("username") or data.get("name"),
             email=data.get("email"),
             password_hash=data.get("password_hash"),
             role=data.get("role"),
