@@ -271,10 +271,11 @@ def render_admin_face_matching_page():
         with st.spinner("Detecting faces using MediaPipe Landmarker..."):
             try:
                 rgb_arr = np.asarray(pil_image, dtype=np.uint8)
-                det_result = detect_faces(rgb_arr)
+                det_result = detect_faces(rgb_arr, refine_crops=True)
                 st.session_state.detection_result = det_result
                 st.session_state.detection_file_hash = file_hash
                 st.session_state.selected_face_index = 0
+                st.session_state.last_selected_face_idx = 0
                 st.session_state.match_result = None
             except Exception as exc:
                 det_result = None
@@ -313,12 +314,16 @@ def render_admin_face_matching_page():
                 st.image(crop_img, caption=f"Face {idx + 1}", use_container_width=True)
 
         face_options = [f"Face {i + 1}" for i in range(det_result.num_faces)]
-        selected_face_str = st.radio("Choose Target Face:", face_options, index=st.session_state.selected_face_index)
+        selected_face_str = st.radio("Choose Target Face:", face_options, index=st.session_state.get("selected_face_index", 0))
         selected_face_idx = face_options.index(selected_face_str)
+        if st.session_state.get("last_selected_face_idx") != selected_face_idx:
+            st.session_state.last_selected_face_idx = selected_face_idx
+            st.session_state.match_result = None
         st.session_state.selected_face_index = selected_face_idx
     else:
         selected_face_idx = 0
         st.session_state.selected_face_index = 0
+        st.session_state.last_selected_face_idx = 0
 
     selected_face: DetectedFace = det_result.faces[selected_face_idx]
     selected_crop = _extract_face_crop(rgb_processed, selected_face)
@@ -390,40 +395,36 @@ def render_admin_face_matching_page():
             try:
                 _ensure_all_cases_indexed()
                 knn_engine = KNNFaceMatchingEngine()
-                all_batch_cands = []
+                batch_per_face = []
                 for f_idx in range(det_result.num_faces):
                     try:
                         q_vec = generate_face_vector_by_index(det_result, face_index=f_idx, expected_landmarks=468)
                         v_vec = validate_query_vector(q_vec, expected_dim=1404)
                         m_res = knn_engine.match_vector(v_vec, top_k=top_k_input, threshold=threshold_input)
-                        for c in m_res.get("candidates", []):
-                            c_copy = dict(c)
-                            c_copy["face_source_idx"] = f_idx + 1
-                            all_batch_cands.append(c_copy)
+                        cands = m_res.get("candidates", [])
+                        for r_idx, c in enumerate(cands, start=1):
+                            c["face_source_idx"] = f_idx + 1
+                            c["rank"] = r_idx
+                        crop_img = _extract_face_crop(rgb_processed, det_result.faces[f_idx])
+                        batch_per_face.append({
+                            "face_idx": f_idx,
+                            "face_label": f"Face #{f_idx + 1}",
+                            "crop": crop_img,
+                            "candidates": cands
+                        })
                     except Exception:
                         pass
 
-                best_by_case = {}
-                for c in all_batch_cands:
-                    cid = c.get("case_id")
-                    if cid not in best_by_case or c.get("distance", 999.0) < best_by_case[cid].get("distance", 999.0):
-                        best_by_case[cid] = c
-
-                sorted_batch = sorted(best_by_case.values(), key=lambda x: x.get("distance", 999.0))
-                for r_idx, c in enumerate(sorted_batch, start=1):
-                    c["rank"] = r_idx
-
-                has_pot = any(c.get("is_potential_match") for c in sorted_batch)
                 st.session_state.match_result = {
-                    "status": "POTENTIAL_MATCH" if has_pot else "NO_POTENTIAL_MATCH",
-                    "candidates": sorted_batch,
-                    "num_reference_vectors": len(sorted_batch),
+                    "is_batch": True,
+                    "batch_per_face": batch_per_face,
+                    "num_reference_vectors": 1,
                 }
             except Exception as exc:
                 st.error(f"❌ **Batch Matching Error**: {exc}")
                 st.stop()
 
-    elif run_matching or ("match_result" in st.session_state and st.session_state.match_result is not None):
+    elif run_matching:
         with st.spinner("Searching reference database, computing Euclidean distances, and ranking candidates..."):
             try:
                 _ensure_all_cases_indexed()
@@ -433,6 +434,8 @@ def render_admin_face_matching_page():
                     top_k=top_k_input,
                     threshold=threshold_input
                 )
+                match_res["is_batch"] = False
+                match_res["face_source_idx"] = selected_face_idx + 1
                 st.session_state.match_result = match_res
             except Exception as exc:
                 st.error(f"❌ **KNN Search Error**: {exc}")
@@ -441,14 +444,6 @@ def render_admin_face_matching_page():
     match_res = st.session_state.get("match_result")
 
     if match_res is not None:
-        status_code = match_res.get("status")
-        candidates = match_res.get("candidates", [])
-        num_ref = match_res.get("num_reference_vectors", 0)
-
-        if status_code == "NO_REFERENCE_VECTORS" or num_ref == 0:
-            st.warning("⚠️ **No Reference Vectors Stored**: The database currently contains 0 registered missing person face profiles. Please register missing person cases with photos first.")
-            st.stop()
-
         case_service = CaseService()
         current_user = st.session_state.get("user")
 
@@ -466,24 +461,26 @@ def render_admin_face_matching_page():
                 except Exception:
                     return None
 
-        # Filter valid matches enforcing score threshold AND gender match
-        valid_matches = []
-        target_g = gender_filter.strip().lower()
-        for c in candidates:
-            dist = c.get("distance", 999.0)
-            sim = c.get("similarity_score", 0.0)
-            is_pot = bool(c.get("is_potential_match") or dist <= threshold_input or sim >= 40.0)
-            if not is_pot:
-                continue
+        def _filter_candidates(cands):
+            valid_matches = []
+            target_g = gender_filter.strip().lower()
+            for c in cands:
+                dist = c.get("distance", 999.0)
+                sim = c.get("similarity_score", 0.0)
+                is_pot = bool(c.get("is_potential_match") or dist <= threshold_input or sim >= 40.0)
+                if not is_pot:
+                    continue
 
-            case_obj = _get_case_obj(c.get("case_id"))
-            cand_gender = str(getattr(case_obj, "gender", "") or "").strip().lower()
+                case_obj = _get_case_obj(c.get("case_id"))
+                cand_gender = str(getattr(case_obj, "gender", "") or "").strip().lower()
 
-            if target_g in ["female", "male"] and cand_gender and cand_gender != target_g:
-                continue
+                if target_g in ["female", "male"] and cand_gender and cand_gender != target_g:
+                    continue
 
-            c["_case_obj"] = case_obj
-            valid_matches.append(c)
+                c_copy = dict(c)
+                c_copy["_case_obj"] = case_obj
+                valid_matches.append(c_copy)
+            return valid_matches
 
         def _render_candidate_card(cand):
             rank = cand.get("rank")
@@ -539,13 +536,40 @@ def render_admin_face_matching_page():
                         st.markdown(f"**Calculated Distance:** {distance:.4f}")
                         st.markdown(f"**Calculated Similarity:** {similarity:.1f}%")
 
-        if valid_matches:
-            st.success(f"🎉 **POTENTIAL MATCH IDENTIFIED**: Found **{len(valid_matches)}** matching case(s) in the database!")
-            st.markdown("#### 📊 Matched Person Profiles")
-            for cand in valid_matches:
-                _render_candidate_card(cand)
+        if match_res.get("is_batch"):
+            batch_list = match_res.get("batch_per_face", [])
+            st.success(f"👥 **BATCH MATCH RESULTS**: Processed **{len(batch_list)}** face(s) from group photo.")
+            for face_item in batch_list:
+                f_label = face_item.get("face_label")
+                f_crop = face_item.get("crop")
+                f_cands = face_item.get("candidates", [])
+                v_matches = _filter_candidates(f_cands)
+
+                st.markdown(f"#### 👤 {f_label} Match Results")
+                f_col1, f_col2 = st.columns([1, 3])
+                with f_col1:
+                    if f_crop is not None:
+                        st.image(f_crop, caption=f_label, width=130)
+                with f_col2:
+                    if v_matches:
+                        st.success(f"Found **{len(v_matches)}** matching case(s) for {f_label}!")
+                    else:
+                        st.info(f"No potential matches found above threshold for {f_label}.")
+
+                if v_matches:
+                    for cand in v_matches:
+                        _render_candidate_card(cand)
+                st.markdown("---")
         else:
-            st.warning("⚠️ **NO MATCHING CASES FOUND**: None of the registered missing person cases in the database met the facial similarity and target gender criteria.")
+            candidates = match_res.get("candidates", [])
+            valid_matches = _filter_candidates(candidates)
+            if valid_matches:
+                st.success(f"🎉 **POTENTIAL MATCH IDENTIFIED**: Found **{len(valid_matches)}** matching case(s) in the database!")
+                st.markdown("#### 📊 Matched Person Profiles")
+                for cand in valid_matches:
+                    _render_candidate_card(cand)
+            else:
+                st.warning("⚠️ **NO MATCHING CASES FOUND**: None of the registered missing person cases in the database met the facial similarity and target gender criteria.")
 
     # ── 9. Footer ───────────────────────────────────────────────────────
     st.markdown("---", unsafe_allow_html=True)
@@ -560,3 +584,4 @@ def render_admin_face_matching_page():
 
 if __name__ == "__main__":
     render_admin_face_matching_page()
+
